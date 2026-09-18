@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iEMS Breakpoint Check vs Local Automation Map · So sánh thực tế · 比較</title>
+<style>
+  :root{
+    --bg:#f7f6f3;
+    --card:#ffffff;
+    --ink:#1b1b1f;
+    --muted:#6b6b70;
+    --border:#e4e2dc;
+    --blue:#2f5fd8;
+    --blue-bg:#eaf0ff;
+    --amber:#b8790a;
+    --amber-bg:#fdf1dd;
+    --red:#b3261e;
+    --red-bg:#fdecea;
+    --green:#1e8e5a;
+    --green-bg:#e8f6ee;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
+  }
+  .container{max-width:1000px;margin:0 auto;padding:40px 20px 80px;position:relative;}
+  .langswitch{
+    position:fixed;top:18px;right:18px;background:#fff;border:1px solid var(--border);
+    border-radius:999px;padding:4px;display:flex;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,0.08);z-index:50;
+  }
+  .langswitch button{
+    border:none;background:transparent;padding:7px 13px;border-radius:999px;
+    font-size:0.8rem;cursor:pointer;color:var(--muted);font-weight:600;
+  }
+  .langswitch button.active{background:var(--ink);color:#fff;}
+  .langswitch button:hover:not(.active){color:var(--ink);}
+  @media (max-width:640px){
+    .langswitch{position:static;display:inline-flex;margin-bottom:18px;box-shadow:none;}
+  }
+  .eyebrow{
+    display:inline-block;font-size:0.7rem;letter-spacing:0.04em;font-weight:700;
+    text-transform:uppercase;color:var(--blue);background:var(--blue-bg);
+    padding:5px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  h1{font-size:1.8rem;margin:0 0 8px;line-height:1.28;}
+  .subtitle{color:var(--muted);max-width:800px;font-size:0.98rem;}
+  nav.companion{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  nav.companion a{
+    text-decoration:none;font-size:0.83rem;padding:7px 14px;
+    border:1px solid var(--border);border-radius:999px;color:var(--ink);background:var(--card);
+  }
+  nav.companion a:hover{border-color:var(--blue);color:var(--blue);}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0;}
+  .badge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 16px;font-size:0.82rem;min-width:170px;flex:1 1 170px;}
+  .badge b{display:block;font-size:0.95rem;margin-bottom:2px;}
+  .legend{
+    display:flex;gap:20px;flex-wrap:wrap;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 18px;font-size:0.85rem;margin-bottom:28px;
+  }
+  .legend span.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:26px;}
+  .card h2{font-size:1.15rem;margin:0 0 14px;}
+  .card p.lead{color:var(--muted);margin:0 0 18px;font-size:0.92rem;}
+  .fulltext-box .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  button.copy-btn{
+    background:var(--ink);color:#fff;border:none;padding:10px 16px;
+    border-radius:10px;cursor:pointer;font-size:0.83rem;white-space:nowrap;
+  }
+  button.copy-btn:hover{opacity:0.85;}
+  button.copy-btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--border);}
+  pre.fulltext{
+    display:none;margin-top:16px;background:#0f0f10;color:#eaeaea;
+    padding:18px;border-radius:10px;overflow-x:auto;font-size:0.78rem;
+    white-space:pre-wrap;line-height:1.5;
+  }
+  pre.fulltext.open{display:block;}
+  table.compare{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  table.compare th,table.compare td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.compare thead th{background:var(--blue-bg);color:var(--blue);font-weight:700;font-size:0.8rem;}
+  table.compare tbody tr:nth-child(even) td{background:#fbfaf8;}
+  table.compare td:first-child{font-weight:600;}
+  table.compare code{background:#eee;padding:1px 5px;border-radius:4px;font-size:0.78rem;}
+  .callout{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:16px;font-size:0.9rem;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-bg);}
+  .callout.good{border-left-color:var(--green);background:var(--green-bg);}
+  .callout h4{margin:0 0 6px;font-size:0.95rem;}
+  .reclist{margin:0;padding-left:20px;font-size:0.92rem;}
+  .reclist li{margin-bottom:10px;}
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);}
+  footer a{color:var(--muted);}
+  svg text{font-family:inherit;}
+  .diagram-wrap{overflow-x:auto;}
+  .note-sensitive{font-size:0.78rem;color:var(--muted);margin-top:10px;font-style:italic;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="langswitch" role="group" aria-label="Language switch">
+    <button class="langbtn" data-lang="zh" onclick="setLang('zh')">中文</button>
+    <button class="langbtn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="langbtn active" data-lang="vi" onclick="setLang('vi')">VI</button>
+  </div>
+
+  <span class="eyebrow" data-i18n="eyebrow">SO SÁNH THỰC TẾ · SCHEDULED TASK "IEMS BREAKPOINT CHECK" VS LOCAL AUTOMATION MAP</span>
+  <h1 data-i18n="h1">iEMS Breakpoint Check: đối chiếu 1 Scheduled Task thật với quy trình Local Automation Map</h1>
+  <p class="subtitle" data-i18n="subtitle">Đây không phải ví dụ giả định — đây là cấu hình thật của 1 Scheduled Task đang chạy hằng ngày tại HugeBamboo, lấy trực tiếp từ hệ thống (cron, permission_mode, folder, lần chạy gần nhất), đối chiếu với quy trình 6 bước của Local Automation Map.</p>
+
+  <nav class="companion">
+    <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">↗ Local Automation Map</a>
+    <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">↗ Cloud Automation Map</a>
+  </nav>
+
+  <div class="badges">
+    <div class="badge"><b data-i18n="b1_t">Cron 08:30 hằng ngày</b><span data-i18n="b1_b">CRON_TZ=Asia/Bangkok 30 8 * * * — persist_session: false, mỗi lần chạy là phiên hoàn toàn mới</span></div>
+    <div class="badge"><b data-i18n="b2_t">permission_mode: auto</b><span data-i18n="b2_b">Không dùng cơ chế duyệt của nền tảng — task tự dựng cổng duyệt riêng bằng mã số</span></div>
+    <div class="badge"><b data-i18n="b3_t">Đã khai đúng local device</b><span data-i18n="b3_b">folders: E:\DataAnalysis\Breakpoint-EMS — không mắc lỗi quên khai máy/folder</span></div>
+    <div class="badge"><b data-i18n="b4_t">Chỉ 1 kênh thông báo</b><span data-i18n="b4_b">notifications: push = true, email = false</span></div>
+    <div class="badge"><b data-i18n="b5_t">Lần chạy gần nhất: 4 giây</b><span data-i18n="b5_b">18/09 08:32:29 → 08:32:33 giờ Bangkok — bất thường so với 1 lượt audit đầy đủ</span></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--amber)"></span><span data-i18n="l1">Scheduled Task (cơ chế trigger)</span></span>
+    <span><span class="dot" style="background:var(--blue)"></span><span data-i18n="l2">Bước thuộc quy trình Local Automation Map</span></span>
+    <span><span class="dot" style="background:var(--green)"></span><span data-i18n="l3">Thiết kế tốt hơn kỳ vọng của LAM</span></span>
+    <span><span class="dot" style="background:var(--red)"></span><span data-i18n="l4">Rủi ro / điểm cần kiểm tra</span></span>
+  </div>
+
+  <div class="card fulltext-box">
+    <div class="row">
+      <div>
+        <h2 data-i18n="fulltextHeading">Toàn văn so sánh (dạng text)</h2>
+        <p class="lead" style="margin-bottom:0;" data-i18n="fulltextLead">Bản rút gọn dạng text thuần, tiện copy vào ghi chú hoặc CLAUDE.md/AGENTS.md.</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="copy-btn secondary" id="toggleBtn" onclick="toggleFullText()" data-i18n="btnViewFulltext">Xem & copy toàn văn</button>
+        <button class="copy-btn" id="copyBtn" onclick="copyFullText()" data-i18n="btnCopy">Copy</button>
+      </div>
+    </div>
+    <pre class="fulltext" id="fulltext" data-i18n="fulltextContent">IEMS BREAKPOINT CHECK vs LOCAL AUTOMATION MAP (case thuc te tai HugeBamboo)
+
+Cau hinh that: cron 30 8 * * * gio Asia/Bangkok, persist_session: false, permission_mode:
+auto, requires_local_device voi folder E:\DataAnalysis\Breakpoint-EMS, notifications
+push=true/email=false. Lan chay gan nhat (18/09) SUCCEEDED nhung chi ~4 giay.
+
+9 diem doi chieu voi Local Automation Map:
+1. Stage 1-2 (SPEC.md duyet 1 lan): khong co SPEC.md rieng, tri thuc tich luy truc tiep
+   vao prompt qua ~10 ngay va loi that.
+2. Stage 3 (API -> local script): iEMS khong co API, 100% qua Chrome action; ngay ca
+   phan tinh cong thuc EC cung de Claude tu doc anh va tu tinh, khong tach script rieng.
+3. Dry-run truoc real-run: Buoc 1 (cron tu dong) luon audit-only; Buoc 2 (ghi that) chi
+   chay khi co ma duyet trong tin nhan, cron khong bao gio tu gui ma.
+4. Approval khi fire: permission_mode auto, tu dung cong duyet rieng bang ma
+   BP-CR-/BP-SR- thay vi dung co che duyet cua nen tang.
+5. Dedup: kiem Heading 1 theo Stat.date trong file .docx truoc khi ghi log.
+6. Retry khi loi: dung ngay va bao cao, khong tu retry (hop ly vi dang ghi de so lieu
+   that tren he thong san xuat).
+7. requires_local_device + folder: da khai dung.
+8. Notification: chi 1 kenh (push), khong co email.
+9. Lan chay gan nhat: SUCCEEDED nhung chi ~4 giay - bat thuong so voi 1 luot audit day
+   du (thuong mat vai phut).
+
+3 diem thiet ke tot hon LAM:
+1. Dry-run vinh vien o nhanh tu dong - ghi that khong bao gio xay ra tu dong.
+2. Cong duyet rieng bu cho permission_mode auto, kiem qua 6 dieu kien cong khoa (B2).
+3. Khai dung requires_local_device + dedup that qua log .docx.
+
+3 rui ro can kiem tra:
+1. Lan chay 4 giay bat thuong - can mo session cse_01W2S2YSPAmbsMCb4k6ErkdT de xac minh.
+2. Chi 1 kenh thong bao (push) - khong co du phong neu khong xem dien thoai buoi sang.
+3. Kiem cong thuc EC hoan toan dua vao suy luan LLM, khong co script doi chieu doc lap.
+
+Khuyen nghi tiep theo:
+- Mo lai session cse_01W2S2YSPAmbsMCb4k6ErkdT de xac minh phien 4 giay da dung o dau.
+- Can nhac bat them email notification song song voi push.
+- Can nhac tach phan tinh EC (wrap - Initial + Final) thanh 1 script nho doc lap.</pre>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagram1Heading">Sơ đồ quan hệ</h2>
+    <p class="lead" data-i18n="diagram1Lead">Scheduled Task này nằm lồng bên trong Stage 5 của Local Automation Map — nhưng phần logic an toàn (mã duyệt) được task tự xây thêm, nằm ngoài phạm vi mà LAM mặc định cung cấp.</p>
+    <div class="diagram-wrap">
+    <svg viewBox="0 0 900 340" width="100%" role="img" aria-label="Relationship diagram">
+      <defs>
+        <marker id="arrow1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#b3261e"/>
+        </marker>
+      </defs>
+      <rect x="20" y="20" width="860" height="212" rx="18" fill="#eaf0ff" stroke="#2f5fd8" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text x="40" y="46" font-size="14" font-weight="700" fill="#2f5fd8" data-i18n="containerLabel">Local Automation Map — quy trình 6 bước</text>
+
+      <rect x="40" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="99" y="86" font-size="11" font-weight="700" text-anchor="middle">STAGE 1</text>
+      <text x="99" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s1_sub1">Interview</text>
+
+      <rect x="174" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="233" y="86" font-size="11" font-weight="700" text-anchor="middle">STAGE 2</text>
+      <text x="233" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s2_sub1">Confirm plan</text>
+      <text x="233" y="118" font-size="10" text-anchor="middle" fill="#6b6b70">SPEC.md</text>
+
+      <rect x="308" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="367" y="86" font-size="11" font-weight="700" text-anchor="middle">STAGE 3</text>
+      <text x="367" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s3_sub1">Build &amp; test</text>
+      <text x="367" y="118" font-size="10" text-anchor="middle" fill="#6b6b70">dry-run</text>
+
+      <rect x="442" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="501" y="86" font-size="11" font-weight="700" text-anchor="middle">STAGE 4</text>
+      <text x="501" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub1">Confirm</text>
+      <text x="501" y="118" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub2">schedule</text>
+
+      <rect x="576" y="62" width="118" height="80" rx="10" fill="#fdf1dd" stroke="#b8790a" stroke-width="1.5"/>
+      <text x="635" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#b8790a">STAGE 5</text>
+      <text x="635" y="104" font-size="10" text-anchor="middle" fill="#8a5c07" data-i18n="s5_sub1">Set up</text>
+      <text x="635" y="118" font-size="10" text-anchor="middle" fill="#8a5c07" data-i18n="s5_sub2">schedule</text>
+
+      <rect x="710" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="769" y="86" font-size="11" font-weight="700" text-anchor="middle">STAGE 6</text>
+      <text x="769" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub1">Verify &amp;</text>
+      <text x="769" y="118" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub2">handoff</text>
+
+      <line x1="635" y1="142" x2="635" y2="160" stroke="#b8790a" stroke-width="1.5"/>
+      <rect x="510" y="160" width="250" height="52" rx="10" fill="#ffffff" stroke="#b8790a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="635" y="180" font-size="11" font-weight="700" text-anchor="middle" fill="#b8790a">Scheduled Task</text>
+      <text x="635" y="196" font-size="9.5" text-anchor="middle" fill="#8a5c07">cron 30 8 * * * · permission_mode: auto</text>
+
+      <line x1="635" y1="212" x2="635" y2="228" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#arrow1)"/>
+      <rect x="460" y="228" width="350" height="78" rx="10" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="635" y="250" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1e8e5a" data-i18n="extraLine1">Task tự thêm: cổng mã duyệt BP-CR-/BP-SR-</text>
+      <text x="635" y="267" font-size="9.5" text-anchor="middle" fill="#175f3f" data-i18n="extraLine2">nằm NGOÀI phạm vi Stage 5 mặc định của LAM</text>
+      <text x="635" y="284" font-size="9.5" text-anchor="middle" fill="#175f3f" data-i18n="extraLine3">→ bù cho việc đặt permission_mode: auto</text>
+
+      <text x="40" y="300" font-size="10.5" fill="#6b6b70" data-i18n="leftNote">Toàn bộ khối bên trái (Stage 1–4, 6) tồn tại rời rạc trong ~10 ngày vá lỗi thật, không phải 1 lượt duyệt duy nhất như LAM mô tả.</text>
+    </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagram2Heading">Cơ chế an toàn 2 đường của task này</h2>
+    <p class="lead" data-i18n="diagram2Lead">Đây là điểm task này làm tốt hơn khuôn mẫu Local Automation Map: đường tự động (cron) không bao giờ được phép ghi dữ liệu thật; ghi dữ liệu thật chỉ xảy ra qua đường thủ công có mã duyệt.</p>
+    <div class="diagram-wrap">
+    <svg viewBox="0 0 920 300" width="100%" role="img" aria-label="Two-path safety diagram">
+      <defs>
+        <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#1b1b1f"/>
+        </marker>
+        <marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#b3261e"/>
+        </marker>
+      </defs>
+
+      <!-- Lane A: automatic -->
+      <rect x="10" y="10" width="900" height="100" rx="14" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <rect x="30" y="30" width="190" height="60" rx="10" fill="#ffffff" stroke="#1e8e5a"/>
+      <text x="125" y="55" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_a1a">Cron 08:30</text>
+      <text x="125" y="70" font-size="10.5" text-anchor="middle" data-i18n="d2_a1b">tự động</text>
+
+      <line x1="220" y1="60" x2="248" y2="60" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#arrow2)"/>
+      <rect x="250" y="30" width="220" height="60" rx="10" fill="#ffffff" stroke="#1e8e5a"/>
+      <text x="360" y="52" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_a2a">BƯỚC 1</text>
+      <text x="360" y="68" font-size="9.5" text-anchor="middle" data-i18n="d2_a2b">audit-only (đọc, cấm bấm nút)</text>
+
+      <line x1="470" y1="60" x2="498" y2="60" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#arrow2)"/>
+      <rect x="500" y="30" width="290" height="60" rx="10" fill="#ffffff" stroke="#1e8e5a"/>
+      <text x="645" y="52" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_a3a">Báo cáo +</text>
+      <text x="645" y="68" font-size="9.5" text-anchor="middle" data-i18n="d2_a3b">đề xuất mã duyệt BP-CR-/BP-SR-</text>
+
+      <!-- connector down -->
+      <line x1="645" y1="90" x2="645" y2="150" stroke="#6b6b70" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#arrow2)"/>
+      <text x="645" y="128" font-size="9" text-anchor="middle" fill="#6b6b70" data-i18n="d2_connector">Tân copy mã duyệt vào tin nhắn kích hoạt</text>
+
+      <!-- Lane B: manual -->
+      <rect x="10" y="150" width="900" height="140" rx="14" fill="#fdecea" stroke="#b3261e" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <rect x="30" y="170" width="190" height="60" rx="10" fill="#ffffff" stroke="#b3261e"/>
+      <text x="125" y="192" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_b1a">Fire thủ công</text>
+      <text x="125" y="208" font-size="9.5" text-anchor="middle" data-i18n="d2_b1b">+ mã duyệt trong tin nhắn</text>
+
+      <line x1="220" y1="200" x2="248" y2="200" stroke="#b3261e" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <rect x="250" y="170" width="180" height="60" rx="10" fill="#ffffff" stroke="#b3261e"/>
+      <text x="340" y="192" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_b2a">Cổng khoá</text>
+      <text x="340" y="208" font-size="9.5" text-anchor="middle" data-i18n="d2_b2b">6 điều kiện (B2)</text>
+
+      <line x1="430" y1="200" x2="458" y2="200" stroke="#b3261e" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <rect x="460" y="170" width="200" height="60" rx="10" fill="#ffffff" stroke="#b3261e"/>
+      <text x="560" y="192" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_b3a">BƯỚC 2</text>
+      <text x="560" y="208" font-size="9.5" text-anchor="middle" data-i18n="d2_b3b">Clear reset / Set as reset</text>
+
+      <line x1="660" y1="200" x2="688" y2="200" stroke="#b3261e" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <rect x="690" y="170" width="200" height="60" rx="10" fill="#ffffff" stroke="#b3261e"/>
+      <text x="790" y="192" font-size="10.5" font-weight="700" text-anchor="middle" data-i18n="d2_b4a">Hậu kiểm bắt buộc</text>
+      <text x="790" y="208" font-size="9.5" text-anchor="middle" data-i18n="d2_b4b">(B5)</text>
+
+      <line x1="340" y1="230" x2="340" y2="250" stroke="#b3261e" stroke-width="1.3" stroke-dasharray="4 3"/>
+      <text x="340" y="266" font-size="9" text-anchor="middle" fill="#8a2a24" data-i18n="d2_reject1">Không khớp điều kiện</text>
+      <text x="340" y="280" font-size="9" text-anchor="middle" fill="#8a2a24" data-i18n="d2_reject2">→ bỏ qua dòng đó, ghi lý do</text>
+    </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="tableHeading">Đối chiếu 9 khía cạnh</h2>
+    <table class="compare">
+      <thead>
+        <tr><th data-i18n="col1">Khía cạnh Local Automation Map kỳ vọng</th><th data-i18n="col2">Thực tế trong iEMS Breakpoint Check</th><th data-i18n="col3">Đánh giá</th></tr>
+      </thead>
+      <tbody>
+        <tr><td data-i18n="r1_h">Stage 1–2: phỏng vấn 1 lần → SPEC.md, duyệt xong mới code</td><td data-i18n="r1_a">Không có SPEC.md riêng — tri thức tích luỹ trực tiếp vào prompt qua ~10 ngày vá lỗi thật (đổi tên đồng hồ 08/09, đổi hệ số đọc BCM-23 15/09, phát hiện Report trễ refresh 17/09, dời giờ chạy 8:10→8:30 17/09)</td><td data-i18n="r1_b">Prompt này là spec sống, không phải bản duyệt 1 lần rồi đóng băng như LAM mô tả — cho thấy quy trình 6 bước tuyến tính khá lý tưởng hoá so với thực tế vá liên tục</td></tr>
+        <tr><td data-i18n="r2_h">Stage 3: bước có API → local script cố định</td><td data-i18n="r2_a">iEMS không có API → 100% qua Chrome action, kể cả phần thuần số học (kiểm công thức EC) cũng để Claude tự đọc ảnh và tự tính mỗi lần, không tách thành script riêng</td><td data-i18n="r2_b">Đúng tinh thần "no-API → Chrome action", nhưng phần tính công thức đáng lẽ tách được thành script nhỏ, xác định 100% — hiện để LLM tự suy luận, có rủi ro sai số học trên số liệu năng lượng thật</td></tr>
+        <tr><td data-i18n="r3_h">Dry-run trước real-run</td><td data-i18n="r3_a">Bước 1 (mọi lần cron tự chạy) luôn audit-only, cấm tuyệt đối bấm nút; Bước 2 (ghi đè thật) chỉ chạy khi có tin nhắn kèm mã duyệt hợp lệ, và cron không bao giờ tự gửi mã đó</td><td data-i18n="r3_b">Làm chặt hơn cả LAM lý thuyết — LAM chỉ bắt dry-run 1 lần lúc test; ở đây mọi lần tự động vĩnh viễn là dry-run</td></tr>
+        <tr><td data-i18n="r4_h">Approval khi fire</td><td data-i18n="r4_a">permission_mode: auto — không dùng cơ chế duyệt của nền tảng, tự dựng cổng duyệt riêng bằng mã BP-CR-/BP-SR-</td><td data-i18n="r4_b">Hợp lý vì cần chạy được lúc 8:30 sáng không ai trực, nhưng an toàn giờ phụ thuộc 100% vào việc LLM đọc đúng mã trong tin nhắn — không có lớp chặn độc lập nào khác ở tầng nền tảng</td></tr>
+        <tr><td data-i18n="r5_h">Dedup</td><td data-i18n="r5_a">Kiểm Heading 1 theo Stat.date trong file .docx trước khi ghi log, tránh ghi trùng ngày</td><td data-i18n="r5_b">Khớp đúng tinh thần LAM, chỉ khác định dạng lưu (docx thay vì JSON/CSV)</td></tr>
+        <tr><td data-i18n="r6_h">Retry khi lỗi</td><td data-i18n="r6_a">Prompt yêu cầu dừng ngay và báo cáo khi lỗi (đăng nhập, hậu kiểm sai...), không tự retry</td><td data-i18n="r6_b">Lệch có chủ đích và hợp lý — task ghi đè số liệu thật trên hệ thống sản xuất, tự retry 1 cú click mơ hồ nguy hiểm hơn dừng lại chờ người xem</td></tr>
+        <tr><td data-i18n="r7_h">requires_local_device + folder</td><td data-i18n="r7_a">Đã khai đúng: folders = E:\DataAnalysis\Breakpoint-EMS</td><td data-i18n="r7_b">Task này không mắc lỗi phổ biến "quên khai máy/folder" đã cảnh báo ở lần so sánh Scheduled Task chung chung</td></tr>
+        <tr><td data-i18n="r8_h">Notification</td><td data-i18n="r8_a">notifications: push = true, email = false</td><td data-i18n="r8_b">Chỉ 1 kênh — nếu không xem điện thoại buổi sáng thì không có lớp dự phòng nào khác</td></tr>
+        <tr><td data-i18n="r9_h">Kết quả lần chạy gần nhất</td><td data-i18n="r9_a">last_run: SUCCEEDED, 18/09 08:32:29 → 08:32:33 giờ Bangkok — chỉ ~4 giây</td><td data-i18n="r9_b">1 lượt audit đầy đủ thường mất vài phút chứ không phải 4 giây — "SUCCEEDED" ở tầng nền tảng nhiều khả năng chỉ có nghĩa "phiên kết thúc không crash", chưa chắc đã thẩm định xong dữ liệu. Cần tự mở session cse_01W2S2YSPAmbsMCb4k6ErkdT để xác minh</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="goodHeading">3 điểm thiết kế tốt hơn khuôn mẫu LAM</h2>
+    <div class="callout good">
+      <h4 data-i18n="g1Title">1. Dry-run vĩnh viễn ở nhánh tự động</h4>
+      <span data-i18n="g1Body">Không giống LAM chỉ yêu cầu dry-run 1 lần lúc test, task này khiến MỌI lần cron tự động đều mặc định audit-only — ghi dữ liệu thật (Clear reset/Set as reset) không bao giờ xảy ra tự động, chỉ qua thao tác thủ công có mã duyệt.</span>
+    </div>
+    <div class="callout good">
+      <h4 data-i18n="g2Title">2. Cổng duyệt riêng bù cho permission_mode: auto</h4>
+      <span data-i18n="g2Body">Vì cần chạy lúc 8:30 sáng không ai trực nên phải đặt permission_mode: auto. Task bù lại bằng hệ thống mã duyệt BP-CR-/BP-SR- do chính prompt kiểm tra qua 6 điều kiện cổng khoá (B2) trước khi cho phép sửa bất kỳ dòng nào.</span>
+    </div>
+    <div class="callout good">
+      <h4 data-i18n="g3Title">3. Khai đúng requires_local_device + dedup qua log</h4>
+      <span data-i18n="g3Body">folders khai đúng E:\DataAnalysis\Breakpoint-EMS (không mắc lỗi phổ biến), và có cơ chế dedup thật: kiểm Heading 1 theo Stat.date trong Breakpoints-Log.docx trước khi ghi, tránh log trùng ngày.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="riskHeading">3 rủi ro cần kiểm tra</h2>
+    <div class="callout risk">
+      <h4 data-i18n="rk1Title">1. Lần chạy gần nhất chỉ 4 giây — bất thường</h4>
+      <span data-i18n="rk1Body">18/09, phiên bắt đầu 08:32:29 và kết thúc 08:32:33 giờ Bangkok, được đánh dấu SUCCEEDED. Một lượt audit đầy đủ (mở iEMS, lọc, đọc, chụp ảnh, ghi log Word) bình thường mất vài phút. Khả năng cao phiên dừng sớm ở BƯỚC 0 (không tìm thấy thiết bị/trình duyệt) — nhưng đây là suy luận từ thời lượng, chưa đủ bằng chứng chắc chắn. Cần mở lại session cse_01W2S2YSPAmbsMCb4k6ErkdT để xác minh nội dung thật.</span>
+    </div>
+    <div class="callout risk">
+      <h4 data-i18n="rk2Title">2. Chỉ bật 1 kênh thông báo (push)</h4>
+      <span data-i18n="rk2Body">notifications.email = false. Nếu không xem điện thoại buổi sáng, một chuỗi ngày liền chạy 4 giây rồi dừng vẫn hiển thị y hệt SUCCEEDED như 1 ngày chạy đủ — không có tín hiệu khác biệt nào lộ ra ngoài trừ khi tự soi thời lượng như đã làm ở đây.</span>
+    </div>
+    <div class="callout risk">
+      <h4 data-i18n="rk3Title">3. Kiểm công thức EC hoàn toàn dựa vào suy luận của LLM, không có script đối chiếu độc lập</h4>
+      <span data-i18n="rk3Body">Phần tính EC kỳ vọng (wrap − Initial + Final) là phép tính thuần số học, hoàn toàn xác định, nhưng đang để Claude tự đọc ảnh và tự tính mỗi lần thay vì qua 1 script nhỏ cố định. Bản thân prompt cũng tự nhận nhánh CR "chưa từng chạy qua automation lần nào" — rủi ro sai số học trên số liệu năng lượng thật.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="pickHeading">Khuyến nghị tiếp theo</h2>
+    <ul class="reclist">
+      <li data-i18n="rec1">Mở lại session cse_01W2S2YSPAmbsMCb4k6ErkdT trong lịch sử chạy của scheduled task để xác minh phiên 4 giây hôm 18/09 đã dừng ở đâu, thay vì suy đoán.</li>
+      <li data-i18n="rec2">Cân nhắc bật thêm kênh email song song với push, để không phụ thuộc hoàn toàn vào việc mở điện thoại buổi sáng.</li>
+      <li data-i18n="rec3">Cân nhắc tách phần tính công thức EC (wrap − Initial + Final) thành 1 script nhỏ độc lập, nhận input là số đọc được từ màn hình, trả về số kỳ vọng — giảm phụ thuộc vào suy luận tự do của LLM cho phần thuần số học.</li>
+    </ul>
+    <p class="note-sensitive" data-i18n="sensitiveNote">Trang này chứa cấu hình và số liệu nội bộ thật của HugeBamboo (IP, đường dẫn máy, tên/số liệu đồng hồ) — được giữ nguyên theo lựa chọn của người yêu cầu khi tạo trang.</p>
+  </div>
+
+  <footer>
+    <span data-i18n="footerPrefix">Companion to:</span>
+    <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">Local Automation Map</a>
+    · <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">Cloud Automation Map</a>
+    — <span data-i18n="footerSuffix">Trang chỉ để tham khảo, không có tương tác ngoài nút copy.</span>
+  </footer>
+
+</div>
+
+<script>
+var I18N = {
+  vi: {
+    eyebrow: "SO SÁNH THỰC TẾ · SCHEDULED TASK \"IEMS BREAKPOINT CHECK\" VS LOCAL AUTOMATION MAP",
+    h1: "iEMS Breakpoint Check: đối chiếu 1 Scheduled Task thật với quy trình Local Automation Map",
+    subtitle: "Đây không phải ví dụ giả định — đây là cấu hình thật của 1 Scheduled Task đang chạy hằng ngày tại HugeBamboo, lấy trực tiếp từ hệ thống (cron, permission_mode, folder, lần chạy gần nhất), đối chiếu với quy trình 6 bước của Local Automation Map.",
+    b1_t:"Cron 08:30 hằng ngày", b1_b:"CRON_TZ=Asia/Bangkok 30 8 * * * — persist_session: false, mỗi lần chạy là phiên hoàn toàn mới",
+    b2_t:"permission_mode: auto", b2_b:"Không dùng cơ chế duyệt của nền tảng — task tự dựng cổng duyệt riêng bằng mã số",
+    b3_t:"Đã khai đúng local device", b3_b:"folders: E:\\DataAnalysis\\Breakpoint-EMS — không mắc lỗi quên khai máy/folder",
+    b4_t:"Chỉ 1 kênh thông báo", b4_b:"notifications: push = true, email = false",
+    b5_t:"Lần chạy gần nhất: 4 giây", b5_b:"18/09 08:32:29 → 08:32:33 giờ Bangkok — bất thường so với 1 lượt audit đầy đủ",
+    l1:"Scheduled Task (cơ chế trigger)", l2:"Bước thuộc quy trình Local Automation Map", l3:"Thiết kế tốt hơn kỳ vọng của LAM", l4:"Rủi ro / điểm cần kiểm tra",
+    fulltextHeading:"Toàn văn so sánh (dạng text)", fulltextLead:"Bản rút gọn dạng text thuần, tiện copy vào ghi chú hoặc CLAUDE.md/AGENTS.md.",
+    btnViewFulltext:"Xem & copy toàn văn", btnHideFulltext:"Ẩn toàn văn", btnCopy:"Copy", btnCopied:"Đã copy ✓", btnCopyFail:"Không copy được",
+    diagram1Heading:"Sơ đồ quan hệ", diagram1Lead:"Scheduled Task này nằm lồng bên trong Stage 5 của Local Automation Map — nhưng phần logic an toàn (mã duyệt) được task tự xây thêm, nằm ngoài phạm vi mà LAM mặc định cung cấp.",
+    containerLabel:"Local Automation Map — quy trình 6 bước",
+    s1_sub1:"Interview", s2_sub1:"Confirm plan", s3_sub1:"Build & test", s4_sub1:"Confirm", s4_sub2:"lịch chạy", s5_sub1:"Thiết lập", s5_sub2:"lịch chạy", s6_sub1:"Verify &", s6_sub2:"handoff",
+    extraLine1:"Task tự thêm: cổng mã duyệt BP-CR-/BP-SR-", extraLine2:"nằm NGOÀI phạm vi Stage 5 mặc định của LAM", extraLine3:"→ bù cho việc đặt permission_mode: auto",
+    leftNote:"Toàn bộ khối bên trái (Stage 1–4, 6) tồn tại rời rạc trong ~10 ngày vá lỗi thật, không phải 1 lượt duyệt duy nhất như LAM mô tả.",
+    diagram2Heading:"Cơ chế an toàn 2 đường của task này", diagram2Lead:"Đây là điểm task này làm tốt hơn khuôn mẫu Local Automation Map: đường tự động (cron) không bao giờ được phép ghi dữ liệu thật; ghi dữ liệu thật chỉ xảy ra qua đường thủ công có mã duyệt.",
+    d2_a1a:"Cron 08:30", d2_a1b:"tự động", d2_a2a:"BƯỚC 1", d2_a2b:"audit-only (đọc, cấm bấm nút)", d2_a3a:"Báo cáo +", d2_a3b:"đề xuất mã duyệt BP-CR-/BP-SR-",
+    d2_connector:"Tân copy mã duyệt vào tin nhắn kích hoạt",
+    d2_b1a:"Fire thủ công", d2_b1b:"+ mã duyệt trong tin nhắn", d2_b2a:"Cổng khoá", d2_b2b:"6 điều kiện (B2)", d2_b3a:"BƯỚC 2", d2_b3b:"Clear reset / Set as reset", d2_b4a:"Hậu kiểm bắt buộc", d2_b4b:"(B5)",
+    d2_reject1:"Không khớp điều kiện", d2_reject2:"→ bỏ qua dòng đó, ghi lý do",
+    tableHeading:"Đối chiếu 9 khía cạnh", col1:"Khía cạnh Local Automation Map kỳ vọng", col2:"Thực tế trong iEMS Breakpoint Check", col3:"Đánh giá",
+    r1_h:"Stage 1–2: phỏng vấn 1 lần → SPEC.md, duyệt xong mới code", r1_a:"Không có SPEC.md riêng — tri thức tích luỹ trực tiếp vào prompt qua ~10 ngày vá lỗi thật (đổi tên đồng hồ 08/09, đổi hệ số đọc BCM-23 15/09, phát hiện Report trễ refresh 17/09, dời giờ chạy 8:10→8:30 17/09)", r1_b:"Prompt này là spec sống, không phải bản duyệt 1 lần rồi đóng băng như LAM mô tả — cho thấy quy trình 6 bước tuyến tính khá lý tưởng hoá so với thực tế vá liên tục",
+    r2_h:"Stage 3: bước có API → local script cố định", r2_a:"iEMS không có API → 100% qua Chrome action, kể cả phần thuần số học (kiểm công thức EC) cũng để Claude tự đọc ảnh và tự tính mỗi lần, không tách thành script riêng", r2_b:"Đúng tinh thần \"no-API → Chrome action\", nhưng phần tính công thức đáng lẽ tách được thành script nhỏ, xác định 100% — hiện để LLM tự suy luận, có rủi ro sai số học trên số liệu năng lượng thật",
+    r3_h:"Dry-run trước real-run", r3_a:"Bước 1 (mọi lần cron tự chạy) luôn audit-only, cấm tuyệt đối bấm nút; Bước 2 (ghi đè thật) chỉ chạy khi có tin nhắn kèm mã duyệt hợp lệ, và cron không bao giờ tự gửi mã đó", r3_b:"Làm chặt hơn cả LAM lý thuyết — LAM chỉ bắt dry-run 1 lần lúc test; ở đây mọi lần tự động vĩnh viễn là dry-run",
+    r4_h:"Approval khi fire", r4_a:"permission_mode: auto — không dùng cơ chế duyệt của nền tảng, tự dựng cổng duyệt riêng bằng mã BP-CR-/BP-SR-", r4_b:"Hợp lý vì cần chạy được lúc 8:30 sáng không ai trực, nhưng an toàn giờ phụ thuộc 100% vào việc LLM đọc đúng mã trong tin nhắn — không có lớp chặn độc lập nào khác ở tầng nền tảng",
+    r5_h:"Dedup", r5_a:"Kiểm Heading 1 theo Stat.date trong file .docx trước khi ghi log, tránh ghi trùng ngày", r5_b:"Khớp đúng tinh thần LAM, chỉ khác định dạng lưu (docx thay vì JSON/CSV)",
+    r6_h:"Retry khi lỗi", r6_a:"Prompt yêu cầu dừng ngay và báo cáo khi lỗi (đăng nhập, hậu kiểm sai...), không tự retry", r6_b:"Lệch có chủ đích và hợp lý — task ghi đè số liệu thật trên hệ thống sản xuất, tự retry 1 cú click mơ hồ nguy hiểm hơn dừng lại chờ người xem",
+    r7_h:"requires_local_device + folder", r7_a:"Đã khai đúng: folders = E:\\DataAnalysis\\Breakpoint-EMS", r7_b:"Task này không mắc lỗi phổ biến \"quên khai máy/folder\" đã cảnh báo ở lần so sánh Scheduled Task chung chung",
+    r8_h:"Notification", r8_a:"notifications: push = true, email = false", r8_b:"Chỉ 1 kênh — nếu không xem điện thoại buổi sáng thì không có lớp dự phòng nào khác",
+    r9_h:"Kết quả lần chạy gần nhất", r9_a:"last_run: SUCCEEDED, 18/09 08:32:29 → 08:32:33 giờ Bangkok — chỉ ~4 giây", r9_b:"1 lượt audit đầy đủ thường mất vài phút chứ không phải 4 giây — \"SUCCEEDED\" ở tầng nền tảng nhiều khả năng chỉ có nghĩa \"phiên kết thúc không crash\", chưa chắc đã thẩm định xong dữ liệu. Cần tự mở session cse_01W2S2YSPAmbsMCb4k6ErkdT để xác minh",
+    goodHeading:"3 điểm thiết kế tốt hơn khuôn mẫu LAM",
+    g1Title:"1. Dry-run vĩnh viễn ở nhánh tự động", g1Body:"Không giống LAM chỉ yêu cầu dry-run 1 lần lúc test, task này khiến MỌI lần cron tự động đều mặc định audit-only — ghi dữ liệu thật (Clear reset/Set as reset) không bao giờ xảy ra tự động, chỉ qua thao tác thủ công có mã duyệt.",
+    g2Title:"2. Cổng duyệt riêng bù cho permission_mode: auto", g2Body:"Vì cần chạy lúc 8:30 sáng không ai trực nên phải đặt permission_mode: auto. Task bù lại bằng hệ thống mã duyệt BP-CR-/BP-SR- do chính prompt kiểm tra qua 6 điều kiện cổng khoá (B2) trước khi cho phép sửa bất kỳ dòng nào.",
+    g3Title:"3. Khai đúng requires_local_device + dedup qua log", g3Body:"folders khai đúng E:\\DataAnalysis\\Breakpoint-EMS (không mắc lỗi phổ biến), và có cơ chế dedup thật: kiểm Heading 1 theo Stat.date trong Breakpoints-Log.docx trước khi ghi, tránh log trùng ngày.",
+    riskHeading:"3 rủi ro cần kiểm tra",
+    rk1Title:"1. Lần chạy gần nhất chỉ 4 giây — bất thường", rk1Body:"18/09, phiên bắt đầu 08:32:29 và kết thúc 08:32:33 giờ Bangkok, được đánh dấu SUCCEEDED. Một lượt audit đầy đủ (mở iEMS, lọc, đọc, chụp ảnh, ghi log Word) bình thường mất vài phút. Khả năng cao phiên dừng sớm ở BƯỚC 0 (không tìm thấy thiết bị/trình duyệt) — nhưng đây là suy luận từ thời lượng, chưa đủ bằng chứng chắc chắn. Cần mở lại session cse_01W2S2YSPAmbsMCb4k6ErkdT để xác minh nội dung thật.",
+    rk2Title:"2. Chỉ bật 1 kênh thông báo (push)", rk2Body:"notifications.email = false. Nếu không xem điện thoại buổi sáng, một chuỗi ngày liền chạy 4 giây rồi dừng vẫn hiển thị y hệt SUCCEEDED như 1 ngày chạy đủ — không có tín hiệu khác biệt nào lộ ra ngoài trừ khi tự soi thời lượng như đã làm ở đây.",
+    rk3Title:"3. Kiểm công thức EC hoàn toàn dựa vào suy luận của LLM, không có script đối chiếu độc lập", rk3Body:"Phần tính EC kỳ vọng (wrap − Initial + Final) là phép tính thuần số học, hoàn toàn xác định, nhưng đang để Claude tự đọc ảnh và tự tính mỗi lần thay vì qua 1 script nhỏ cố định. Bản thân prompt cũng tự nhận nhánh CR \"chưa từng chạy qua automation lần nào\" — rủi ro sai số học trên số liệu năng lượng thật.",
+    pickHeading:"Khuyến nghị tiếp theo",
+    rec1:"Mở lại session cse_01W2S2YSPAmbsMCb4k6ErkdT trong lịch sử chạy của scheduled task để xác minh phiên 4 giây hôm 18/09 đã dừng ở đâu, thay vì suy đoán.",
+    rec2:"Cân nhắc bật thêm kênh email song song với push, để không phụ thuộc hoàn toàn vào việc mở điện thoại buổi sáng.",
+    rec3:"Cân nhắc tách phần tính công thức EC (wrap − Initial + Final) thành 1 script nhỏ độc lập, nhận input là số đọc được từ màn hình, trả về số kỳ vọng — giảm phụ thuộc vào suy luận tự do của LLM cho phần thuần số học.",
+    sensitiveNote:"Trang này chứa cấu hình và số liệu nội bộ thật của HugeBamboo (IP, đường dẫn máy, tên/số liệu đồng hồ) — được giữ nguyên theo lựa chọn của người yêu cầu khi tạo trang.",
+    footerPrefix:"Companion to:", footerSuffix:"Trang chỉ để tham khảo, không có tương tác ngoài nút copy.",
+    fulltextContent: null
+  },
+  en: {
+    eyebrow: "REAL-WORLD COMPARISON · SCHEDULED TASK \"IEMS BREAKPOINT CHECK\" VS LOCAL AUTOMATION MAP",
+    h1: "iEMS Breakpoint Check: a real Scheduled Task compared against the Local Automation Map process",
+    subtitle: "This isn't a hypothetical example — it's the real configuration of a Scheduled Task running daily at HugeBamboo, pulled directly from the system (cron, permission_mode, folder, most recent run), compared against Local Automation Map's six-stage process.",
+    b1_t:"Cron 08:30 daily", b1_b:"CRON_TZ=Asia/Bangkok 30 8 * * * — persist_session: false, every run is a brand-new session",
+    b2_t:"permission_mode: auto", b2_b:"Doesn't use the platform's approval mechanism — the task builds its own approval gate with codes",
+    b3_t:"Correctly declares local device", b3_b:"folders: E:\\DataAnalysis\\Breakpoint-EMS — doesn't fall into the \"forgot to declare device/folder\" trap",
+    b4_t:"Single notification channel", b4_b:"notifications: push = true, email = false",
+    b5_t:"Latest run: 4 seconds", b5_b:"Sep 18, 08:32:29 → 08:32:33 Bangkok time — anomalous for a full audit",
+    l1:"Scheduled Task (trigger mechanism)", l2:"Step belonging to the Local Automation Map process", l3:"Design that exceeds what LAM expects", l4:"Risk / point worth checking",
+    fulltextHeading:"Full comparison (plain text)", fulltextLead:"A condensed plain-text version, handy to paste into notes or CLAUDE.md/AGENTS.md.",
+    btnViewFulltext:"View & copy full text", btnHideFulltext:"Hide full text", btnCopy:"Copy", btnCopied:"Copied ✓", btnCopyFail:"Could not copy",
+    diagram1Heading:"Relationship diagram", diagram1Lead:"This Scheduled Task sits nested inside Stage 5 of Local Automation Map — but the safety logic (approval codes) is something the task built on its own, outside what LAM provides by default.",
+    containerLabel:"Local Automation Map — six-stage process",
+    s1_sub1:"Interview", s2_sub1:"Confirm plan", s3_sub1:"Build & test", s4_sub1:"Confirm", s4_sub2:"schedule", s5_sub1:"Set up", s5_sub2:"schedule", s6_sub1:"Verify &", s6_sub2:"handoff",
+    extraLine1:"Task adds its own: BP-CR-/BP-SR- approval-code gate", extraLine2:"sits OUTSIDE LAM's default Stage 5 scope", extraLine3:"→ compensates for setting permission_mode: auto",
+    leftNote:"The whole left block (Stage 1–4, 6) existed piecemeal over ~10 days of real patching, not a single approval pass as LAM describes.",
+    diagram2Heading:"This task's two-path safety mechanism", diagram2Lead:"This is where the task exceeds the Local Automation Map template: the automatic path (cron) is never allowed to write real data; writing real data only happens through the manual path with an approval code.",
+    d2_a1a:"Cron fires at 8:30", d2_a1b:"automatically", d2_a2a:"STEP 1", d2_a2b:"audit-only (read, no clicking)", d2_a3a:"Report +", d2_a3b:"proposed BP-CR-/BP-SR- code",
+    d2_connector:"Tân copies the code into the trigger message",
+    d2_b1a:"Manual fire", d2_b1b:"+ code in the message", d2_b2a:"Lock gate", d2_b2b:"6 conditions (B2)", d2_b3a:"STEP 2", d2_b3b:"Clear reset / Set as reset", d2_b4a:"Mandatory post-check", d2_b4b:"(B5)",
+    d2_reject1:"Condition not met", d2_reject2:"→ skip row, log reason",
+    tableHeading:"Nine-point comparison", col1:"Aspect Local Automation Map expects", col2:"Reality in iEMS Breakpoint Check", col3:"Assessment",
+    r1_h:"Stage 1–2: interview once → SPEC.md, approved before coding", r1_a:"No standalone SPEC.md — knowledge accumulated directly into the prompt over ~10 days of real fixes (meter rename 09/08, BCM-23 reading-factor change 09/15, Report refresh-lag discovery 09/17, schedule moved 8:10→8:30 09/17)", r1_b:"This prompt is a living spec, not a one-time-approved-then-frozen document as LAM describes — shows the linear six-stage process is fairly idealized versus the reality of continuous patching",
+    r2_h:"Stage 3: API step → fixed local script", r2_a:"iEMS has no API → 100% goes through Chrome action, including the purely arithmetic part (checking the EC formula) — Claude reads a screenshot and computes it live each time instead of a separate script", r2_b:"Matches the \"no-API → Chrome action\" spirit, but the formula check should be splittable into a small, 100% deterministic script — leaving it to LLM reasoning risks arithmetic errors on real energy data",
+    r3_h:"Dry-run before real run", r3_a:"Step 1 (every automatic cron fire) is always audit-only, strictly forbidden from clicking anything; Step 2 (real write) only runs when the triggering message carries a valid approval code, and the cron never sends that code itself", r3_b:"Stricter than LAM's theoretical model — LAM only requires a dry-run once during testing; here every automatic fire is permanently a dry-run",
+    r4_h:"Approval on fire", r4_a:"permission_mode: auto — doesn't use the platform's approval mechanism, builds its own gate with BP-CR-/BP-SR- codes instead", r4_b:"Reasonable since it must run at 8:30 AM with no one there, but safety now depends entirely on the LLM correctly reading the code in the message — no independent platform-level barrier",
+    r5_h:"Dedup", r5_a:"Checks for an existing Heading 1 by Stat.date in the .docx file before logging, avoiding duplicate entries for the same day", r5_b:"Matches LAM's intent exactly, just a different storage format (docx instead of JSON/CSV)",
+    r6_h:"Retry on error", r6_a:"The prompt requires stopping immediately and reporting on any error (login, failed post-check...), no automatic retry", r6_b:"A deliberate, reasonable deviation — this task overwrites real data on a production system; auto-retrying an ambiguous click is more dangerous than stopping for a human to look",
+    r7_h:"requires_local_device + folder", r7_a:"Correctly declared: folders = E:\\DataAnalysis\\Breakpoint-EMS", r7_b:"This task doesn't fall into the common \"forgot to declare device/folder\" trap flagged in the earlier generic Scheduled Task comparison",
+    r8_h:"Notification", r8_a:"notifications: push = true, email = false", r8_b:"Single channel only — if the phone isn't checked in the morning, there's no fallback",
+    r9_h:"Latest run result", r9_a:"last_run: SUCCEEDED, Sep 18 08:32:29 → 08:32:33 Bangkok time — only ~4 seconds", r9_b:"A full audit normally takes minutes, not 4 seconds. \"SUCCEEDED\" at the platform level likely only means \"the session ended without crashing,\" not that the data was actually audited. Worth opening session cse_01W2S2YSPAmbsMCb4k6ErkdT to verify",
+    goodHeading:"3 design points that exceed the LAM template",
+    g1Title:"1. Permanent dry-run on the automatic path", g1Body:"Unlike LAM, which only requires a dry-run once during testing, this task makes every automatic cron fire audit-only by default — real writes (Clear reset/Set as reset) never happen automatically, only through a deliberate manual action with an approval code.",
+    g2Title:"2. A dedicated approval gate compensating for permission_mode: auto", g2Body:"Since it must run at 8:30 AM with no one there, permission_mode had to be set to auto. The task compensates with its own BP-CR-/BP-SR- approval-code system, checked by the prompt itself against 6 gate conditions (B2) before touching any row.",
+    g3Title:"3. Correct requires_local_device declaration + dedup via the log", g3Body:"folders correctly set to E:\\DataAnalysis\\Breakpoint-EMS (avoiding the common mistake), plus real dedup: checking for an existing Heading 1 by Stat.date in Breakpoints-Log.docx before writing, avoiding duplicate daily entries.",
+    riskHeading:"3 risks worth checking",
+    rk1Title:"1. The latest run took only 4 seconds — anomalous", rk1Body:"On Sep 18, the session started at 08:32:29 and ended at 08:32:33 Bangkok time, marked SUCCEEDED. A full audit (open iEMS, filter, read, screenshot, write the Word log) normally takes minutes. Most likely the session stopped early at Step 0 (device/browser not found) — but this is inferred from duration alone, not confirmed. Worth opening session cse_01W2S2YSPAmbsMCb4k6ErkdT to verify what actually happened.",
+    rk2Title:"2. Only one notification channel is enabled (push)", rk2Body:"notifications.email = false. If the phone isn't checked in the morning, a string of days that each run for 4 seconds and stop still shows up identically as SUCCEEDED, same as a full day's run — no distinguishing signal surfaces unless duration is inspected like this.",
+    rk3Title:"3. EC formula checking relies entirely on LLM reasoning, with no independent verification script", rk3Body:"Computing the expected EC (wrap − Initial + Final) is a purely deterministic arithmetic operation, yet Claude reads a screenshot and computes it live each time instead of through a small fixed script. The prompt itself admits the CR branch has \"never run through automation before\" — a real arithmetic-error risk on real energy data.",
+    pickHeading:"Next steps",
+    rec1:"Open session cse_01W2S2YSPAmbsMCb4k6ErkdT in the scheduled task's run history to verify where the 4-second run on Sep 18 actually stopped, instead of guessing.",
+    rec2:"Consider enabling email alongside push, so it doesn't depend entirely on checking the phone in the morning.",
+    rec3:"Consider splitting the EC formula calculation (wrap − Initial + Final) into a small independent script that takes the screen-read values as input and returns the expected number — reducing reliance on free-form LLM reasoning for a purely arithmetic step.",
+    sensitiveNote:"This page contains HugeBamboo's real internal configuration and data (IP, machine path, meter names/values) — kept as-is at the requester's explicit choice when this page was created.",
+    footerPrefix:"Companion to:", footerSuffix:"Reference only, no interaction besides the copy button.",
+    fulltextContent: null
+  },
+  zh: {
+    eyebrow: "實際案例比較 · SCHEDULED TASK「IEMS BREAKPOINT CHECK」與 LOCAL AUTOMATION MAP",
+    h1: "iEMS Breakpoint Check:1 個真實 Scheduled Task 對照 Local Automation Map 流程",
+    subtitle: "這不是假設案例 — 這是 HugeBamboo 每天實際在跑的 1 個 Scheduled Task 的真實設定(直接從系統取得:cron、permission_mode、資料夾、最近一次執行),對照 Local Automation Map 六階段流程。",
+    b1_t:"每天 08:30 排程", b1_b:"CRON_TZ=Asia/Bangkok 30 8 * * * — persist_session: false,每次執行都是全新 session",
+    b2_t:"permission_mode: auto", b2_b:"不使用平台的核准機制 — 任務自行建立以代碼為主的核准關卡",
+    b3_t:"正確宣告本機裝置", b3_b:"folders: E:\\DataAnalysis\\Breakpoint-EMS — 沒有踩到「忘記宣告裝置/資料夾」的坑",
+    b4_t:"只有 1 個通知管道", b4_b:"notifications: push = true, email = false",
+    b5_t:"最近一次執行:4 秒", b5_b:"09/18 曼谷時間 08:32:29 → 08:32:33 — 對完整稽核來說明顯異常",
+    l1:"Scheduled Task(觸發機制)", l2:"屬於 Local Automation Map 流程的步驟", l3:"比 LAM 預期更完善的設計", l4:"需要留意的風險/檢查點",
+    fulltextHeading:"完整比較(純文字版)", fulltextLead:"精簡的純文字版本,方便貼到筆記或 CLAUDE.md/AGENTS.md。",
+    btnViewFulltext:"查看並複製全文", btnHideFulltext:"隱藏全文", btnCopy:"複製", btnCopied:"已複製 ✓", btnCopyFail:"複製失敗",
+    diagram1Heading:"關係示意圖", diagram1Lead:"這個 Scheduled Task 是嵌套在 Local Automation Map 第 5 階段裡面 — 但安全機制(核准代碼)是任務自己額外打造的,超出 LAM 預設會提供的範圍。",
+    containerLabel:"Local Automation Map — 六階段流程",
+    s1_sub1:"訪談", s2_sub1:"確認計畫", s3_sub1:"建置與測試", s4_sub1:"確認", s4_sub2:"排程", s5_sub1:"設定", s5_sub2:"排程", s6_sub1:"驗收與", s6_sub2:"交接",
+    extraLine1:"任務自行加上:BP-CR-/BP-SR- 核准代碼關卡", extraLine2:"超出 LAM 預設第 5 階段的範圍", extraLine3:"→ 用來彌補設定 permission_mode: auto",
+    leftNote:"左側整個區塊(Stage 1–4、6)是在約 10 天的真實修補過程中逐步累積出來的,不是像 LAM 描述那樣一次核准完成。",
+    diagram2Heading:"這個任務的雙路徑安全機制", diagram2Lead:"這正是這個任務做得比 Local Automation Map 範本更好的地方:自動路徑(cron)永遠不允許寫入真實資料;寫入真實資料只透過帶核准代碼的手動路徑發生。",
+    d2_a1a:"Cron 於 8:30", d2_a1b:"自動觸發", d2_a2a:"STEP 1", d2_a2b:"只稽核(唯讀,禁止點擊)", d2_a3a:"報告 +", d2_a3b:"建議的 BP-CR-/BP-SR- 代碼",
+    d2_connector:"Tân 把代碼複製進觸發訊息",
+    d2_b1a:"手動觸發", d2_b1b:"+ 訊息內附代碼", d2_b2a:"鎖定關卡", d2_b2b:"6 項條件(B2)", d2_b3a:"STEP 2", d2_b3b:"Clear reset / Set as reset", d2_b4a:"強制事後檢查", d2_b4b:"(B5)",
+    d2_reject1:"條件不符", d2_reject2:"→ 跳過該行,記錄原因",
+    tableHeading:"9 個面向對照", col1:"Local Automation Map 預期的面向", col2:"iEMS Breakpoint Check 的實際狀況", col3:"評估",
+    r1_h:"Stage 1–2:訪談一次 → SPEC.md,核准後才寫程式", r1_a:"沒有獨立的 SPEC.md — 知識直接累積進 prompt,經過約 10 天的真實修補(08/09 改儀表名稱、09/15 改 BCM-23 讀值倍率、09/17 發現 Report 刷新延遲、09/17 把排程從 8:10 改到 8:30)", r1_b:"這份 prompt 是活的規格文件,不是像 LAM 描述那樣核准一次就凍結 — 顯示線性六階段流程相對理想化,跟持續修補的現實有落差",
+    r2_h:"Stage 3:有 API 的步驟 → 固定 local script", r2_a:"iEMS 沒有 API → 100% 走 Chrome action,連純粹的數學驗證(檢查 EC 公式)也是每次讓 Claude 自己讀截圖、自己計算,沒有拆成獨立 script", r2_b:"符合「沒有 API → Chrome action」的精神,但公式驗證這部分其實可以拆成 1 個 100% 確定的小 script — 目前交給 LLM 自由推理,對真實能源數據有算錯的風險",
+    r3_h:"正式執行前先 dry-run", r3_a:"Step 1(每次 cron 自動觸發)永遠只稽核不動手,絕對禁止按任何按鈕;Step 2(真正寫入)只有在觸發訊息帶有效核准代碼時才執行,而且 cron 本身永遠不會自己送出那個代碼", r3_b:"比 LAM 理論上的要求更嚴謹 — LAM 只要求測試階段 dry-run 一次;這裡是每次自動觸發永遠都是 dry-run",
+    r4_h:"觸發時的核准機制", r4_a:"permission_mode: auto — 不使用平台的核准機制,改用 BP-CR-/BP-SR- 代碼自建關卡", r4_b:"因為要在早上 8:30 沒人在場時執行,這樣設定合理,但安全性現在完全取決於 LLM 是否正確讀懂訊息裡的代碼 — 平台層級沒有其他獨立防線",
+    r5_h:"去重(Dedup)", r5_a:"寫入前先檢查 .docx 檔案裡是否已有該 Stat.date 的 Heading 1,避免同一天重複記錄", r5_b:"完全符合 LAM 的精神,只是儲存格式不同(docx 而非 JSON/CSV)",
+    r6_h:"錯誤重試", r6_a:"prompt 要求遇到錯誤(登入、事後檢查不符...)立即停止並回報,不自動重試", r6_b:"刻意且合理的偏離 — 這個任務會覆寫生產系統上的真實數據,自動重試一個含糊的點擊動作,比停下來讓人看還危險",
+    r7_h:"requires_local_device + 資料夾", r7_a:"正確宣告:folders = E:\\DataAnalysis\\Breakpoint-EMS", r7_b:"這個任務沒有踩到先前比較一般 Scheduled Task 時提到的「忘記宣告裝置/資料夾」常見坑",
+    r8_h:"通知", r8_a:"notifications: push = true, email = false", r8_b:"只有 1 個管道 — 如果早上沒看手機,就沒有其他備援",
+    r9_h:"最近一次執行結果", r9_a:"last_run: SUCCEEDED,09/18 曼谷時間 08:32:29 → 08:32:33 — 只有約 4 秒", r9_b:"完整稽核通常要花幾分鐘,不是 4 秒。平台層級的「SUCCEEDED」很可能只代表「session 結束時沒有當掉」,不代表真的完成資料稽核。建議打開 session cse_01W2S2YSPAmbsMCb4k6ErkdT 確認實際狀況",
+    goodHeading:"3 個比 LAM 範本更完善的設計",
+    g1Title:"1. 自動路徑永遠是 dry-run", g1Body:"不像 LAM 只要求測試階段 dry-run 一次,這個任務讓每次自動 cron 觸發預設都只稽核不動手 — 真正的寫入(Clear reset/Set as reset)永遠不會自動發生,只透過帶核准代碼的手動操作。",
+    g2Title:"2. 專屬核准關卡,彌補 permission_mode: auto", g2Body:"因為要在早上 8:30 沒人在場時執行,permission_mode 必須設成 auto。任務用自己的 BP-CR-/BP-SR- 核准代碼系統來彌補,由 prompt 本身依 6 項關卡條件(B2)逐一檢查後才允許修改任何一行。",
+    g3Title:"3. 正確宣告 requires_local_device + 透過紀錄檔去重", g3Body:"folders 正確設定為 E:\\DataAnalysis\\Breakpoint-EMS(沒踩到常見的坑),而且有真正的去重機制:寫入前先檢查 Breakpoints-Log.docx 裡是否已有該 Stat.date 的 Heading 1,避免同一天重複記錄。",
+    riskHeading:"3 個需要留意的風險",
+    rk1Title:"1. 最近一次執行只花 4 秒 — 異常", rk1Body:"09/18,session 於曼谷時間 08:32:29 開始、08:32:33 結束,標記為 SUCCEEDED。完整稽核(開啟 iEMS、篩選、讀取、截圖、寫入 Word 紀錄)正常要花幾分鐘。很可能是 session 在 Step 0 就提早停止(找不到裝置/瀏覽器)— 但這只是從執行時間推測,還不算確定證據。建議打開 session cse_01W2S2YSPAmbsMCb4k6ErkdT 確認實際內容。",
+    rk2Title:"2. 只開啟 1 個通知管道(push)", rk2Body:"notifications.email = false。如果早上沒看手機,連續好幾天都只跑 4 秒就停止,畫面上仍然會跟跑滿全程的一天顯示得一模一樣,都是 SUCCEEDED — 除非像這樣主動檢查執行時間,不然不會冒出任何不一樣的訊號。",
+    rk3Title:"3. EC 公式驗證完全依賴 LLM 推理,沒有獨立的對照 script", rk3Body:"計算預期 EC(wrap − Initial + Final)是純粹、完全確定的數學運算,但目前是每次都讓 Claude 自己讀截圖、自己計算,而不是透過 1 個固定的小 script。prompt 本身也承認 CR 分支「從未透過自動化真正跑過」— 對真實能源數據來說是實際存在的計算錯誤風險。",
+    pickHeading:"接下來的建議",
+    rec1:"打開 scheduled task 執行紀錄裡的 session cse_01W2S2YSPAmbsMCb4k6ErkdT,確認 09/18 那次 4 秒的執行到底停在哪一步,而不是用猜的。",
+    rec2:"考慮在 push 之外同時開啟 email 通知,這樣就不會完全依賴早上有沒有看手機。",
+    rec3:"考慮把 EC 公式計算(wrap − Initial + Final)拆成 1 個獨立的小 script,輸入畫面讀到的數值、輸出預期數字 — 減少純數學步驟依賴 LLM 自由推理的程度。",
+    sensitiveNote:"本頁包含 HugeBamboo 真實的內部設定與數據(IP、機器路徑、儀表名稱/數值)— 依需求方在建立本頁時的明確選擇予以保留。",
+    footerPrefix:"對照文件:", footerSuffix:"本頁僅供參考,除複製按鈕外沒有其他互動。",
+    fulltextContent: null
+  }
+};
+
+function fulltext_en(){
+  return "IEMS BREAKPOINT CHECK vs LOCAL AUTOMATION MAP (a real case at HugeBamboo)\n\n" +
+"Real configuration: cron 30 8 * * * Asia/Bangkok time, persist_session: false,\n" +
+"permission_mode: auto, requires_local_device with folder E:\\DataAnalysis\\Breakpoint-EMS,\n" +
+"notifications push=true/email=false. Latest run (Sep 18) SUCCEEDED but only ~4 seconds.\n\n" +
+"9 points compared against Local Automation Map:\n" +
+"1. Stage 1-2 (SPEC.md approved once): no standalone SPEC.md, knowledge accumulated\n" +
+"   directly into the prompt over ~10 days of real fixes.\n" +
+"2. Stage 3 (API -> local script): iEMS has no API, 100% goes through Chrome action; even\n" +
+"   the EC formula check is done by Claude reading a screenshot and computing live, no\n" +
+"   separate script.\n" +
+"3. Dry-run before real run: Step 1 (automatic cron) is always audit-only; Step 2 (real\n" +
+"   write) only runs with an approval code in the message, the cron never sends one itself.\n" +
+"4. Approval on fire: permission_mode auto, builds its own approval gate with\n" +
+"   BP-CR-/BP-SR- codes instead of using the platform's approval mechanism.\n" +
+"5. Dedup: checks for an existing Heading 1 by Stat.date in the .docx file before logging.\n" +
+"6. Retry on error: stops immediately and reports, no auto-retry (reasonable since it\n" +
+"   overwrites real data on a production system).\n" +
+"7. requires_local_device + folder: correctly declared.\n" +
+"8. Notification: single channel (push), no email.\n" +
+"9. Latest run: SUCCEEDED but only ~4 seconds - anomalous versus a full audit (normally\n" +
+"   takes minutes).\n\n" +
+"3 design points that exceed LAM:\n" +
+"1. Permanent dry-run on the automatic path - real writes never happen automatically.\n" +
+"2. A dedicated approval gate compensating for permission_mode auto, checked against 6\n" +
+"   gate conditions (B2).\n" +
+"3. Correct requires_local_device declaration + real dedup via the .docx log.\n\n" +
+"3 risks worth checking:\n" +
+"1. The 4-second run is anomalous - open session cse_01W2S2YSPAmbsMCb4k6ErkdT to verify.\n" +
+"2. Only one notification channel (push) - no fallback if the phone isn't checked.\n" +
+"3. EC formula checking relies entirely on LLM reasoning, no independent verification\n" +
+"   script.\n\n" +
+"Next steps:\n" +
+"- Open session cse_01W2S2YSPAmbsMCb4k6ErkdT to verify where the 4-second run stopped.\n" +
+"- Consider enabling email notifications alongside push.\n" +
+"- Consider splitting the EC calculation (wrap - Initial + Final) into a small\n" +
+"  independent script.";
+}
+function fulltext_zh(){
+  return "IEMS BREAKPOINT CHECK 對比 LOCAL AUTOMATION MAP(HugeBamboo 真實案例)\n\n" +
+"真實設定:cron 30 8 * * * 曼谷時間,persist_session: false,permission_mode: auto,\n" +
+"requires_local_device 資料夾為 E:\\DataAnalysis\\Breakpoint-EMS,notifications\n" +
+"push=true/email=false。最近一次執行(09/18)標記 SUCCEEDED,但只花約 4 秒。\n\n" +
+"對照 Local Automation Map 的 9 個要點:\n" +
+"1. Stage 1-2(SPEC.md 核准一次):沒有獨立 SPEC.md,知識直接累積進 prompt,經過約\n" +
+"   10 天的真實修補。\n" +
+"2. Stage 3(有 API -> local script):iEMS 沒有 API,100% 走 Chrome action;連 EC 公式\n" +
+"   驗證也是每次讓 Claude 讀截圖、即時計算,沒有獨立 script。\n" +
+"3. 正式執行前先 dry-run:Step 1(cron 自動)永遠只稽核;Step 2(真正寫入)只有訊息帶\n" +
+"   核准代碼才執行,cron 本身永遠不會自己送出代碼。\n" +
+"4. 觸發時的核准機制:permission_mode auto,改用 BP-CR-/BP-SR- 代碼自建關卡,而非\n" +
+"   平台的核准機制。\n" +
+"5. 去重:寫入前先檢查 .docx 裡是否已有該 Stat.date 的 Heading 1。\n" +
+"6. 錯誤重試:立即停止並回報,不自動重試(合理,因為會覆寫生產系統的真實數據)。\n" +
+"7. requires_local_device + 資料夾:正確宣告。\n" +
+"8. 通知:只有 1 個管道(push),沒有 email。\n" +
+"9. 最近一次執行:SUCCEEDED 但只約 4 秒 — 對完整稽核(正常要幾分鐘)來說異常。\n\n" +
+"3 個比 LAM 更完善的設計:\n" +
+"1. 自動路徑永遠是 dry-run — 真正寫入永遠不會自動發生。\n" +
+"2. 專屬核准關卡彌補 permission_mode auto,依 6 項關卡條件(B2)檢查。\n" +
+"3. 正確宣告 requires_local_device + 透過 .docx 紀錄真正去重。\n\n" +
+"3 個需要留意的風險:\n" +
+"1. 4 秒的執行時間異常 — 打開 session cse_01W2S2YSPAmbsMCb4k6ErkdT 確認。\n" +
+"2. 只有 1 個通知管道(push)— 沒看手機就沒有備援。\n" +
+"3. EC 公式驗證完全依賴 LLM 推理,沒有獨立對照 script。\n\n" +
+"接下來的建議:\n" +
+"- 打開 session cse_01W2S2YSPAmbsMCb4k6ErkdT 確認 4 秒執行到底停在哪裡。\n" +
+"- 考慮在 push 之外同時開啟 email 通知。\n" +
+"- 考慮把 EC 計算(wrap - Initial + Final)拆成 1 個獨立的小 script。";
+}
+
+var currentLang = 'vi';
+var fulltextOpen = false;
+
+function setLang(lang){
+  if(!I18N[lang]) return;
+  currentLang = lang;
+  if(lang==='vi' && !I18N.vi.fulltextContent){ I18N.vi.fulltextContent = document.getElementById('fulltext').textContent; }
+  if(lang==='en' && !I18N.en.fulltextContent){ I18N.en.fulltextContent = fulltext_en(); }
+  if(lang==='zh' && !I18N.zh.fulltextContent){ I18N.zh.fulltextContent = fulltext_zh(); }
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key = el.getAttribute('data-i18n');
+    if(I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+  });
+  document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : lang;
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  var toggleBtn = document.getElementById('toggleBtn');
+  toggleBtn.textContent = fulltextOpen ? I18N[lang].btnHideFulltext : I18N[lang].btnViewFulltext;
+  document.getElementById('copyBtn').textContent = I18N[lang].btnCopy;
+}
+
+function toggleFullText(){
+  var pre = document.getElementById('fulltext');
+  pre.classList.toggle('open');
+  fulltextOpen = pre.classList.contains('open');
+  document.getElementById('toggleBtn').textContent = fulltextOpen ? I18N[currentLang].btnHideFulltext : I18N[currentLang].btnViewFulltext;
+}
+
+function copyFullText(){
+  var pre = document.getElementById('fulltext');
+  var text = pre.innerText || pre.textContent;
+  var btn = document.getElementById('copyBtn');
+  var original = I18N[currentLang].btnCopy;
+  function done(ok){
+    btn.textContent = ok ? I18N[currentLang].btnCopied : I18N[currentLang].btnCopyFail;
+    setTimeout(function(){ btn.textContent = original; }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(false);});
+  } else {
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(true);
+    }catch(e){ done(false); }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setLang('vi');
+});
+</script>
+</body>
+</html>
