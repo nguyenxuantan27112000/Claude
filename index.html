@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scheduled Task vs Local Automation Map · So sánh · 比較</title>
+<style>
+  :root{
+    --bg:#f7f6f3;
+    --card:#ffffff;
+    --ink:#1b1b1f;
+    --muted:#6b6b70;
+    --border:#e4e2dc;
+    --blue:#2f5fd8;
+    --blue-bg:#eaf0ff;
+    --amber:#b8790a;
+    --amber-bg:#fdf1dd;
+    --red:#b3261e;
+    --red-bg:#fdecea;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
+  }
+  .container{max-width:980px;margin:0 auto;padding:40px 20px 80px;position:relative;}
+  .langswitch{
+    position:fixed;top:18px;right:18px;background:#fff;border:1px solid var(--border);
+    border-radius:999px;padding:4px;display:flex;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,0.08);z-index:50;
+  }
+  .langswitch button{
+    border:none;background:transparent;padding:7px 13px;border-radius:999px;
+    font-size:0.8rem;cursor:pointer;color:var(--muted);font-weight:600;
+  }
+  .langswitch button.active{background:var(--ink);color:#fff;}
+  .langswitch button:hover:not(.active){color:var(--ink);}
+  @media (max-width:640px){
+    .langswitch{position:static;display:inline-flex;margin-bottom:18px;box-shadow:none;}
+  }
+  .eyebrow{
+    display:inline-block;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--blue);
+    background:var(--blue-bg);
+    padding:5px 10px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  h1{font-size:1.9rem;margin:0 0 8px;line-height:1.25;}
+  .subtitle{color:var(--muted);max-width:760px;font-size:0.98rem;}
+  nav.companion{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  nav.companion a{
+    text-decoration:none;font-size:0.83rem;padding:7px 14px;
+    border:1px solid var(--border);border-radius:999px;color:var(--ink);background:var(--card);
+  }
+  nav.companion a:hover{border-color:var(--blue);color:var(--blue);}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0;}
+  .badge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 16px;font-size:0.82rem;min-width:150px;}
+  .badge b{display:block;font-size:0.95rem;margin-bottom:2px;}
+  .legend{
+    display:flex;gap:20px;flex-wrap:wrap;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 18px;font-size:0.85rem;margin-bottom:28px;
+  }
+  .legend span.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:26px;}
+  .card h2{font-size:1.15rem;margin:0 0 14px;}
+  .card p.lead{color:var(--muted);margin:0 0 18px;font-size:0.92rem;}
+  .fulltext-box .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  button.copy-btn{
+    background:var(--ink);color:#fff;border:none;padding:10px 16px;
+    border-radius:10px;cursor:pointer;font-size:0.83rem;white-space:nowrap;
+  }
+  button.copy-btn:hover{opacity:0.85;}
+  button.copy-btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--border);}
+  pre.fulltext{
+    display:none;margin-top:16px;background:#0f0f10;color:#eaeaea;
+    padding:18px;border-radius:10px;overflow-x:auto;font-size:0.78rem;
+    white-space:pre-wrap;line-height:1.5;
+  }
+  pre.fulltext.open{display:block;}
+  table.compare{width:100%;border-collapse:collapse;font-size:0.86rem;}
+  table.compare th,table.compare td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.compare thead th{background:var(--blue-bg);color:var(--blue);font-weight:700;font-size:0.82rem;}
+  table.compare tbody tr:nth-child(even) td{background:#fbfaf8;}
+  table.compare td:first-child{font-weight:600;white-space:nowrap;}
+  table.compare code{background:#eee;padding:1px 5px;border-radius:4px;font-size:0.8rem;}
+  .callout{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:16px;font-size:0.9rem;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-bg);}
+  .callout h4{margin:0 0 6px;font-size:0.95rem;}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:720px){.cols2{grid-template-columns:1fr;}}
+  .pickcard{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:#fdfcfa;}
+  .pickcard h4{margin:0 0 8px;font-size:0.98rem;}
+  .pickcard ul{margin:0;padding-left:18px;font-size:0.88rem;}
+  .pickcard li{margin-bottom:6px;}
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);}
+  footer a{color:var(--muted);}
+  svg text{font-family:inherit;}
+  .diagram-wrap{overflow-x:auto;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="langswitch" role="group" aria-label="Language switch">
+    <button class="langbtn" data-lang="zh" onclick="setLang('zh')">中文</button>
+    <button class="langbtn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="langbtn active" data-lang="vi" onclick="setLang('vi')">VI</button>
+  </div>
+
+  <span class="eyebrow" data-i18n="eyebrow">SO SÁNH · SCHEDULED TASK VS LOCAL AUTOMATION MAP</span>
+  <h1 data-i18n="h1">Scheduled Task và Local Automation Map: quan hệ, khác biệt, khi nào dùng gì</h1>
+  <p class="subtitle" data-i18n="subtitle">
+    Scheduled Task không phải một phương án cạnh tranh với Local Automation Map — nó là cơ chế
+    trigger (đánh thức theo lịch) mà Local Automation Map dùng ở Stage 5 trong quy trình 6 bước của mình.
+    Trang này đối chiếu 2 cách dùng: tạo thẳng 1 Scheduled Task, so với đi hết quy trình 6 bước rồi mới
+    gắn vào Scheduled Task.
+  </p>
+
+  <nav class="companion">
+    <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">↗ Local Automation Map</a>
+    <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">↗ Cloud Automation Map</a>
+  </nav>
+
+  <div class="badges">
+    <div class="badge"><b data-i18n="badge1_t">1 quy trình ⊃ 1 cơ chế</b><span data-i18n="badge1_b">Scheduled Task chỉ là Stage 5 trong 6 bước của Local Automation Map</span></div>
+    <div class="badge"><b data-i18n="badge2_t">Lịch tối thiểu ~1 giờ</b><span data-i18n="badge2_b">Nền tảng thường từ chối lịch chạy dày hơn mỗi giờ</span></div>
+    <div class="badge"><b data-i18n="badge3_t">Cần khai báo máy</b><span data-i18n="badge3_b">Muốn chạy script/Chrome cục bộ phải bật "cần máy này"</span></div>
+    <div class="badge"><b data-i18n="badge4_t">Approval có thể treo task</b><span data-i18n="badge4_b">Nếu không ở chế độ tự duyệt, 1 action cần duyệt mà không ai trực → phiên dừng giữa chừng</span></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--amber)"></span><span data-i18n="legend1">Scheduled Task (cơ chế trigger)</span></span>
+    <span><span class="dot" style="background:var(--blue)"></span><span data-i18n="legend2">Các bước thuộc quy trình Local Automation Map</span></span>
+    <span><span class="dot" style="background:var(--red)"></span><span data-i18n="legend3">Rủi ro / giới hạn cần lưu ý</span></span>
+  </div>
+
+  <div class="card fulltext-box">
+    <div class="row">
+      <div>
+        <h2 data-i18n="fulltextHeading">Toàn văn so sánh (dạng text)</h2>
+        <p class="lead" style="margin-bottom:0;" data-i18n="fulltextLead">Bản rút gọn dạng text thuần, tiện copy vào ghi chú hoặc CLAUDE.md/AGENTS.md.</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="copy-btn secondary" id="toggleBtn" onclick="toggleFullText()" data-i18n="btnViewFulltext">Xem & copy toàn văn</button>
+        <button class="copy-btn" id="copyBtn" onclick="copyFullText()" data-i18n="btnCopy">Copy</button>
+      </div>
+    </div>
+    <pre class="fulltext" id="fulltext" data-i18n="fulltextContent">SCHEDULED TASK vs LOCAL AUTOMATION MAP
+
+Quan he: Scheduled Task la co che trigger (cron hoac chay 1 lan) danh thuc 1 phien Claude
+de chay 1 prompt. Local Automation Map la quy trinh 6 buoc (interview -> SPEC.md -> build
+script/RUNBOOK/AI judgment -> dry-run/test -> git commit -> cau hinh Scheduled Task ->
+verify/handoff), trong do Scheduled Task chi la co che trigger dung o Stage 5.
+
+Khac biet chinh:
+- Logic xu ly moi lan fire: Scheduled Task tran de Claude tu suy luan lai tu dau; Local
+  Automation Map cho buoc co API chay bang local script co dinh, chi buoc can phan doan moi
+  de Claude suy luan.
+- Dedup: Scheduled Task tran khong co san; Local Automation Map bat buoc luu ID da xu ly.
+- Retry khi loi mang: Scheduled Task tran tuy Claude; Local Automation Map bat buoc retry
+  voi backoff trong code.
+- Kiem thu truoc khi live: Scheduled Task tran khong bat buoc; Local Automation Map bat
+  buoc dry-run truoc, chi chay that khi khop Acceptance.
+- Version control: Scheduled Task tran khong co; Local Automation Map co git commit local.
+- Approval khi fire: rui ro giong nhau o ca 2 - neu permission_mode khong phai auto, 1 action
+  can duyet ma khong ai truc se lam phien dung giua chung.
+- May can thiet: Scheduled Task tran mac dinh khong can may nguoi dung (chay tren cloud);
+  Local Automation Map luon can may + Claude app + Chrome vi script/.env/git song tren do,
+  nen phai khai bao "requires_local_device" va dung folder.
+- Chi phi token: Scheduled Task tran ton token moi lan du viec lap lai y het; Local
+  Automation Map chi ton suy luan o buoc AI judgment, phan script gan nhu free.
+- Audit: Scheduled Task tran phai luc transcript; Local Automation Map co log ro tung buoc
+  + README ghi san 3 dieu can check khi loi.
+
+2 lo hong ky thuat can luu y:
+1. Gioi han tan suat toi thieu (~1 gio) co the mau thuan voi vi du "polling moi 5 phut" ma
+   prompt goc Local Automation Map dua ra cho truong hop event-trigger. Kiem tra gioi han
+   lich thuc te cua to chuc truoc khi build.
+2. Prompt goc khong nhac gi ve viec khai bao "requires_local_device" + dung folder khi tao
+   Scheduled Task o Stage 5. Bo qua buoc nay se khien task chay nhu 1 phien cloud thuan tuy,
+   khong thay duoc script/repo/Chrome, va fail ngay lan chay dau.
+
+Khi nao dung cai nao:
+- Dung thang Scheduled Task: viec don gian, lich chay >= 1 gio la du, khong can dedup/retry
+  chat, chap nhan Claude suy luan lai moi lan.
+- Di full quy trinh Local Automation Map: viec lap lai thuong xuyen, can dedup, can log de
+  audit, muon logic co dinh khong phu thuoc suy luan moi lan chay.</pre>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagramHeading">Sơ đồ quan hệ</h2>
+    <p class="lead" data-i18n="diagramLead">Scheduled Task nằm lồng bên trong Stage 5 của Local Automation Map — không phải một khối tách biệt song song.</p>
+    <div class="diagram-wrap">
+    <svg viewBox="0 0 900 340" width="100%" role="img" aria-label="Relationship diagram">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#b3261e"/>
+        </marker>
+      </defs>
+
+      <!-- Outer container: Local Automation Map -->
+      <rect x="20" y="20" width="860" height="212" rx="18" fill="#eaf0ff" stroke="#2f5fd8" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text x="40" y="46" font-size="14" font-weight="700" fill="#2f5fd8" data-i18n="containerLabel">Local Automation Map — quy trình 6 bước</text>
+
+      <!-- Stage boxes -->
+      <rect x="40" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="99" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 1</text>
+      <text x="99" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s1_sub1">Interview</text>
+
+      <rect x="174" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="233" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 2</text>
+      <text x="233" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s2_sub1">Confirm plan</text>
+      <text x="233" y="118" font-size="10" text-anchor="middle" fill="#6b6b70">SPEC.md</text>
+
+      <rect x="308" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="367" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 3</text>
+      <text x="367" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s3_sub1">Build &amp; test</text>
+      <text x="367" y="118" font-size="10" text-anchor="middle" fill="#6b6b70">dry-run</text>
+
+      <rect x="442" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="501" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 4</text>
+      <text x="501" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub1">Confirm</text>
+      <text x="501" y="118" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub2">schedule</text>
+
+      <rect x="576" y="62" width="118" height="80" rx="10" fill="#fdf1dd" stroke="#b8790a" stroke-width="1.5"/>
+      <text x="635" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#b8790a">STAGE 5</text>
+      <text x="635" y="104" font-size="10" text-anchor="middle" fill="#8a5c07" data-i18n="s5_sub1">Set up</text>
+      <text x="635" y="118" font-size="10" text-anchor="middle" fill="#8a5c07" data-i18n="s5_sub2">schedule</text>
+
+      <rect x="710" y="62" width="118" height="80" rx="10" fill="#ffffff" stroke="#e4e2dc"/>
+      <text x="769" y="86" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 6</text>
+      <text x="769" y="104" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub1">Verify &amp;</text>
+      <text x="769" y="118" font-size="10" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub2">handoff</text>
+
+      <line x1="635" y1="142" x2="635" y2="160" stroke="#b8790a" stroke-width="1.5"/>
+
+      <rect x="525" y="160" width="220" height="52" rx="10" fill="#ffffff" stroke="#b8790a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="635" y="182" font-size="11" font-weight="700" text-anchor="middle" fill="#b8790a">Scheduled Task</text>
+      <text x="635" y="198" font-size="9.5" text-anchor="middle" fill="#8a5c07" data-i18n="scheduledTaskSub">cron / run-once · trigger engine</text>
+
+      <line x1="745" y1="186" x2="810" y2="250" stroke="#b3261e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="590" y="255" width="290" height="70" rx="10" fill="#fdecea" stroke="#b3261e" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="735" y="276" font-size="10.5" font-weight="700" text-anchor="middle" fill="#b3261e" data-i18n="riskLine1">Nếu tạo thẳng, bỏ qua Stage 1–4</text>
+      <text x="735" y="293" font-size="9.5" text-anchor="middle" fill="#8a2a24" data-i18n="riskLine2">mất dedup · retry · dry-run · git · log</text>
+      <text x="735" y="308" font-size="9.5" text-anchor="middle" fill="#8a2a24" data-i18n="riskLine3">→ mỗi lần fire, Claude tự suy luận lại từ đầu</text>
+
+      <text x="40" y="300" font-size="10.5" fill="#6b6b70" data-i18n="leftNote">Toàn bộ khối bên trái (Stage 1–4, 6) không tồn tại nếu chỉ dùng Scheduled Task một mình.</text>
+    </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="tableHeading">Bảng so sánh chi tiết</h2>
+    <table class="compare">
+      <thead>
+        <tr><th data-i18n="col1">Khía cạnh</th><th data-i18n="col2">Scheduled Task (dùng trần)</th><th data-i18n="col3">Local Automation Map (quy trình đầy đủ)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td data-i18n="r1_h">Bản chất</td><td data-i18n="r1_a">Cơ chế trigger thuần: cron hoặc chạy 1 lần, đánh thức 1 phiên và gửi vào 1 prompt</td><td data-i18n="r1_b">Quy trình 6 bước; Scheduled Task chỉ là cơ chế trigger ở Stage 5</td></tr>
+        <tr><td data-i18n="r2_h">Logic xử lý mỗi lần fire</td><td data-i18n="r2_a">Claude tự suy luận lại từ đầu mỗi lần, dựa hoàn toàn vào prompt đã lưu</td><td data-i18n="r2_b">Bước có API → local script cố định (deterministic); chỉ bước cần phán đoán mới để Claude suy luận</td></tr>
+        <tr><td data-i18n="r3_h">Dedup</td><td data-i18n="r3_a">Không có sẵn — phải tự thiết kế nếu muốn</td><td data-i18n="r3_b">Bắt buộc: SPEC.md yêu cầu field "has this been processed" + lưu ID đã xử lý vào file local</td></tr>
+        <tr><td data-i18n="r4_h">Retry khi lỗi mạng</td><td data-i18n="r4_a">Tuỳ Claude tự quyết định lúc chạy, không đảm bảo</td><td data-i18n-html="r4_b">Bắt buộc trong code: <code>retries with backoff</code> trên mọi network call</td></tr>
+        <tr><td data-i18n="r5_h">Kiểm thử trước khi live</td><td data-i18n="r5_a">Không bắt buộc — tạo xong có thể chạy thật ngay</td><td data-i18n="r5_b">Bắt buộc dry-run, chỉ chạy thật khi khớp Acceptance trong SPEC.md</td></tr>
+        <tr><td data-i18n="r6_h">Version control</td><td data-i18n="r6_a">Không có</td><td data-i18n="r6_b">git commit local sau mỗi lần build/test</td></tr>
+        <tr><td data-i18n="r7_h">Log / Audit</td><td data-i18n="r7_a">Phải lục lại transcript phiên đã chạy</td><td data-i18n="r7_b">Log rõ từng bước + README ghi sẵn 3 điều cần check khi lỗi</td></tr>
+        <tr><td data-i18n="r8_h">Chi phí token / lần</td><td data-i18n="r8_a">Toàn bộ do Claude suy luận lại → tốn token dù việc lặp y hệt</td><td data-i18n="r8_b">Phần script gần như free; chỉ AI judgment mới tốn suy luận</td></tr>
+        <tr><td data-i18n="r9_h">Approval khi fire</td><td data-i18n-html="r9_a">Theo <code>permission_mode</code>: nếu không auto, action cần duyệt mà không ai trực → dừng giữa chừng</td><td data-i18n="r9_b">Rủi ro y hệt — quy trình không giải quyết, chỉ Stage 5 có bước test thủ công để phát hiện sớm</td></tr>
+        <tr><td data-i18n="r10_h">Cần máy cụ thể</td><td data-i18n="r10_a">Mặc định không — có thể chạy hoàn toàn trên cloud</td><td data-i18n-html="r10_b">Luôn cần — script/.env/git repo sống trên máy, phải khai <code>requires_local_device: true</code></td></tr>
+        <tr><td data-i18n="r11_h">Output bàn giao</td><td data-i18n="r11_a">Không có gì ngoài chính task đó</td><td data-i18n="r11_b">SPEC.md, RUNBOOK.md (nếu có), README.md, git history</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="risksHeading">2 lỗ hổng kỹ thuật đáng chú ý</h2>
+    <div class="callout risk">
+      <h4 data-i18n="risk1Title">1. Giới hạn tần suất tối thiểu mâu thuẫn với ví dụ trong prompt gốc</h4>
+      <span data-i18n="risk1Body">Scheduled Task theo mặc định chỉ chạy tối thiểu mỗi giờ, trừ khi tổ chức bật riêng cho phép ngắn hơn.
+      Prompt gốc của Local Automation Map lại lấy ví dụ "polling every 5 minutes" cho trigger dạng event.
+      Nếu tài khoản không được cấp lịch dưới 1 giờ, chiến lược này không tạo được — nên kiểm tra giới hạn
+      thật của tổ chức trước khi build hết Stage 1–4.</span>
+    </div>
+    <div class="callout risk">
+      <h4 data-i18n="risk2Title">2. Thiếu khai báo "cần máy này" + đúng folder khi tạo Scheduled Task ở Stage 5</h4>
+      <span data-i18n="risk2Body">Muốn Scheduled Task chạy đúng script/.env/RUNBOOK/Chrome trên máy của bạn, lúc tạo phải khai máy cục
+      bộ và đúng thư mục automation. Prompt gốc không nhắc bước này — bỏ qua sẽ khiến lần chạy đầu tiên fail
+      vì không tìm thấy file, mà không rõ lý do tại sao.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="pickHeading">Khi nào dùng cái nào</h2>
+    <div class="cols2">
+      <div class="pickcard">
+        <h4 data-i18n="pick1Title">Dùng thẳng Scheduled Task</h4>
+        <ul>
+          <li data-i18n="pick1_li1">Việc đơn giản, không cần chạy dày hơn mỗi giờ</li>
+          <li data-i18n="pick1_li2">Không cần dedup/retry chặt chẽ</li>
+          <li data-i18n="pick1_li3">Chấp nhận Claude suy luận lại từ đầu mỗi lần, đổi lấy không cần viết code</li>
+        </ul>
+      </div>
+      <div class="pickcard">
+        <h4 data-i18n="pick2Title">Đi full quy trình Local Automation Map</h4>
+        <ul>
+          <li data-i18n="pick2_li1">Việc lặp lại thường xuyên, cần ổn định</li>
+          <li data-i18n="pick2_li2">Cần đảm bảo không xử lý trùng, cần log để audit khi sự cố</li>
+          <li data-i18n="pick2_li3">Muốn logic cố định, không phụ thuộc suy luận có thể lệch nhau giữa các lần chạy</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span data-i18n="footerPrefix">Companion to:</span>
+    <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">Local Automation Map</a>
+    · <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">Cloud Automation Map</a>
+    — <span data-i18n="footerSuffix">Trang chỉ để tham khảo, không có tương tác ngoài nút copy.</span>
+  </footer>
+
+</div>
+
+<script>
+var I18N = {
+  vi: {
+    eyebrow: "SO SÁNH · SCHEDULED TASK VS LOCAL AUTOMATION MAP",
+    h1: "Scheduled Task và Local Automation Map: quan hệ, khác biệt, khi nào dùng gì",
+    subtitle: "Scheduled Task không phải một phương án cạnh tranh với Local Automation Map — nó là cơ chế trigger (đánh thức theo lịch) mà Local Automation Map dùng ở Stage 5 trong quy trình 6 bước của mình. Trang này đối chiếu 2 cách dùng: tạo thẳng 1 Scheduled Task, so với đi hết quy trình 6 bước rồi mới gắn vào Scheduled Task.",
+    badge1_t: "1 quy trình ⊃ 1 cơ chế", badge1_b: "Scheduled Task chỉ là Stage 5 trong 6 bước của Local Automation Map",
+    badge2_t: "Lịch tối thiểu ~1 giờ", badge2_b: "Nền tảng thường từ chối lịch chạy dày hơn mỗi giờ",
+    badge3_t: "Cần khai báo máy", badge3_b: "Muốn chạy script/Chrome cục bộ phải bật \"cần máy này\"",
+    badge4_t: "Approval có thể treo task", badge4_b: "Nếu không ở chế độ tự duyệt, 1 action cần duyệt mà không ai trực → phiên dừng giữa chừng",
+    legend1: "Scheduled Task (cơ chế trigger)", legend2: "Các bước thuộc quy trình Local Automation Map", legend3: "Rủi ro / giới hạn cần lưu ý",
+    fulltextHeading: "Toàn văn so sánh (dạng text)", fulltextLead: "Bản rút gọn dạng text thuần, tiện copy vào ghi chú hoặc CLAUDE.md/AGENTS.md.",
+    btnViewFulltext: "Xem & copy toàn văn", btnHideFulltext: "Ẩn toàn văn", btnCopy: "Copy", btnCopied: "Đã copy ✓", btnCopyFail: "Không copy được",
+    diagramHeading: "Sơ đồ quan hệ", diagramLead: "Scheduled Task nằm lồng bên trong Stage 5 của Local Automation Map — không phải một khối tách biệt song song.",
+    containerLabel: "Local Automation Map — quy trình 6 bước",
+    s1_sub1: "Interview",
+    s2_sub1: "Confirm plan",
+    s3_sub1: "Build & test",
+    s4_sub1: "Confirm", s4_sub2: "lịch chạy",
+    s5_sub1: "Thiết lập", s5_sub2: "lịch chạy",
+    s6_sub1: "Verify &", s6_sub2: "handoff",
+    scheduledTaskSub: "cron / run-once · bộ điều phối trigger",
+    riskLine1: "Nếu tạo thẳng, bỏ qua Stage 1–4", riskLine2: "mất dedup · retry · dry-run · git · log", riskLine3: "→ mỗi lần fire, Claude tự suy luận lại từ đầu",
+    leftNote: "Toàn bộ khối bên trái (Stage 1–4, 6) không tồn tại nếu chỉ dùng Scheduled Task một mình.",
+    tableHeading: "Bảng so sánh chi tiết",
+    col1: "Khía cạnh", col2: "Scheduled Task (dùng trần)", col3: "Local Automation Map (quy trình đầy đủ)",
+    r1_h:"Bản chất", r1_a:"Cơ chế trigger thuần: cron hoặc chạy 1 lần, đánh thức 1 phiên và gửi vào 1 prompt", r1_b:"Quy trình 6 bước; Scheduled Task chỉ là cơ chế trigger ở Stage 5",
+    r2_h:"Logic xử lý mỗi lần fire", r2_a:"Claude tự suy luận lại từ đầu mỗi lần, dựa hoàn toàn vào prompt đã lưu", r2_b:"Bước có API → local script cố định (deterministic); chỉ bước cần phán đoán mới để Claude suy luận",
+    r3_h:"Dedup", r3_a:"Không có sẵn — phải tự thiết kế nếu muốn", r3_b:"Bắt buộc: SPEC.md yêu cầu field \"has this been processed\" + lưu ID đã xử lý vào file local",
+    r4_h:"Retry khi lỗi mạng", r4_a:"Tuỳ Claude tự quyết định lúc chạy, không đảm bảo", r4_b:"Bắt buộc trong code: <code>retries with backoff</code> trên mọi network call",
+    r5_h:"Kiểm thử trước khi live", r5_a:"Không bắt buộc — tạo xong có thể chạy thật ngay", r5_b:"Bắt buộc dry-run, chỉ chạy thật khi khớp Acceptance trong SPEC.md",
+    r6_h:"Version control", r6_a:"Không có", r6_b:"git commit local sau mỗi lần build/test",
+    r7_h:"Log / Audit", r7_a:"Phải lục lại transcript phiên đã chạy", r7_b:"Log rõ từng bước + README ghi sẵn 3 điều cần check khi lỗi",
+    r8_h:"Chi phí token / lần", r8_a:"Toàn bộ do Claude suy luận lại → tốn token dù việc lặp y hệt", r8_b:"Phần script gần như free; chỉ AI judgment mới tốn suy luận",
+    r9_h:"Approval khi fire", r9_a:"Theo <code>permission_mode</code>: nếu không auto, action cần duyệt mà không ai trực → dừng giữa chừng", r9_b:"Rủi ro y hệt — quy trình không giải quyết, chỉ Stage 5 có bước test thủ công để phát hiện sớm",
+    r10_h:"Cần máy cụ thể", r10_a:"Mặc định không — có thể chạy hoàn toàn trên cloud", r10_b:"Luôn cần — script/.env/git repo sống trên máy, phải khai <code>requires_local_device: true</code>",
+    r11_h:"Output bàn giao", r11_a:"Không có gì ngoài chính task đó", r11_b:"SPEC.md, RUNBOOK.md (nếu có), README.md, git history",
+    risksHeading: "2 lỗ hổng kỹ thuật đáng chú ý",
+    risk1Title: "1. Giới hạn tần suất tối thiểu mâu thuẫn với ví dụ trong prompt gốc",
+    risk1Body: "Scheduled Task theo mặc định chỉ chạy tối thiểu mỗi giờ, trừ khi tổ chức bật riêng cho phép ngắn hơn. Prompt gốc của Local Automation Map lại lấy ví dụ \"polling every 5 minutes\" cho trigger dạng event. Nếu tài khoản không được cấp lịch dưới 1 giờ, chiến lược này không tạo được — nên kiểm tra giới hạn thật của tổ chức trước khi build hết Stage 1–4.",
+    risk2Title: "2. Thiếu khai báo \"cần máy này\" + đúng folder khi tạo Scheduled Task ở Stage 5",
+    risk2Body: "Muốn Scheduled Task chạy đúng script/.env/RUNBOOK/Chrome trên máy của bạn, lúc tạo phải khai máy cục bộ và đúng thư mục automation. Prompt gốc không nhắc bước này — bỏ qua sẽ khiến lần chạy đầu tiên fail vì không tìm thấy file, mà không rõ lý do tại sao.",
+    pickHeading: "Khi nào dùng cái nào",
+    pick1Title: "Dùng thẳng Scheduled Task", pick1_li1:"Việc đơn giản, không cần chạy dày hơn mỗi giờ", pick1_li2:"Không cần dedup/retry chặt chẽ", pick1_li3:"Chấp nhận Claude suy luận lại từ đầu mỗi lần, đổi lấy không cần viết code",
+    pick2Title: "Đi full quy trình Local Automation Map", pick2_li1:"Việc lặp lại thường xuyên, cần ổn định", pick2_li2:"Cần đảm bảo không xử lý trùng, cần log để audit khi sự cố", pick2_li3:"Muốn logic cố định, không phụ thuộc suy luận có thể lệch nhau giữa các lần chạy",
+    footerPrefix: "Companion to:", footerSuffix: "Trang chỉ để tham khảo, không có tương tác ngoài nút copy.",
+    fulltextContent: document_fulltext_vi()
+  },
+  en: {
+    eyebrow: "COMPARISON · SCHEDULED TASK VS LOCAL AUTOMATION MAP",
+    h1: "Scheduled Task and Local Automation Map: relationship, differences, when to use which",
+    subtitle: "Scheduled Task isn't a competing option to Local Automation Map — it's the trigger mechanism (wake-up on a schedule) that Local Automation Map uses at Stage 5 of its six-stage process. This page compares two approaches: creating a Scheduled Task directly, versus going through the full six-stage process before wiring it to a Scheduled Task.",
+    badge1_t: "1 process ⊃ 1 mechanism", badge1_b: "Scheduled Task is only Stage 5 within Local Automation Map's six stages",
+    badge2_t: "Minimum interval ~1 hour", badge2_b: "Platforms usually reject schedules tighter than hourly",
+    badge3_t: "Requires declaring a device", badge3_b: "To run local scripts/Chrome, you must enable \"requires this computer\"",
+    badge4_t: "Approval can stall a run", badge4_b: "If not in auto-approve mode, an action needing approval with no one there stops the run midway",
+    legend1: "Scheduled Task (trigger mechanism)", legend2: "Steps belonging to the Local Automation Map process", legend3: "Risks / limitations to note",
+    fulltextHeading: "Full comparison (plain text)", fulltextLead: "A condensed plain-text version, handy to paste into notes or CLAUDE.md/AGENTS.md.",
+    btnViewFulltext: "View & copy full text", btnHideFulltext: "Hide full text", btnCopy: "Copy", btnCopied: "Copied ✓", btnCopyFail: "Could not copy",
+    diagramHeading: "Relationship diagram", diagramLead: "Scheduled Task sits nested inside Stage 5 of Local Automation Map — not a separate parallel block.",
+    containerLabel: "Local Automation Map — six-stage process",
+    s1_sub1: "Interview",
+    s2_sub1: "Confirm plan",
+    s3_sub1: "Build & test",
+    s4_sub1: "Confirm", s4_sub2: "schedule",
+    s5_sub1: "Set up", s5_sub2: "schedule",
+    s6_sub1: "Verify &", s6_sub2: "handoff",
+    scheduledTaskSub: "cron / run-once · trigger engine",
+    riskLine1: "If created directly, skipping Stage 1–4", riskLine2: "loses dedup · retry · dry-run · git · log", riskLine3: "→ every fire, Claude reasons from scratch again",
+    leftNote: "The entire left block (Stage 1–4, 6) doesn't exist if you only use Scheduled Task alone.",
+    tableHeading: "Detailed comparison table",
+    col1: "Aspect", col2: "Scheduled Task (used directly)", col3: "Local Automation Map (full process)",
+    r1_h:"Nature", r1_a:"Pure trigger mechanism: cron or one-off run, wakes a session and sends it a prompt", r1_b:"Six-stage process; Scheduled Task is only the trigger mechanism at Stage 5",
+    r2_h:"Processing logic per fire", r2_a:"Claude reasons from scratch every time, based entirely on the saved prompt", r2_b:"Steps with an API → fixed local script (deterministic); only judgment steps have Claude reason live",
+    r3_h:"Dedup", r3_a:"Not built in — must be designed yourself if wanted", r3_b:"Mandatory: SPEC.md requires a \"has this been processed\" field + stores processed IDs in a local file",
+    r4_h:"Retry on network errors", r4_a:"Up to Claude to decide at runtime, not guaranteed", r4_b:"Mandatory in code: <code>retries with backoff</code> on every network call",
+    r5_h:"Testing before going live", r5_a:"Not required — can run for real right after creation", r5_b:"Mandatory dry-run first, only runs for real once it matches the Acceptance field in SPEC.md",
+    r6_h:"Version control", r6_a:"None", r6_b:"Local git commit after every build/test",
+    r7_h:"Log / Audit", r7_a:"Must dig through the run's transcript", r7_b:"Clear per-step log + README with the 3 things to check first when it fails",
+    r8_h:"Token cost per run", r8_a:"Entirely reasoned by Claude each time → costs tokens even for identical repeats", r8_b:"Script portion is nearly free; only AI judgment consumes reasoning",
+    r9_h:"Approval on fire", r9_a:"Depends on <code>permission_mode</code>: if not auto, an action needing approval with no one there → stalls mid-run", r9_b:"Same risk exactly — the process doesn't solve this, Stage 5 only has a manual test run to catch it early",
+    r10_h:"Needs a specific device", r10_a:"Not by default — can run entirely in the cloud", r10_b:"Always — script/.env/git repo live on that machine, must declare <code>requires_local_device: true</code>",
+    r11_h:"Handover output", r11_a:"Nothing beyond the task itself", r11_b:"SPEC.md, RUNBOOK.md (if any), README.md, git history",
+    risksHeading: "2 technical gaps worth flagging",
+    risk1Title: "1. Minimum interval conflicts with the original prompt's example",
+    risk1Body: "By default a Scheduled Task only runs as often as hourly, unless the organization enables shorter intervals. The original Local Automation Map prompt gives \"polling every 5 minutes\" as an example for event-based triggers. If your account isn't granted sub-hourly scheduling, this strategy simply can't be created — check your organization's real scheduling limit before building through Stage 1–4.",
+    risk2Title: "2. Missing \"requires this device\" + correct folder declaration at Stage 5",
+    risk2Body: "For a Scheduled Task to actually run your script/.env/RUNBOOK/Chrome on your machine, you must declare the local device and the correct automation folder when creating it. The original prompt never mentions this step — skipping it means the first real run fails because files can't be found, with no clear reason why.",
+    pickHeading: "When to use which",
+    pick1Title: "Use Scheduled Task directly", pick1_li1:"Simple task, hourly-or-looser schedule is fine", pick1_li2:"No need for strict dedup/retry", pick1_li3:"Fine with Claude reasoning from scratch each time, in exchange for not writing code",
+    pick2Title: "Go through the full Local Automation Map process", pick2_li1:"Frequently repeating task that needs to be stable", pick2_li2:"Must guarantee no duplicate processing, needs logs for audit", pick2_li3:"Want fixed logic, not dependent on reasoning that can vary run to run",
+    footerPrefix: "Companion to:", footerSuffix: "Reference only, no interaction besides the copy button.",
+    fulltextContent: document_fulltext_en()
+  },
+  zh: {
+    eyebrow: "比較 · SCHEDULED TASK 與 LOCAL AUTOMATION MAP",
+    h1: "Scheduled Task 與 Local Automation Map:關係、差異、該用哪一個",
+    subtitle: "Scheduled Task 不是 Local Automation Map 的競爭方案 — 它是 Local Automation Map 六階段流程中,第 5 階段所使用的觸發機制(依排程喚醒)。本頁對照兩種用法:直接建立 1 個 Scheduled Task,以及走完整套六階段流程後再接上 Scheduled Task。",
+    badge1_t: "1 流程 ⊃ 1 機制", badge1_b: "Scheduled Task 只是 Local Automation Map 六階段中的第 5 階段",
+    badge2_t: "排程最短約 1 小時", badge2_b: "平台通常會拒絕比每小時更密集的排程",
+    badge3_t: "需要指定裝置", badge3_b: "要在本機執行 script/Chrome,必須開啟「需要這台電腦」",
+    badge4_t: "審核可能卡住任務", badge4_b: "若非自動核准模式,遇到需要人工核准的動作卻沒人在場 → 該次執行會卡在中途",
+    legend1: "Scheduled Task(觸發機制)", legend2: "屬於 Local Automation Map 流程的步驟", legend3: "需要留意的風險/限制",
+    fulltextHeading: "完整比較(純文字版)", fulltextLead: "精簡的純文字版本,方便貼到筆記或 CLAUDE.md/AGENTS.md。",
+    btnViewFulltext: "查看並複製全文", btnHideFulltext: "隱藏全文", btnCopy: "複製", btnCopied: "已複製 ✓", btnCopyFail: "複製失敗",
+    diagramHeading: "關係示意圖", diagramLead: "Scheduled Task 是嵌套在 Local Automation Map 第 5 階段裡面 — 不是並列的獨立區塊。",
+    containerLabel: "Local Automation Map — 六階段流程",
+    s1_sub1: "訪談",
+    s2_sub1: "確認計畫",
+    s3_sub1: "建置與測試",
+    s4_sub1: "確認", s4_sub2: "排程",
+    s5_sub1: "設定", s5_sub2: "排程",
+    s6_sub1: "驗收與", s6_sub2: "交接",
+    scheduledTaskSub: "cron / run-once · 觸發引擎",
+    riskLine1: "若跳過 Stage 1–4 直接建立", riskLine2: "會失去 dedup · retry · dry-run · git · log", riskLine3: "→ 每次觸發,Claude 都要從頭重新推理",
+    leftNote: "如果只單獨使用 Scheduled Task,左側整個區塊(Stage 1–4、6)並不存在。",
+    tableHeading: "詳細比較表",
+    col1: "面向", col2: "Scheduled Task(直接使用)", col3: "Local Automation Map(完整流程)",
+    r1_h:"本質", r1_a:"純粹的觸發機制:cron 或執行一次,喚醒 1 個 session 並丟入 1 個 prompt", r1_b:"六階段流程;Scheduled Task 只是第 5 階段用的觸發機制",
+    r2_h:"每次觸發的處理邏輯", r2_a:"Claude 每次都要從頭重新推理,完全依賴事先寫好的 prompt", r2_b:"有 API 的步驟 → 固定的 local script(deterministic);只有需要判斷的步驟才讓 Claude 即時推理",
+    r3_h:"去重(Dedup)", r3_a:"預設沒有 — 想要就得自己設計", r3_b:"強制要求:SPEC.md 必須有「是否已處理過」欄位,並把已處理 ID 存成本機檔案",
+    r4_h:"網路錯誤重試", r4_a:"由 Claude 當下自行判斷,不保證", r4_b:"程式碼中強制要求:每次網路呼叫都要有 <code>retries with backoff</code>",
+    r5_h:"上線前測試", r5_a:"非強制 — 建立完就能直接正式執行", r5_b:"強制先 dry-run,符合 SPEC.md 的 Acceptance 才會真正執行",
+    r6_h:"版本控制", r6_a:"沒有", r6_b:"每次 build/test 後都有本機 git commit",
+    r7_h:"紀錄/事後追查", r7_a:"得回頭翻執行過的 transcript", r7_b:"每一步都有清楚 log,README 也預先寫好故障時要先檢查的 3 件事",
+    r8_h:"每次執行的 token 成本", r8_a:"完全由 Claude 重新推理 → 即使內容完全重複也要耗費 token", r8_b:"script 部分幾乎免費;只有 AI judgment 那步才耗費推理",
+    r9_h:"觸發時的核准機制", r9_a:"取決於 <code>permission_mode</code>:若非自動核准,遇到需要核准卻沒人在場的動作 → 卡在中途", r9_b:"風險完全相同 — 流程本身沒有解決,只有第 5 階段的手動測試能提早發現",
+    r10_h:"是否需要特定裝置", r10_a:"預設不需要 — 可以完全在雲端執行", r10_b:"永遠需要 — script/.env/git repo 都在那台機器上,必須宣告 <code>requires_local_device: true</code>",
+    r11_h:"交接產出", r11_a:"除了任務本身,沒有其他東西", r11_b:"SPEC.md、RUNBOOK.md(如果有)、README.md、git 歷史紀錄",
+    risksHeading: "2 個值得注意的技術漏洞",
+    risk1Title: "1. 最短排程間隔與原始 prompt 的範例互相矛盾",
+    risk1Body: "Scheduled Task 預設最短每小時才能執行一次,除非組織另外開放更短的間隔。Local Automation Map 原始 prompt 卻以「polling every 5 minutes」作為事件觸發的範例。如果你的帳號沒有取得低於 1 小時的排程權限,這個策略根本建立不出來 — 建議在走完 Stage 1–4 之前,先確認組織實際的排程限制。",
+    risk2Title: "2. 第 5 階段建立 Scheduled Task 時,沒有提到要宣告「需要這台電腦」與正確資料夾",
+    risk2Body: "要讓 Scheduled Task 真的在你的電腦上執行 script/.env/RUNBOOK/Chrome,建立時必須指定本機裝置與正確的 automation 資料夾。原始 prompt 完全沒提到這一步 — 漏掉的話,第一次正式執行就會因為找不到檔案而失敗,而且不容易看出原因。",
+    pickHeading: "什麼情況該用哪一個",
+    pick1Title: "直接使用 Scheduled Task", pick1_li1:"任務單純,排程間隔在 1 小時以上就夠用", pick1_li2:"不需要嚴謹的 dedup/retry", pick1_li3:"可以接受 Claude 每次都從頭重新推理,換取不用寫程式",
+    pick2Title: "走完整套 Local Automation Map 流程", pick2_li1:"任務會頻繁重複執行,需要穩定", pick2_li2:"必須確保不會重複處理,需要 log 以便事後追查", pick2_li3:"希望邏輯固定,不想依賴每次執行可能不一致的推理",
+    footerPrefix: "對照文件:", footerSuffix: "本頁僅供參考,除複製按鈕外沒有其他互動。",
+    fulltextContent: document_fulltext_zh()
+  }
+};
+
+function document_fulltext_vi(){
+  return document.getElementById('fulltext').textContent;
+}
+function document_fulltext_en(){
+  return "SCHEDULED TASK vs LOCAL AUTOMATION MAP\n\n" +
+"Relationship: Scheduled Task is a trigger mechanism (cron or one-off run) that wakes a\n" +
+"Claude session to run 1 prompt. Local Automation Map is a six-stage process (interview ->\n" +
+"SPEC.md -> build script/RUNBOOK/AI judgment -> dry-run/test -> git commit -> configure\n" +
+"Scheduled Task -> verify/handoff), where Scheduled Task is only the trigger mechanism used\n" +
+"at Stage 5.\n\n" +
+"Key differences:\n" +
+"- Processing logic per fire: raw Scheduled Task makes Claude reason from scratch each time;\n" +
+"  Local Automation Map runs API-backed steps as a fixed local script, only judgment steps\n" +
+"  have Claude reason live.\n" +
+"- Dedup: raw Scheduled Task has none by default; Local Automation Map mandates storing\n" +
+"  processed IDs.\n" +
+"- Retry on network errors: raw Scheduled Task depends on Claude; Local Automation Map\n" +
+"  mandates retry with backoff in code.\n" +
+"- Testing before going live: raw Scheduled Task doesn't require it; Local Automation Map\n" +
+"  mandates a dry-run first, real run only once it matches Acceptance.\n" +
+"- Version control: raw Scheduled Task has none; Local Automation Map has local git commits.\n" +
+"- Approval on fire: same risk on both sides — if permission_mode isn't auto, an action\n" +
+"  needing approval with no one there stalls the run midway.\n" +
+"- Device requirement: raw Scheduled Task doesn't need the user's device by default (runs in\n" +
+"  the cloud); Local Automation Map always needs the device + Claude app + Chrome because the\n" +
+"  script/.env/git live there, so it must declare \"requires_local_device\" and the right folder.\n" +
+"- Token cost: raw Scheduled Task spends tokens every run even for identical repeats; Local\n" +
+"  Automation Map only spends reasoning on the AI judgment step, the script part is nearly free.\n" +
+"- Audit: raw Scheduled Task requires digging through transcripts; Local Automation Map has a\n" +
+"  clear per-step log + a README listing the 3 things to check first when it fails.\n\n" +
+"2 technical gaps worth flagging:\n" +
+"1. The minimum scheduling interval (~1 hour) can conflict with the \"polling every 5 minutes\"\n" +
+"   example the original Local Automation Map prompt gives for event-based triggers. Check\n" +
+"   your organization's real scheduling limit before building.\n" +
+"2. The original prompt never mentions declaring \"requires_local_device\" + the correct folder\n" +
+"   when creating the Scheduled Task at Stage 5. Skipping this makes the task run as a plain\n" +
+"   cloud session that can't see your script/repo/Chrome, and it fails on the very first run.\n\n" +
+"When to use which:\n" +
+"- Use Scheduled Task directly: simple task, hourly-or-looser schedule is enough, no need for\n" +
+"  strict dedup/retry, fine with Claude reasoning from scratch each time.\n" +
+"- Go through the full Local Automation Map process: frequently repeating task, needs dedup,\n" +
+"  needs logs for audit, wants fixed logic independent of reasoning that can vary run to run.";
+}
+function document_fulltext_zh(){
+  return "SCHEDULED TASK 對比 LOCAL AUTOMATION MAP\n\n" +
+"關係:Scheduled Task 是觸發機制(cron 或執行一次),用來喚醒 1 個 Claude session 執行\n" +
+"1 個 prompt。Local Automation Map 是六階段流程(訪談 -> SPEC.md -> 建置 script/RUNBOOK/\n" +
+"AI judgment -> dry-run/測試 -> git commit -> 設定 Scheduled Task -> 驗收/交接),其中\n" +
+"Scheduled Task 只是第 5 階段所使用的觸發機制。\n\n" +
+"主要差異:\n" +
+"- 每次觸發的處理邏輯:直接使用 Scheduled Task 會讓 Claude 每次都從頭重新推理;Local\n" +
+"  Automation Map 讓有 API 的步驟跑固定的 local script,只有需要判斷的步驟才讓 Claude\n" +
+"  即時推理。\n" +
+"- 去重(Dedup):直接使用 Scheduled Task 預設沒有;Local Automation Map 強制要求儲存\n" +
+"  已處理過的 ID。\n" +
+"- 網路錯誤重試:直接使用 Scheduled Task 靠 Claude 當下判斷;Local Automation Map 在\n" +
+"  程式碼中強制要求 retry with backoff。\n" +
+"- 上線前測試:直接使用 Scheduled Task 非強制;Local Automation Map 強制先 dry-run,\n" +
+"  符合 Acceptance 才正式執行。\n" +
+"- 版本控制:直接使用 Scheduled Task 沒有;Local Automation Map 有本機 git commit。\n" +
+"- 觸發時的核准機制:兩者風險相同 — 若 permission_mode 不是自動核准,遇到需要核准卻\n" +
+"  沒人在場的動作,該次執行會卡在中途。\n" +
+"- 裝置需求:直接使用 Scheduled Task 預設不需要使用者的電腦(可在雲端執行);Local\n" +
+"  Automation Map 永遠需要電腦 + Claude app + Chrome,因為 script/.env/git 都在那台機器\n" +
+"  上,必須宣告 requires_local_device 與正確資料夾。\n" +
+"- Token 成本:直接使用 Scheduled Task 每次都要花費 token,即使內容完全重複;Local\n" +
+"  Automation Map 只有 AI judgment 那步才耗費推理,script 部分幾乎免費。\n" +
+"- 事後追查:直接使用 Scheduled Task 得回頭翻 transcript;Local Automation Map 有清楚\n" +
+"  的每步 log,README 也預先寫好故障時要先檢查的 3 件事。\n\n" +
+"2 個值得注意的技術漏洞:\n" +
+"1. 最短排程間隔(約 1 小時)可能與 Local Automation Map 原始 prompt 針對事件觸發給的\n" +
+"   「polling every 5 minutes」範例互相矛盾。建置前請先確認組織實際的排程限制。\n" +
+"2. 原始 prompt 完全沒提到在第 5 階段建立 Scheduled Task 時,要宣告「需要這台電腦」與\n" +
+"   正確的資料夾。漏掉這一步會讓任務變成單純的雲端 session,看不到你的 script/repo/\n" +
+"   Chrome,第一次執行就會失敗。\n\n" +
+"什麼情況該用哪一個:\n" +
+"- 直接使用 Scheduled Task:任務單純,排程間隔 1 小時以上就夠用,不需要嚴謹的\n" +
+"  dedup/retry,可以接受 Claude 每次都從頭重新推理。\n" +
+"- 走完整套 Local Automation Map 流程:任務會頻繁重複執行,需要 dedup,需要 log 以便\n" +
+"  事後追查,希望邏輯固定,不依賴每次執行可能不一致的推理。";
+}
+
+var currentLang = 'vi';
+var fulltextOpen = false;
+
+function setLang(lang){
+  if(!I18N[lang]) return;
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key = el.getAttribute('data-i18n');
+    if(I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    var key = el.getAttribute('data-i18n-html');
+    if(I18N[lang][key] !== undefined) el.innerHTML = I18N[lang][key];
+  });
+  document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : lang;
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  var toggleBtn = document.getElementById('toggleBtn');
+  toggleBtn.textContent = fulltextOpen ? I18N[lang].btnHideFulltext : I18N[lang].btnViewFulltext;
+  document.getElementById('copyBtn').textContent = I18N[lang].btnCopy;
+}
+
+function toggleFullText(){
+  var pre = document.getElementById('fulltext');
+  pre.classList.toggle('open');
+  fulltextOpen = pre.classList.contains('open');
+  document.getElementById('toggleBtn').textContent = fulltextOpen ? I18N[currentLang].btnHideFulltext : I18N[currentLang].btnViewFulltext;
+}
+
+function copyFullText(){
+  var pre = document.getElementById('fulltext');
+  var text = pre.innerText || pre.textContent;
+  var btn = document.getElementById('copyBtn');
+  var original = I18N[currentLang].btnCopy;
+  function done(ok){
+    btn.textContent = ok ? I18N[currentLang].btnCopied : I18N[currentLang].btnCopyFail;
+    setTimeout(function(){ btn.textContent = original; }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(false);});
+  } else {
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(true);
+    }catch(e){ done(false); }
+  }
+}
+
+// initialize default language (matches original page content already in the HTML)
+document.addEventListener('DOMContentLoaded', function(){
+  setLang('vi');
+});
+</script>
+</body>
+</html>
