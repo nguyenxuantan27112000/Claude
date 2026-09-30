@@ -1,0 +1,89 @@
+{
+  "updated": "2026-09-30",
+  "projects": [
+    {
+      "id": "iems-breakpoint-check",
+      "name": {
+        "vi": "iEMS Breakpoint Check – 8:30 AM (T2–T7, tự chạy bù)",
+        "en": "iEMS Breakpoint Check – 8:30 AM (Mon–Sat, auto catch-up)",
+        "zh": "iEMS Breakpoint Check – 8:30 AM(週一至週六,自動補跑)"
+      },
+      "summary": {
+        "vi": "Thẩm định hằng ngày các cờ Break point trên iEMS (Meter reading correction): phân loại cờ hợp lệ / gắn sai / bỏ sót, cấp mã duyệt để Tân quyết định, ghi log và cập nhật báo cáo ISO nước.",
+        "en": "Daily audit of Break point flags in iEMS (Meter reading correction): classifies flags as valid / wrongly set / missed, issues approval codes for Tân to decide, keeps a log and updates the ISO water report.",
+        "zh": "每天稽核 iEMS(Meter reading correction)的 Break point 標記:分類為有效/誤標/漏標,發出核准代碼由 Tân 決定,記錄日誌並更新 ISO 用水報表。"
+      },
+      "module": ["iEMS"],
+      "type": "scheduled-task",
+      "status": "active",
+      "since": "2026-09-09",
+      "schedule": {
+        "vi": "08:30 thứ 2 → thứ 7 (Asia/Bangkok) · tự chạy bù ngày thiếu trong 7 ngày",
+        "en": "08:30 Monday → Saturday (Asia/Bangkok) · auto catch-up of missed days within 7 days",
+        "zh": "週一至週六 08:30(Asia/Bangkok)· 自動補跑 7 天內缺漏的日期"
+      },
+      "stack": ["Cowork Scheduled Task", "Claude in Chrome", "ec_calc.py", "check.py", "Windows Task Scheduler", "NAS sync"],
+      "steps": [
+        {
+          "vi": "Bước 1 — thẩm định & báo cáo: chỉ đọc, đọc dữ liệu lưới, phân loại Nhóm 1/2/3, cấp mã duyệt",
+          "en": "Step 1 — audit & report: read-only, reads grid data, classifies Group 1/2/3, issues approval codes",
+          "zh": "Step 1 — 稽核與報告:只讀、讀取表格資料、分類第 1/2/3 組、發出核准代碼"
+        },
+        {
+          "vi": "Bước 2 — thực thi Clear reset / Set as reset khi có mã duyệt, hậu kiểm và đối chiếu Report",
+          "en": "Step 2 — executes Clear reset / Set as reset only with an approval code, then post-checks against the Report",
+          "zh": "Step 2 — 僅在有核准代碼時執行 Clear reset / Set as reset,事後檢查並對照 Report"
+        },
+        {
+          "vi": "Bước 3 — ghi báo cáo ISO (check.py qua Windows Task Scheduler, bàn giao bằng file cờ)",
+          "en": "Step 3 — writes the ISO report (check.py via Windows Task Scheduler, handed off with a flag file)",
+          "zh": "Step 3 — 寫入 ISO 報表(check.py 經 Windows Task Scheduler 執行,以旗標檔交接)"
+        },
+        {
+          "vi": "Ghi log Breakpoints-Log.docx và đồng bộ log + báo cáo ISO lên NAS",
+          "en": "Logs to Breakpoints-Log.docx and syncs the log + ISO report to the NAS",
+          "zh": "記錄於 Breakpoints-Log.docx,並將日誌與 ISO 報表同步到 NAS"
+        }
+      ],
+      "versions": [
+        {
+          "v": 2,
+          "date": "2026-09-28",
+          "path": "iems-breakpoint-check/v2.html",
+          "note": {
+            "vi": "Cập nhật toàn diện: Bước 3 chạy qua Task Scheduler, đọc dữ liệu lưới, đồng bộ NAS, lịch T2–T7 + chạy bù, Clear reset thật lần đầu",
+            "en": "Full refresh: Step 3 via Task Scheduler, grid-data reading, NAS sync, Mon–Sat schedule + catch-up, first real Clear reset",
+            "zh": "全面更新:Step 3 改由 Task Scheduler 執行、讀取表格資料、NAS 同步、週一至週六排程 + 補跑、首次真正執行 Clear reset"
+          }
+        },
+        {
+          "v": 1,
+          "date": "2026-09-18",
+          "path": "iems-breakpoint-check/v1.html",
+          "note": {
+            "vi": "Bản gốc: đối chiếu cấu hình thật của task với quy trình 6 bước của Local Automation Map",
+            "en": "Baseline: the task's real configuration compared against Local Automation Map's six-stage process",
+            "zh": "基準版:以任務的真實設定對照 Local Automation Map 六階段流程"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": [
+    {
+      "id": "scheduled-task-vs-local-automation-map",
+      "title": {
+        "vi": "Scheduled Task và Local Automation Map: quan hệ, khác biệt, khi nào dùng gì",
+        "en": "Scheduled Task and Local Automation Map: relationship, differences, when to use which",
+        "zh": "Scheduled Task 與 Local Automation Map:關係、差異、該用哪一個"
+      },
+      "summary": {
+        "vi": "Scheduled Task là cơ chế trigger mà Local Automation Map dùng ở Stage 5 — trang đối chiếu tạo thẳng 1 Scheduled Task với đi hết quy trình 6 bước.",
+        "en": "Scheduled Task is the trigger mechanism Local Automation Map uses at Stage 5 — compares creating a Scheduled Task directly with going through the full six-stage process.",
+        "zh": "Scheduled Task 是 Local Automation Map 在第 5 階段使用的觸發機制 — 對照直接建立 Scheduled Task 與走完整套六階段流程。"
+      },
+      "date": "2026-09-18",
+      "path": "docs/scheduled-task-vs-local-automation-map.html"
+    }
+  ]
+}

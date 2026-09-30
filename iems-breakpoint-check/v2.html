@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="pageTitle">iEMS Breakpoint Check · Version 2(09/28)· 對照 09/18 報告與 Local Automation Map</title>
+<style>
+  :root{
+    --bg:#f7f6f3;
+    --card:#ffffff;
+    --ink:#1b1b1f;
+    --muted:#6b6b70;
+    --border:#e4e2dc;
+    --blue:#2f5fd8;
+    --blue-bg:#eaf0ff;
+    --amber:#b8790a;
+    --amber-bg:#fdf1dd;
+    --red:#b3261e;
+    --red-bg:#fdecea;
+    --green:#1e8e5a;
+    --green-bg:#e8f6ee;
+    --grey:#5b6470;
+    --grey-bg:#eef0f2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
+  }
+  .container{max-width:1080px;margin:0 auto;padding:40px 20px 80px;position:relative;}
+  .langswitch{
+    position:fixed;top:18px;right:18px;background:#fff;border:1px solid var(--border);
+    border-radius:999px;padding:4px;display:flex;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,0.08);z-index:50;
+  }
+  .langswitch button{
+    border:none;background:transparent;padding:7px 13px;border-radius:999px;
+    font-size:0.8rem;cursor:pointer;color:var(--muted);font-weight:600;
+  }
+  .langswitch button.active{background:var(--ink);color:#fff;}
+  .langswitch button:hover:not(.active){color:var(--ink);}
+  @media (max-width:640px){
+    .langswitch{position:static;display:inline-flex;margin-bottom:18px;box-shadow:none;}
+  }
+  .eyebrow{
+    display:inline-block;font-size:0.7rem;letter-spacing:0.04em;font-weight:700;
+    text-transform:uppercase;color:var(--blue);background:var(--blue-bg);
+    padding:5px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  h1{font-size:1.7rem;margin:0 0 8px;line-height:1.28;}
+  .subtitle{color:var(--muted);max-width:840px;font-size:0.98rem;}
+  nav.companion{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  nav.companion a{
+    text-decoration:none;font-size:0.83rem;padding:7px 14px;
+    border:1px solid var(--border);border-radius:999px;color:var(--ink);background:var(--card);
+  }
+  nav.companion a:hover{border-color:var(--blue);color:var(--blue);}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0;}
+  .badge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 16px;font-size:0.82rem;min-width:170px;flex:1 1 210px;}
+  .badge b{display:block;font-size:0.95rem;margin-bottom:2px;}
+  .badge.risk{border-color:var(--red);background:var(--red-bg);}
+  .tag{display:inline-block;font-size:0.68rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:middle;white-space:nowrap;}
+  .tag-resolved{background:var(--green-bg);color:var(--green);}
+  .tag-unchanged{background:var(--grey-bg);color:var(--grey);}
+  .tag-escalated{background:var(--red-bg);color:var(--red);}
+  .tag-new{background:var(--amber-bg);color:var(--amber);}
+  .tagline{display:flex;gap:8px;flex-wrap:wrap;font-size:0.78rem;color:var(--muted);align-items:center;margin-bottom:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:26px;}
+  .card h2{font-size:1.15rem;margin:0 0 14px;}
+  .card p.lead{color:var(--muted);margin:0 0 18px;font-size:0.92rem;}
+  .fulltext-box .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  button.copy-btn{
+    background:var(--ink);color:#fff;border:none;padding:10px 16px;
+    border-radius:10px;cursor:pointer;font-size:0.83rem;white-space:nowrap;
+  }
+  button.copy-btn:hover{opacity:0.85;}
+  button.copy-btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--border);}
+  pre.fulltext{
+    display:none;margin-top:16px;background:#0f0f10;color:#eaeaea;
+    padding:18px;border-radius:10px;overflow-x:auto;font-size:0.78rem;
+    white-space:pre-wrap;line-height:1.5;
+  }
+  pre.fulltext.open{display:block;}
+  .timeline{margin:0;padding:0;list-style:none;}
+  .timeline li{border-left:2px solid var(--border);padding:0 0 20px 20px;position:relative;margin-left:6px;}
+  .timeline li:last-child{padding-bottom:0;}
+  .timeline li::before{content:"";position:absolute;left:-6px;top:2px;width:10px;height:10px;border-radius:50%;background:var(--green);}
+  .timeline b{display:block;font-size:0.95rem;margin-bottom:4px;}
+  .timeline span{font-size:0.88rem;color:var(--muted);}
+  table.compare{width:100%;border-collapse:collapse;font-size:0.83rem;}
+  table.compare th,table.compare td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.compare thead th{background:var(--blue-bg);color:var(--blue);font-weight:700;font-size:0.78rem;}
+  table.compare tbody tr:nth-child(even) td{background:#fbfaf8;}
+  table.compare td:first-child{font-weight:600;}
+  table.compare code{background:#eee;padding:1px 5px;border-radius:4px;font-size:0.76rem;}
+  .callout{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:16px;font-size:0.9rem;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-bg);}
+  .callout.good{border-left-color:var(--green);background:var(--green-bg);}
+  .callout h4{margin:0 0 6px;font-size:0.95rem;display:flex;align-items:center;flex-wrap:wrap;}
+  .reclist{margin:0;padding-left:20px;font-size:0.92rem;}
+  .reclist li{margin-bottom:10px;}
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);}
+  footer a{color:var(--muted);}
+  svg text{font-family:inherit;}
+  .diagram-wrap{overflow-x:auto;}
+  .note-sensitive{font-size:0.78rem;color:var(--muted);margin-top:10px;font-style:italic;}
+  .dnote{font-size:0.8rem;color:var(--muted);margin:12px 0 0;}
+  .table-wrap{overflow-x:auto;}
+  .timeline span{display:block;}
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="langswitch" role="group" aria-label="Language switch">
+    <button class="langbtn active" data-lang="zh" onclick="setLang('zh')">中文</button>
+    <button class="langbtn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="langbtn" data-lang="vi" onclick="setLang('vi')">VI</button>
+  </div>
+
+  <span class="eyebrow" data-i18n="eyebrow">VERSION 2 · 09/28 更新 · 對照 09/18 報告與 LOCAL AUTOMATION MAP</span>
+  <h1 data-i18n="h1">iEMS Breakpoint Check:目前狀態(09/28)對照 09/18 報告,以及對照 Local Automation Map</h1>
+  <p class="subtitle" data-i18n="subtitle">自 09/18 基準版以來 10 天,這個 Scheduled Task(現已更名為「iEMS Breakpoint Check – 8:30 AM(週一至週六,自動補跑)」)經歷了一次重大的重新架構:Step 3 移到 Windows Task Scheduler 執行、資料來源改為表格資料、新增 NAS 同步、排程改為週一至週六並可自動補跑,並且第一次在真實資料上執行 Clear reset。本頁所有內容都直接取自任務的即時設定、SPEC.md、Step 3 紀錄、監聽器紀錄與 NAS 同步紀錄 — 不用猜測。</p>
+
+  <nav class="companion">
+    <a href="./v1.html" target="_blank" rel="noopener" data-i18n="navV1">↗ 09/18 報告(基準版)</a>
+    <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">↗ Local Automation Map</a>
+    <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">↗ Cloud Automation Map</a>
+  </nav>
+
+  <div class="badges">
+    <div class="badge"><b data-i18n="b1_t">08:30,週一至週六 — 已變更(09/28)</b><span data-i18n="b1_b">CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · 週日電腦關機故取消;漏掉的日期會在 7 天視窗內自動補跑</span></div>
+    <div class="badge"><b data-i18n="b2_t">Prompt 隨流程邏輯增長,靜態知識放在 SPEC.md</b><span data-i18n="b2_b">18,680 字元(09/19)→ 26,999(09/25)→ 09/28 再增加(補跑、日期區間旗標、commit 後驗證);SPEC.md 27KB → 35KB</span></div>
+    <div class="badge"><b data-i18n="b3_t">第一次真正執行 Clear reset — 已關閉(09/28)</b><span data-i18n="b3_b">BP-CR-20260926-BSLBIANCO-B-7267:EC 7706491.5 → 7267.25 L;Report 7706.5125 → 7.2883 m³,與 Details 相符</span></div>
+    <div class="badge"><b data-i18n="b4_t">Step 3 在 Cowork 外執行 — 新增(09/22)</b><span data-i18n="b4_b">在 Tân 的電腦上以 Windows Task Scheduler + 事件監聽器執行,透過旗標檔交接,回報延遲 1 天</span></div>
+    <div class="badge"><b data-i18n="b5_t">2 個檔案的 NAS 同步 — 新增(09/24)</b><span data-i18n="b5_b">Breakpoints-Log.docx + WaterData-ReportDaily.xlsx,單向、以雜湊值達成冪等,xlsx 保留按日期的歷史紀錄</span></div>
+    <div class="badge"><b data-i18n="b6_t">主要來源:表格資料 — 新增(09/25)</b><span data-i18n="b6_b">以 JS 讀取 vxe-table 取代截圖/OCR;約 450 列 100% 相符;截圖僅作佐證</span></div>
+    <div class="badge risk"><b data-i18n="b7_t">⚠ 新版 check.py 尚未有真正的 GO 執行</b><span data-i18n="b7_b">含 --end-date/--start-date 的版本於 09/28 中午上線;之前所有 GO 都是用舊版執行。第一次真正執行:09/29 早上</span></div>
+  </div>
+
+  <div class="tagline">
+    <span data-i18n="tagIntro">狀態標籤說明:</span>
+    <span class="tag tag-resolved" data-i18n="tag_resolved">已關閉</span>
+    <span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span>
+    <span class="tag tag-new" data-i18n="tag_new">新增</span>
+  </div>
+
+  <div class="card fulltext-box">
+    <div class="row">
+      <div>
+        <h2 data-i18n="fulltextHeading">完整比較(純文字版)</h2>
+        <p class="lead" style="margin-bottom:0;" data-i18n="fulltextLead">精簡的純文字版本,方便貼到筆記或 CLAUDE.md/AGENTS.md。</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="copy-btn secondary" id="toggleBtn" onclick="toggleFullText()">查看並複製全文</button>
+        <button class="copy-btn" id="copyBtn" onclick="copyFullText()">複製</button>
+      </div>
+    </div>
+    <pre class="fulltext" id="fulltext" data-i18n="fulltextContent">iEMS Breakpoint Check — Version 2(09/28 狀態)
+自 09/18 基準版以來 10 天,這個 Scheduled Task(現已更名為「iEMS Breakpoint Check – 8:30 AM(週一至週六,自動補跑)」)經歷了一次重大的重新架構:Step 3 移到 Windows Task Scheduler 執行、資料來源改為表格資料、新增 NAS 同步、排程改為週一至週六並可自動補跑,並且第一次在真實資料上執行 Clear reset。本頁所有內容都直接取自任務的即時設定、SPEC.md、Step 3 紀錄、監聽器紀錄與 NAS 同步紀錄 — 不用猜測。
+
+目前設定
+- 08:30,週一至週六 — 已變更(09/28): CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · 週日電腦關機故取消;漏掉的日期會在 7 天視窗內自動補跑
+- Prompt 隨流程邏輯增長,靜態知識放在 SPEC.md: 18,680 字元(09/19)→ 26,999(09/25)→ 09/28 再增加(補跑、日期區間旗標、commit 後驗證);SPEC.md 27KB → 35KB
+- 第一次真正執行 Clear reset — 已關閉(09/28): BP-CR-20260926-BSLBIANCO-B-7267:EC 7706491.5 → 7267.25 L;Report 7706.5125 → 7.2883 m³,與 Details 相符
+- Step 3 在 Cowork 外執行 — 新增(09/22): 在 Tân 的電腦上以 Windows Task Scheduler + 事件監聽器執行,透過旗標檔交接,回報延遲 1 天
+- 2 個檔案的 NAS 同步 — 新增(09/24): Breakpoints-Log.docx + WaterData-ReportDaily.xlsx,單向、以雜湊值達成冪等,xlsx 保留按日期的歷史紀錄
+- 主要來源:表格資料 — 新增(09/25): 以 JS 讀取 vxe-table 取代截圖/OCR;約 450 列 100% 相符;截圖僅作佐證
+- ⚠ 新版 check.py 尚未有真正的 GO 執行: 含 --end-date/--start-date 的版本於 09/28 中午上線;之前所有 GO 都是用舊版執行。第一次真正執行:09/29 早上
+
+自 09/18 以來的變更(依時間)
+1. EC 改用固定 script 計算(09/19)
+   CR(Final − Initial)與 SR((wrap − Initial) + Final)公式,從 LLM 自行推理改為呼叫 ec_calc.py,A6a、A7、B2 使用同一種呼叫方式。已用真實資料獨立驗證 ≥4 次,每次 100% 相符。
+2. SPEC.md 從 prompt 拆出(09/19)
+   全部靜態知識移到 Tân 電腦上的 SPEC.md,於 STEP 0.5 讀取。修改靜態知識不需要更新任務 — 因此 SPEC.md 可以長到 35KB,而 prompt 仍只包含流程邏輯。
+3. 移除 check.py 的異常防護機制(09/21)
+   與 7 天平均值比對的防護機制造成真實誤判(BCM-23 在 09/19–20 因平均值仍受 09/12–14 錯誤值污染而被擋下)。依 Tân 的要求已移除:Step 3 只依正確日期/格式抓取並寫入數字;異常偵測完全由 Step 1/2 負責。
+4. 已知故障儀表的 Report 對帳(09/21)
+   當 第 2/3 組 不是空的,但所有卡住的行都是 SPEC.md 中已知故障的儀表(JR01/04/05 蒸汽表)時,只要 Report 與 Details 加總相符,A11c/B10b 就放行 Step 3 — 不需要核准代碼。不相符或無法對帳時預設擋下。
+5. Step 3 脫離 Cowork,改由 Task Scheduler 執行(09/22)
+   任務的 Cowork session 沒有 device_bash(已安裝 WSL2 + Virtual Machine Platform 仍沒有 — 原因不明)。Step 3 改在 Tân 的電腦上獨立執行:Cowork 寫入 GO/NOGO 旗標檔,事件監聽器(FileSystemWatcher)幾秒內偵測到並呼叫 run_step3.ps1 → check.py,寫入 step3_run_log_&lt;日期&gt;.txt。下一次 session 於 STEP 0.6 讀取 — 刻意的取捨:回報延遲 1 天,換取不必再開排程任務。
+6. 除錯新架構時發現並修正的 3 個基礎設施錯誤(09/22–23)
+   (1)device_commit_files 有時回報成功,但電腦上的檔案沒有改變 — 每次 commit 後必須重新 stage 確認。(2)FileSystemWatcher 漏掉 Renamed 事件(橋接以原子方式寫檔)— 已加入 Renamed,並加上每 60 秒的定期檢查。(3)cp950 UnicodeEncodeError:Tân 電腦的 Big5 主控台讓 check.py 印越南文時當機 — 在 run_step3.ps1 設定 PYTHONIOENCODING=utf-8 解決,未改動 check.py。
+7. 紀錄檔與 ISO 資料的 NAS 同步(09/24)
+   舊任務只同步 docx、目的地錯誤,且因建立帳號無主被管理員刪除。新任務(Watch-NasSync.ps1,以該電腦的專屬帳號執行)將兩個檔案單向從 Tân 的電腦同步到 NAS,目的地已修正,先比對雜湊值避免重複複製,以 .tmp + rename 安全寫入,xlsx 保留按日期的歷史。第一次完整驗證:09/25 早上。
+8. 表格資料(vxe-table)成為主要來源(09/25)
+   Meter reading correction 頁面使用 vxe-table(Vue 2):以 JS 讀取 tableFullData,翻完所有分頁、依 id 合併,並與分頁器的「Total N」對照。09/25 驗證:約 450 列(BCM*、BR14、BIHT02、JR01、JR13)與畫面完全相符,包含 46 列 Break point = Yes 且 wrap 偏離標稱值(9994、9998、9999862.00、9999951.00)。截圖保留作為佐證。
+9. 週一至週六排程 + 自動補跑(09/28)
+   週日 09/27 電腦關機 → Stat.date 09/26 沒有被稽核,也沒有任何 session 回報。排程改為週一至週六;每次執行時,STEP 0.7 會找出最近 7 天內在 Breakpoints-Log.docx 中「沒有」Heading 1 的 Stat.date 並補做稽核(由舊到新)— 依紀錄判斷,不依星期推測。超過 7 天的缺漏只列出讓 Tân 決定,因為已接近 iEMS「Update details days」= 14 的上限。
+10. 事故:未稽核的日期被寫入 ISO → check.py 改為接受日期區間(09/28)
+   舊版 check.py 不使用旗標中的 Stat.date:GO|2026-09-27(09/28 08:38,water_updated=54 = 2 天)連同尚未稽核的 09/26 也寫入 → 09/26 的 B-SL BIANCO NƯỚC 儲存格 = 7706.5125 m³(錯誤)。處理:Clear reset、清空儲存格(Tân 核准)、重跑 GO → 7.28825 m³,與 Report 相符。根本修正:check.py 接受 --end-date/--start-date,run_step3.ps1 讀取旗標中的 Stat.date 與 from= 欄位,Cowork 整批只寫一個旗標(GO|S_max|from=S_min),寫入前先確認各月份工作表都存在;舊版保留為 .bak_20260928。「回報 written 但未改變」的 commit 錯誤在旗標檔與 docx 上再度發生 → commit 後強制重新 stage/檢查大小。
+11. 第一次真正的 Clear reset + 多斷點儀表(09/28)
+   BSL_BIANCO水表 09/26 B 班被 iEMS 標記 2 個假的 System break point(總量只在約 2 分鐘內下降約 81.5 L),EC 7706491.5 L(約為歷史值的 1000 倍)。判定為 第 2 組,代碼 BP-CR-20260926-BSLBIANCO-B-7267,經 Tân 核准,依 Step 2 檢查清單以 Claude in Chrome 執行(於互動 session 中,Tân 在 session 內傳送代碼):一次 Clear reset 同時移除兩個點,EC → 7267.25 = Final − Initial,Refresh stat. 後(約 4.5 分鐘)Report 7706.5125 → 7.2883 m³。ec_calc.py 可接受多個 --wrap 值以精確重現 iEMS 公式;SPEC.md 新增「多斷點」章節。
+
+各面向對照
+- [已關閉] Stage 1–2:SPEC.md,核准後才寫程式: SPEC.md 約 35KB,有依日期記錄的「基礎設施備註」(09/22、09/24、09/28)及新章節「多斷點」 — 不只關閉舊落差,也成為日後除錯可用的事件日誌
+- [已關閉] Stage 3:計算步驟 → 固定 script: 即使沒有 device_bash,ec_calc.py 仍可執行(純 Python,在 session 沙盒中執行);09/28 新增多值 --wrap,已用真實資料驗證 — 真正獨立 script 的好例子:基礎設施變了,公式不受影響
+- [未變] 正式執行前先 dry-run: STEP 1 永遠只稽核,補跑多天時也一樣;STEP 2 只有核准代碼才會執行 — 仍比 LAM 範本更嚴謹
+- [未變] 執行時的核准機制: BP-CR-/BP-SR- 代碼機制未變;A11c/B10b 為已知故障儀表提供逃生閥 — 故障安全:任何模糊分支都預設擋下
+- [未變] 去重(Dedup): 每個 Stat.date 一個 Heading 1,依內容而非位置比對(補跑的日期可能不照順序);Step 3 透過旗標檔的 DONE 狀態去重 — 加入補跑時擴充得恰到好處
+- [未變] 錯誤處理: 原則為停止、不自動重試;適用於表格讀取錯誤、Step 3 紀錄錯誤、Report 對帳失敗、缺少新月份工作表 — 全部預設 NOGO/停止 — 漏洞是透過實際除錯收緊,不是事先猜測
+- [新增] requires_local_device + 資料夾: 宣告 2 個資料夾(根目錄 + data_iso_3),以便寫入旗標檔 — 符合新的實際需求
+- [新增] 通知: Push;開頭列出補跑日期 + 上一次 Step 3 結果(STEP 0.6)+ 已驗證的 GO/NOGO 旗標狀態 — 延遲 1 天的 Step 3 結果放在最前面,不會被淹沒
+- [新增] 排程與補跑: 週一至週六 08:30;STEP 0.7 自動補做最近 7 天內所有缺漏的 Stat.date — 修正真實漏洞(09/26 因週日關機被跳過);7 天視窗與 iEMS 14 天修改上限保持安全距離
+- [新增] Step 3:在哪裡執行: 在 Tân 電腦上的 Windows Task Scheduler 執行,透過旗標檔 + 事件監聽器交接,延遲 1 天回報 — 因平台限制(沒有 device_bash)被迫的改變,不是設計選擇
+- [新增] NAS 同步: 2 個檔案(docx + xlsx),單向、以雜湊值達成冪等,xlsx 保留按日期的歷史 — 以專屬帳號執行(避免再被刪除);NAS 上檔案開啟時的「Access denied」在關閉後自動恢復(RECOVERED)
+- [新增] Step 1 的資料來源: 表格資料(vxe-table)為主要來源,約 450 列 100% 相符;截圖作為佐證 — 降低截圖誤讀風險 — 但 isNormal ↔ Anomaly 的對應仍未驗證
+- [新增] 依日期區間寫入 ISO: check.py --end-date/--start-date;整批一個 GO|S_max|from=S_min 旗標;可跨月份處理 — 09/28 事故(寫入未稽核日期)的根本修正。新版尚未有真正的 GO 執行
+- [已關閉] 真實資料上的 Clear reset 分支: 09/28:依 Step 2 檢查清單執行 BP-CR-20260926-BSLBIANCO-B-7267;事後檢查與 Report 對照皆相符 — 自 09/18 以來懸而最久的風險已關閉。注意:是在互動 session 中執行;自動觸發附代碼的路徑尚未試過
+
+良好設計
+1. 自動路徑永遠只做稽核: 每次自動 cron 執行(包括多天補跑)預設都只讀取 — 真正的寫入永遠不會自動發生。
+2. 專屬核准關卡 + 故障安全逃生閥: BP-CR-/BP-SR- 代碼需通過 6 項條件(B2);已知故障儀表有專屬的 Report 對帳路徑,不確定時預設擋下。
+3. 新的 Step 3 架構維持安全標準: 事件驅動的監聽器(不猜時間)、透過 DONE 達成冪等、啟動時補跑、每 60 秒定期檢查、寫入後驗證旗標。
+4. 以表格資料取代截圖 — 降低誤讀風險: 直接讀取 tableFullData,與分頁器總數對照,並在約 450 列 100% 相符後才採用為主要來源。
+5. NAS 同步的紀律: 複製前比對雜湊值,以 .tmp + rename 寫入,重複錯誤只記錄一次直到 RECOVERED — 日誌保持乾淨。
+6. SPEC.md 自帶附日期的事件紀錄: 每個基礎設施事件都附上日期、原因與處理方式 — 為下次除錯留下證據,而不是修完就忘。
+7. 補跑依紀錄判斷,不依行事曆推測: STEP 0.7 以紀錄中的 Heading 1 判斷缺漏日期,而不是看星期 — 遇到假日、過年或電腦故障也正確;超過 7 天的日期不自動執行,而是回報讓 Tân 決定。
+8. 09/28 事故依流程處理並從根本修正: 發現 ISO 儲存格錯誤 → 發出 CR 代碼 → Tân 核准 → 移除旗標 → 清空儲存格(經核准)→ 重跑 → Report 相符;之後修正 check.py 避免再發生,並保留備份可還原。
+
+風險(依優先順序)
+1. 新版 check.py / run_step3.ps1 尚未有真正的 GO 執行
+   於 09/28 中午部署。當天所有 GO(08:38、10:12、10:30)都使用舊版 — 紀錄中沒有「Tham so check.py」這一行,印出的區間是 09/01 → 09/27。第一次真正執行是 09/29 早上。
+2. 即將到來的月份交界(09/30 → 10/01)
+   10/02 的執行會稽核 Stat.date 10/01,並寫入 10 月日期的旗標。若 ISO 檔中「Tháng 10 …」工作表尚未手動建立,check.py 會在寫入前以「找不到工作表」停止(安全,不會寫一半),但 Step 3 會延後到工作表建立為止。這也是新版跨月分支第一次真正執行。
+3.「回報 written 但未改變」的 commit 錯誤再度發生且範圍擴大
+   最初(09/23)只發生在 script 檔;09/28 在旗標檔與 Breakpoints-Log.docx 上都發生。已有強制重新 stage/檢查大小再 commit 的步驟,但根本原因在平台端,超出可控範圍。
+4. device_bash 無法使用 — 原因不明
+   已安裝 WSL2 + Virtual Machine Platform,仍然沒有。可能是 Anthropic 尚未對此帳號/組織開放的功能。已接受的後果:Step 3 延遲 1 天回報。
+5. BSL_BIANCO水表:假斷點可能再次發生
+   假設(尚未確認):電磁流量計的 NET(正向 − 反向)累計器在機台停止/排水時出現逆流。若屬實,每次停機都會再發生,且每次都需要 Tân 核准一個 CR 代碼。
+6. 已寫錯的 ISO 儲存格不會自動修正
+   ONLY_FILL_BLANK=True:若某天在修正斷點前就被寫入,該儲存格會保留錯誤數值。B10c 只負責偵測與回報;清除/修正仍需 Tân 核准(如 09/28 事故)。--end-date 修正降低了發生機率,但無法完全排除。
+7. BIHT02水表:wrap 值仍為暫定
+   ~9999951 仍為暫定值,待 E&amp;H 儀表規格確認或第 2 次相符的 rollover。
+8. isNormal ↔ Anomaly 的對應尚未驗證
+   09/25 的驗證樣本中沒有真正的 Anomaly 列,因此尚不確定 isNormal=false 是否等於畫面上的 Status = Anomaly。
+9. 未使用的 Canva connector 仍掛在任務上
+   任務有 2 個 connector:Claude_Code_Remote(有使用)與 Canva(prompt 中從未出現)。不會造成功能問題,但依最小權限原則應移除。
+
+建議
+1. 09/29 早上:檢查新版第一次 GO 的 Step 3 紀錄 — 必須有「Tham so check.py: … --end-date &lt;旗標中的 Stat.date&gt; [--start-date …]」且印出的區間正確;若不符,停止並考慮還原為 .bak_20260928。
+2. 在 10/02 早上前於 [HBF2] WaterData-ReportDaily.xlsx 建立「Tháng 10 …」工作表,避免 Stat.date 10/01 的 Step 3 被延後。
+3. 確認 BSL_BIANCO水表 的累計器設定(Net/Forward)以及 09/26 21:45–21:50 前後的原始讀數,以釐清假斷點的原因。
+4. 下一個 CR/SR 代碼出現時,試用「觸發任務並在訊息中附代碼」的路徑(尚未真正執行過),並親自監看第一次執行。
+5. 依 E&amp;H 儀表規格正式確認 BIHT02水表 的 wrap,或等待再一次相符的 rollover。
+6. 第一次在表格中遇到真正的 Anomaly 列時,立刻與畫面上的 Status 欄位對照並記錄到 SPEC.md,確定 isNormal ↔ Anomaly 的對應。
+7. 確認未使用後,從任務中移除 Canva connector。
+
+本頁包含 HugeBamboo 的內部設定與數據(儀表名稱、讀數、核准代碼)。IP 位址與網路/資料夾路徑已移除。</pre>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="timelineHeading">自 09/18 基準版以來已上線的變更(截至 09/28)</h2>
+    <p class="lead" data-i18n="timelineLead">全部直接對照真實系統確認(任務設定、SPEC.md、Step 3 紀錄、監聽器紀錄、NAS 同步紀錄、Breakpoints-Log.docx)。按時間排序。</p>
+    <ul class="timeline">
+      <li><b data-i18n="t1_title">EC 改用固定 script 計算(09/19)</b><span data-i18n="t1_body">CR(Final − Initial)與 SR((wrap − Initial) + Final)公式,從 LLM 自行推理改為呼叫 ec_calc.py,A6a、A7、B2 使用同一種呼叫方式。已用真實資料獨立驗證 ≥4 次,每次 100% 相符。</span></li>
+      <li><b data-i18n="t2_title">SPEC.md 從 prompt 拆出(09/19)</b><span data-i18n="t2_body">全部靜態知識移到 Tân 電腦上的 SPEC.md,於 STEP 0.5 讀取。修改靜態知識不需要更新任務 — 因此 SPEC.md 可以長到 35KB,而 prompt 仍只包含流程邏輯。</span></li>
+      <li><b data-i18n="t3_title">移除 check.py 的異常防護機制(09/21)</b><span data-i18n="t3_body">與 7 天平均值比對的防護機制造成真實誤判(BCM-23 在 09/19–20 因平均值仍受 09/12–14 錯誤值污染而被擋下)。依 Tân 的要求已移除:Step 3 只依正確日期/格式抓取並寫入數字;異常偵測完全由 Step 1/2 負責。</span></li>
+      <li><b data-i18n="t4_title">已知故障儀表的 Report 對帳(09/21)</b><span data-i18n="t4_body">當 第 2/3 組 不是空的,但所有卡住的行都是 SPEC.md 中已知故障的儀表(JR01/04/05 蒸汽表)時,只要 Report 與 Details 加總相符,A11c/B10b 就放行 Step 3 — 不需要核准代碼。不相符或無法對帳時預設擋下。</span></li>
+      <li><b data-i18n="t5_title">Step 3 脫離 Cowork,改由 Task Scheduler 執行(09/22)</b><span data-i18n="t5_body">任務的 Cowork session 沒有 device_bash(已安裝 WSL2 + Virtual Machine Platform 仍沒有 — 原因不明)。Step 3 改在 Tân 的電腦上獨立執行:Cowork 寫入 GO/NOGO 旗標檔,事件監聽器(FileSystemWatcher)幾秒內偵測到並呼叫 run_step3.ps1 → check.py,寫入 step3_run_log_&lt;日期&gt;.txt。下一次 session 於 STEP 0.6 讀取 — 刻意的取捨:回報延遲 1 天,換取不必再開排程任務。</span></li>
+      <li><b data-i18n="t6_title">除錯新架構時發現並修正的 3 個基礎設施錯誤(09/22–23)</b><span data-i18n="t6_body">(1)device_commit_files 有時回報成功,但電腦上的檔案沒有改變 — 每次 commit 後必須重新 stage 確認。(2)FileSystemWatcher 漏掉 Renamed 事件(橋接以原子方式寫檔)— 已加入 Renamed,並加上每 60 秒的定期檢查。(3)cp950 UnicodeEncodeError:Tân 電腦的 Big5 主控台讓 check.py 印越南文時當機 — 在 run_step3.ps1 設定 PYTHONIOENCODING=utf-8 解決,未改動 check.py。</span></li>
+      <li><b data-i18n="t7_title">紀錄檔與 ISO 資料的 NAS 同步(09/24)</b><span data-i18n="t7_body">舊任務只同步 docx、目的地錯誤,且因建立帳號無主被管理員刪除。新任務(Watch-NasSync.ps1,以該電腦的專屬帳號執行)將兩個檔案單向從 Tân 的電腦同步到 NAS,目的地已修正,先比對雜湊值避免重複複製,以 .tmp + rename 安全寫入,xlsx 保留按日期的歷史。第一次完整驗證:09/25 早上。</span></li>
+      <li><b data-i18n="t8_title">表格資料(vxe-table)成為主要來源(09/25)</b><span data-i18n="t8_body">Meter reading correction 頁面使用 vxe-table(Vue 2):以 JS 讀取 tableFullData,翻完所有分頁、依 id 合併,並與分頁器的「Total N」對照。09/25 驗證:約 450 列(BCM*、BR14、BIHT02、JR01、JR13)與畫面完全相符,包含 46 列 Break point = Yes 且 wrap 偏離標稱值(9994、9998、9999862.00、9999951.00)。截圖保留作為佐證。</span></li>
+      <li><b data-i18n="t9_title">週一至週六排程 + 自動補跑(09/28)</b><span data-i18n="t9_body">週日 09/27 電腦關機 → Stat.date 09/26 沒有被稽核,也沒有任何 session 回報。排程改為週一至週六;每次執行時,STEP 0.7 會找出最近 7 天內在 Breakpoints-Log.docx 中「沒有」Heading 1 的 Stat.date 並補做稽核(由舊到新)— 依紀錄判斷,不依星期推測。超過 7 天的缺漏只列出讓 Tân 決定,因為已接近 iEMS「Update details days」= 14 的上限。</span></li>
+      <li><b data-i18n="t10_title">事故:未稽核的日期被寫入 ISO → check.py 改為接受日期區間(09/28)</b><span data-i18n="t10_body">舊版 check.py 不使用旗標中的 Stat.date:GO|2026-09-27(09/28 08:38,water_updated=54 = 2 天)連同尚未稽核的 09/26 也寫入 → 09/26 的 B-SL BIANCO NƯỚC 儲存格 = 7706.5125 m³(錯誤)。處理:Clear reset、清空儲存格(Tân 核准)、重跑 GO → 7.28825 m³,與 Report 相符。根本修正:check.py 接受 --end-date/--start-date,run_step3.ps1 讀取旗標中的 Stat.date 與 from= 欄位,Cowork 整批只寫一個旗標(GO|S_max|from=S_min),寫入前先確認各月份工作表都存在;舊版保留為 .bak_20260928。「回報 written 但未改變」的 commit 錯誤在旗標檔與 docx 上再度發生 → commit 後強制重新 stage/檢查大小。</span></li>
+      <li><b data-i18n="t11_title">第一次真正的 Clear reset + 多斷點儀表(09/28)</b><span data-i18n="t11_body">BSL_BIANCO水表 09/26 B 班被 iEMS 標記 2 個假的 System break point(總量只在約 2 分鐘內下降約 81.5 L),EC 7706491.5 L(約為歷史值的 1000 倍)。判定為 第 2 組,代碼 BP-CR-20260926-BSLBIANCO-B-7267,經 Tân 核准,依 Step 2 檢查清單以 Claude in Chrome 執行(於互動 session 中,Tân 在 session 內傳送代碼):一次 Clear reset 同時移除兩個點,EC → 7267.25 = Final − Initial,Refresh stat. 後(約 4.5 分鐘)Report 7706.5125 → 7.2883 m³。ec_calc.py 可接受多個 --wrap 值以精確重現 iEMS 公式;SPEC.md 新增「多斷點」章節。</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagram1Heading">與 Local Automation Map 的落差 — 前後對照</h2>
+    <p class="lead" data-i18n="diagram1Lead">09/18 報告指出的兩個最大落差(沒有獨立 SPEC.md、沒有固定計算 script)已關閉並維持。排程改為週一至週六並可補跑。</p>
+    <div class="diagram-wrap">
+<svg viewBox="0 0 920 250" width="100%" role="img" aria-label="Gap closure">
+<defs><marker id="m1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#b8790a"/></marker></defs>
+<rect x="20" y="20" width="880" height="140" rx="18" fill="#eaf0ff" stroke="#2f5fd8" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="40" y="44" font-size="13" font-weight="700" text-anchor="start" fill="#2f5fd8" data-i18n="containerLabel">Local Automation Map — 六階段流程</text>
+<rect x="38" y="58" width="130" height="86" rx="10" fill="#ffffff" stroke="#e4e2dc" stroke-width="1"/>
+<text x="103" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 1</text>
+<text x="103" y="105" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s1_sub1">訪談</text>
+<rect x="181" y="58" width="130" height="86" rx="10" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.5"/>
+<text x="246" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#175f3f">STAGE 2</text>
+<text x="246" y="105" font-size="9.5" font-weight="600" text-anchor="middle" fill="#175f3f" data-i18n="s2_sub_after">✓ 獨立 SPEC.md</text>
+<text x="246" y="121" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s2_sub_before">09/18:尚無</text>
+<rect x="324" y="58" width="130" height="86" rx="10" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.5"/>
+<text x="389" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#175f3f">STAGE 3</text>
+<text x="389" y="105" font-size="9.5" font-weight="600" text-anchor="middle" fill="#175f3f" data-i18n="s3_sub_after">✓ ec_calc.py</text>
+<text x="389" y="121" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s3_sub_before">09/18:LLM 自行計算</text>
+<rect x="467" y="58" width="130" height="86" rx="10" fill="#ffffff" stroke="#e4e2dc" stroke-width="1"/>
+<text x="532" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 4</text>
+<text x="532" y="105" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub1">確認</text>
+<text x="532" y="121" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s4_sub2">排程</text>
+<rect x="610" y="58" width="130" height="86" rx="10" fill="#fdf1dd" stroke="#b8790a" stroke-width="1.5"/>
+<text x="675" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#8a5c07">STAGE 5</text>
+<text x="675" y="105" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="s5_sub1">設定</text>
+<text x="675" y="121" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s5_sub2">排程</text>
+<rect x="753" y="58" width="130" height="86" rx="10" fill="#ffffff" stroke="#e4e2dc" stroke-width="1"/>
+<text x="818" y="84" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1b1f">STAGE 6</text>
+<text x="818" y="105" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub1">驗收與</text>
+<text x="818" y="121" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="s6_sub2">交接</text>
+<line x1="675" y1="144" x2="675" y2="176" stroke="#b8790a" stroke-width="1.5" marker-end="url(#m1)"/>
+<rect x="525" y="178" width="300" height="62" rx="10" fill="#ffffff" stroke="#b8790a" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="675" y="198" font-size="11" font-weight="700" text-anchor="middle" fill="#b8790a" data-i18n="d1_sched_t">Scheduled Task</text>
+<text x="675" y="214" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d1_sched_1">cron 30 8 * * 1-6 · permission_mode: auto</text>
+<text x="675" y="229" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d1_sched_2">自動補跑 7 天內缺漏的 Stat.date</text>
+</svg>
+    </div>
+    <p class="dnote" data-i18n="closedNote">綠色 = 09/18 報告指出的落差已在 Stage 2 與 Stage 3 關閉。橘色 = Stage 5(排程設定)於 09/28 變更。其餘階段未變。</p>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagram2Heading">雙路徑安全機制 — 維持不變</h2>
+    <p class="lead" data-i18n="diagram2Lead">自動路徑只做稽核;真正的寫入只透過手動核准代碼(或已知故障儀表的 Report 對帳路徑)。差異:是否執行 Step 3 的決定,現在是「寫入旗標」交給 Task Scheduler(整批一個旗標,含日期區間),不再於 session 內直接執行 check.py。</p>
+    <div class="diagram-wrap">
+<svg viewBox="0 0 920 330" width="100%" role="img" aria-label="Two-path safety">
+<defs><marker id="m2g" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1e8e5a"/></marker><marker id="m2r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#b3261e"/></marker><marker id="m2k" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b6b70"/></marker></defs>
+<rect x="10" y="10" width="900" height="120" rx="14" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="26" y="30" font-size="11" font-weight="700" text-anchor="start" fill="#175f3f" data-i18n="d2_zoneA">自動路徑(cron)</text>
+<rect x="30" y="42" width="190" height="72" rx="10" fill="#ffffff" stroke="#1e8e5a" stroke-width="1"/>
+<text x="125" y="72" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a1a">Cron 08:30</text>
+<text x="125" y="90" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a1b">週一至週六,自動</text>
+<line x1="220" y1="78" x2="247" y2="78" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#m2g)"/>
+<rect x="250" y="42" width="230" height="72" rx="10" fill="#ffffff" stroke="#1e8e5a" stroke-width="1"/>
+<text x="365" y="64" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a2a">STEP 1(+ 補跑)</text>
+<text x="365" y="81" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a2b">只稽核 · 讀取表格資料</text>
+<text x="365" y="97" font-size="9.5" font-weight="600" text-anchor="middle" fill="#175f3f" data-i18n="d2_a2c">EC:ec_calc.py</text>
+<line x1="480" y1="78" x2="507" y2="78" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#m2g)"/>
+<rect x="510" y="42" width="280" height="72" rx="10" fill="#ffffff" stroke="#1e8e5a" stroke-width="1"/>
+<text x="650" y="70" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a3a">寫入旗標 + 報告</text>
+<text x="650" y="88" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_a3b">若有 第 2/3 組 則提出核准代碼</text>
+<line x1="650" y1="114" x2="650" y2="167" stroke="#6b6b70" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#m2k)"/>
+<text x="640" y="147" font-size="9" font-weight="400" text-anchor="end" fill="#4a4a50" data-i18n="d2_conn1">GO/NOGO → Task Scheduler(圖 3)</text>
+<text x="640" y="161" font-size="9" font-weight="400" text-anchor="end" fill="#4a4a50" data-i18n="d2_conn2">或 Tân 傳送核准代碼 → Step 2</text>
+<rect x="10" y="170" width="900" height="150" rx="14" fill="#fdecea" stroke="#b3261e" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="26" y="190" font-size="11" font-weight="700" text-anchor="start" fill="#8a2a24" data-i18n="d2_zoneB">執行路徑(需要核准代碼)</text>
+<rect x="30" y="202" width="190" height="64" rx="10" fill="#ffffff" stroke="#b3261e" stroke-width="1"/>
+<text x="125" y="228" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b1a">觸發 + 核准代碼</text>
+<text x="125" y="245" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b1b">BP-CR-… / BP-SR-…</text>
+<line x1="220" y1="234" x2="247" y2="234" stroke="#b3261e" stroke-width="1.5" marker-end="url(#m2r)"/>
+<rect x="250" y="202" width="170" height="64" rx="10" fill="#ffffff" stroke="#b3261e" stroke-width="1"/>
+<text x="335" y="228" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b2a">鎖定關卡</text>
+<text x="335" y="245" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b2b">6 項條件(B2)</text>
+<line x1="420" y1="234" x2="447" y2="234" stroke="#b3261e" stroke-width="1.5" marker-end="url(#m2r)"/>
+<rect x="450" y="202" width="220" height="64" rx="10" fill="#ffffff" stroke="#b3261e" stroke-width="1"/>
+<text x="560" y="222" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b3a">STEP 2</text>
+<text x="560" y="238" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b3b">Clear reset / Set as reset</text>
+<text x="560" y="254" font-size="9" font-weight="600" text-anchor="middle" fill="#175f3f" data-i18n="d2_b3c">CR 已於 09/28 首次真正執行</text>
+<line x1="670" y1="234" x2="697" y2="234" stroke="#b3261e" stroke-width="1.5" marker-end="url(#m2r)"/>
+<rect x="700" y="202" width="190" height="64" rx="10" fill="#ffffff" stroke="#b3261e" stroke-width="1"/>
+<text x="795" y="228" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b4a">強制事後檢查</text>
+<text x="795" y="245" font-size="9.5" font-weight="400" text-anchor="middle" fill="#1b1b1f" data-i18n="d2_b4b">B5 + 對照 Report</text>
+<line x1="335" y1="266" x2="335" y2="280" stroke="#b3261e" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="335" y="295" font-size="9" font-weight="600" text-anchor="middle" fill="#8a2a24" data-i18n="d2_reject1">條件不符</text>
+<text x="335" y="309" font-size="9" font-weight="400" text-anchor="middle" fill="#8a2a24" data-i18n="d2_reject2">→ 跳過該行,記錄原因</text>
+</svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="diagram3Heading">Step 3 透過旗標檔交接(自 09/22 起,09/28 更新)</h2>
+    <p class="lead" data-i18n="diagram3Lead">check.py 不在 Cowork session 內執行。透過旗標檔 + Tân 電腦上的事件監聽器交接,回報延遲 1 天。</p>
+    <div class="diagram-wrap">
+<svg viewBox="0 0 920 290" width="100%" role="img" aria-label="Step 3 handoff">
+<defs><marker id="m3b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2f5fd8"/></marker><marker id="m3g" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1e8e5a"/></marker><marker id="m3a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#b8790a"/></marker></defs>
+<rect x="10" y="20" width="200" height="90" rx="10" fill="#eaf0ff" stroke="#2f5fd8" stroke-width="1.5"/>
+<text x="110" y="58" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2f5fd8" data-i18n="d3_1a">Cowork(Step 1/2)</text>
+<text x="110" y="76" font-size="9.5" font-weight="400" text-anchor="middle" fill="#2f5fd8" data-i18n="d3_1b">決定 GO/NOGO</text>
+<line x1="210" y1="65" x2="237" y2="65" stroke="#2f5fd8" stroke-width="1.5" marker-end="url(#m3b)"/>
+<rect x="240" y="20" width="190" height="90" rx="10" fill="#ffffff" stroke="#c9c6bf" stroke-width="1"/>
+<text x="335" y="50" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d3_2a">寫入旗標檔</text>
+<text x="335" y="67" font-size="9.5" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="d3_2b">step3_trigger.txt</text>
+<text x="335" y="83" font-size="9" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="d3_2c">GO|S_max|from=S_min</text>
+<line x1="430" y1="65" x2="457" y2="65" stroke="#2f5fd8" stroke-width="1.5" marker-end="url(#m3b)"/>
+<rect x="460" y="20" width="200" height="90" rx="10" fill="#fdf1dd" stroke="#b8790a" stroke-width="1.5"/>
+<text x="560" y="50" font-size="10.5" font-weight="700" text-anchor="middle" fill="#8a5c07" data-i18n="d3_3a">事件監聽器</text>
+<text x="560" y="67" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d3_3b">FileSystemWatcher</text>
+<text x="560" y="83" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d3_3c">幾秒內偵測到</text>
+<line x1="660" y1="65" x2="687" y2="65" stroke="#2f5fd8" stroke-width="1.5" marker-end="url(#m3b)"/>
+<rect x="690" y="20" width="220" height="90" rx="10" fill="#ffffff" stroke="#c9c6bf" stroke-width="1"/>
+<text x="800" y="50" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1b1b1f" data-i18n="d3_4a">run_step3.ps1</text>
+<text x="800" y="67" font-size="9" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="d3_4b">→ check.py --end-date/--start-date</text>
+<text x="800" y="83" font-size="9" font-weight="400" text-anchor="middle" fill="#6b6b70" data-i18n="d3_4c">寫入 step3_run_log_&lt;日期&gt;.txt</text>
+<line x1="850" y1="110" x2="850" y2="187" stroke="#1e8e5a" stroke-width="1.5" marker-end="url(#m3g)"/>
+<text x="842" y="156" font-size="9" font-weight="400" text-anchor="end" fill="#175f3f" data-i18n="d3_5l">xlsx 變更 → 同步</text>
+<rect x="690" y="190" width="220" height="80" rx="10" fill="#e8f6ee" stroke="#1e8e5a" stroke-width="1.5"/>
+<text x="800" y="224" font-size="10.5" font-weight="700" text-anchor="middle" fill="#175f3f" data-i18n="d3_5a">Watch-NasSync.ps1</text>
+<text x="800" y="242" font-size="9.5" font-weight="400" text-anchor="middle" fill="#175f3f" data-i18n="d3_5b">同步 docx + xlsx → NAS</text>
+<polyline points="720,110 720,140 130,140 130,187" fill="none" stroke="#b8790a" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#m3a)"/>
+<text x="425" y="133" font-size="9" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d3_6l">Step 3 紀錄</text>
+<rect x="10" y="190" width="240" height="80" rx="10" fill="#fdf1dd" stroke="#b8790a" stroke-width="1.5"/>
+<text x="130" y="216" font-size="10.5" font-weight="700" text-anchor="middle" fill="#8a5c07" data-i18n="d3_6a">下一次 Cowork session</text>
+<text x="130" y="233" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d3_6b">讀取紀錄(STEP 0.6)</text>
+<text x="130" y="249" font-size="9.5" font-weight="400" text-anchor="middle" fill="#8a5c07" data-i18n="d3_6c">延遲 1 天回報</text>
+</svg>
+    </div>
+    <p class="dnote" data-i18n="d3_note">旗標會更新為 DONE|&lt;日期&gt;|success 或 error_exit_&lt;code&gt;,避免重複執行(冪等)。監聽器啟動時會檢查旗標(catch-up),並有每 60 秒的定期檢查作為保險。每次寫入旗標後,Cowork 必須重新 stage 確認內容(A11d)。</p>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="tableHeading">各面向對照 — 09/28 狀態</h2>
+    <div class="table-wrap">
+    <table class="compare">
+      <thead>
+        <tr><th data-i18n="col1">面向</th><th data-i18n="col2">目前實況(09/28,已對照系統驗證)</th><th data-i18n="col3">評估</th><th data-i18n="col4">狀態</th></tr>
+      </thead>
+      <tbody>
+        <tr><td data-i18n="r1_h">Stage 1–2:SPEC.md,核准後才寫程式</td><td data-i18n="r1_a">SPEC.md 約 35KB,有依日期記錄的「基礎設施備註」(09/22、09/24、09/28)及新章節「多斷點」</td><td data-i18n="r1_b">不只關閉舊落差,也成為日後除錯可用的事件日誌</td><td><span class="tag tag-resolved" data-i18n="tag_resolved">已關閉</span></td></tr>
+        <tr><td data-i18n="r2_h">Stage 3:計算步驟 → 固定 script</td><td data-i18n="r2_a">即使沒有 device_bash,ec_calc.py 仍可執行(純 Python,在 session 沙盒中執行);09/28 新增多值 --wrap,已用真實資料驗證</td><td data-i18n="r2_b">真正獨立 script 的好例子:基礎設施變了,公式不受影響</td><td><span class="tag tag-resolved" data-i18n="tag_resolved">已關閉</span></td></tr>
+        <tr><td data-i18n="r3_h">正式執行前先 dry-run</td><td data-i18n="r3_a">STEP 1 永遠只稽核,補跑多天時也一樣;STEP 2 只有核准代碼才會執行</td><td data-i18n="r3_b">仍比 LAM 範本更嚴謹</td><td><span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></td></tr>
+        <tr><td data-i18n="r4_h">執行時的核准機制</td><td data-i18n="r4_a">BP-CR-/BP-SR- 代碼機制未變;A11c/B10b 為已知故障儀表提供逃生閥</td><td data-i18n="r4_b">故障安全:任何模糊分支都預設擋下</td><td><span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></td></tr>
+        <tr><td data-i18n="r5_h">去重(Dedup)</td><td data-i18n="r5_a">每個 Stat.date 一個 Heading 1,依內容而非位置比對(補跑的日期可能不照順序);Step 3 透過旗標檔的 DONE 狀態去重</td><td data-i18n="r5_b">加入補跑時擴充得恰到好處</td><td><span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></td></tr>
+        <tr><td data-i18n="r6_h">錯誤處理</td><td data-i18n="r6_a">原則為停止、不自動重試;適用於表格讀取錯誤、Step 3 紀錄錯誤、Report 對帳失敗、缺少新月份工作表 — 全部預設 NOGO/停止</td><td data-i18n="r6_b">漏洞是透過實際除錯收緊,不是事先猜測</td><td><span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></td></tr>
+        <tr><td data-i18n="r7_h">requires_local_device + 資料夾</td><td data-i18n="r7_a">宣告 2 個資料夾(根目錄 + data_iso_3),以便寫入旗標檔</td><td data-i18n="r7_b">符合新的實際需求</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r8_h">通知</td><td data-i18n="r8_a">Push;開頭列出補跑日期 + 上一次 Step 3 結果(STEP 0.6)+ 已驗證的 GO/NOGO 旗標狀態</td><td data-i18n="r8_b">延遲 1 天的 Step 3 結果放在最前面,不會被淹沒</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r9_h">排程與補跑</td><td data-i18n="r9_a">週一至週六 08:30;STEP 0.7 自動補做最近 7 天內所有缺漏的 Stat.date</td><td data-i18n="r9_b">修正真實漏洞(09/26 因週日關機被跳過);7 天視窗與 iEMS 14 天修改上限保持安全距離</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r10_h">Step 3:在哪裡執行</td><td data-i18n="r10_a">在 Tân 電腦上的 Windows Task Scheduler 執行,透過旗標檔 + 事件監聽器交接,延遲 1 天回報</td><td data-i18n="r10_b">因平台限制(沒有 device_bash)被迫的改變,不是設計選擇</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r11_h">NAS 同步</td><td data-i18n="r11_a">2 個檔案(docx + xlsx),單向、以雜湊值達成冪等,xlsx 保留按日期的歷史</td><td data-i18n="r11_b">以專屬帳號執行(避免再被刪除);NAS 上檔案開啟時的「Access denied」在關閉後自動恢復(RECOVERED)</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r12_h">Step 1 的資料來源</td><td data-i18n="r12_a">表格資料(vxe-table)為主要來源,約 450 列 100% 相符;截圖作為佐證</td><td data-i18n="r12_b">降低截圖誤讀風險 — 但 isNormal ↔ Anomaly 的對應仍未驗證</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r13_h">依日期區間寫入 ISO</td><td data-i18n="r13_a">check.py --end-date/--start-date;整批一個 GO|S_max|from=S_min 旗標;可跨月份處理</td><td data-i18n="r13_b">09/28 事故(寫入未稽核日期)的根本修正。新版尚未有真正的 GO 執行</td><td><span class="tag tag-new" data-i18n="tag_new">新增</span></td></tr>
+        <tr><td data-i18n="r14_h">真實資料上的 Clear reset 分支</td><td data-i18n="r14_a">09/28:依 Step 2 檢查清單執行 BP-CR-20260926-BSLBIANCO-B-7267;事後檢查與 Report 對照皆相符</td><td data-i18n="r14_b">自 09/18 以來懸而最久的風險已關閉。注意:是在互動 session 中執行;自動觸發附代碼的路徑尚未試過</td><td><span class="tag tag-resolved" data-i18n="tag_resolved">已關閉</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="goodHeading">比 LAM 範本更完善的設計</h2>
+    <div class="callout good"><h4><span data-i18n="g1Title">1. 自動路徑永遠只做稽核</span> <span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></h4><span data-i18n="g1Body">每次自動 cron 執行(包括多天補跑)預設都只讀取 — 真正的寫入永遠不會自動發生。</span></div>
+    <div class="callout good"><h4><span data-i18n="g2Title">2. 專屬核准關卡 + 故障安全逃生閥</span> <span class="tag tag-unchanged" data-i18n="tag_unchanged">未變</span></h4><span data-i18n="g2Body">BP-CR-/BP-SR- 代碼需通過 6 項條件(B2);已知故障儀表有專屬的 Report 對帳路徑,不確定時預設擋下。</span></div>
+    <div class="callout good"><h4><span data-i18n="g3Title">3. 新的 Step 3 架構維持安全標準</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g3Body">事件驅動的監聽器(不猜時間)、透過 DONE 達成冪等、啟動時補跑、每 60 秒定期檢查、寫入後驗證旗標。</span></div>
+    <div class="callout good"><h4><span data-i18n="g4Title">4. 以表格資料取代截圖 — 降低誤讀風險</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g4Body">直接讀取 tableFullData,與分頁器總數對照,並在約 450 列 100% 相符後才採用為主要來源。</span></div>
+    <div class="callout good"><h4><span data-i18n="g5Title">5. NAS 同步的紀律</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g5Body">複製前比對雜湊值,以 .tmp + rename 寫入,重複錯誤只記錄一次直到 RECOVERED — 日誌保持乾淨。</span></div>
+    <div class="callout good"><h4><span data-i18n="g6Title">6. SPEC.md 自帶附日期的事件紀錄</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g6Body">每個基礎設施事件都附上日期、原因與處理方式 — 為下次除錯留下證據,而不是修完就忘。</span></div>
+    <div class="callout good"><h4><span data-i18n="g7Title">7. 補跑依紀錄判斷,不依行事曆推測</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g7Body">STEP 0.7 以紀錄中的 Heading 1 判斷缺漏日期,而不是看星期 — 遇到假日、過年或電腦故障也正確;超過 7 天的日期不自動執行,而是回報讓 Tân 決定。</span></div>
+    <div class="callout good"><h4><span data-i18n="g8Title">8. 09/28 事故依流程處理並從根本修正</span> <span class="tag tag-new" data-i18n="tag_new">新增</span></h4><span data-i18n="g8Body">發現 ISO 儲存格錯誤 → 發出 CR 代碼 → Tân 核准 → 移除旗標 → 清空儲存格(經核准)→ 重跑 → Report 相符;之後修正 check.py 避免再發生,並保留備份可還原。</span></div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="riskHeading">風險 — 依優先順序排列</h2>
+    <div class="callout risk"><h4><span data-i18n="rk1Title">1. 新版 check.py / run_step3.ps1 尚未有真正的 GO 執行</span></h4><span data-i18n="rk1Body">於 09/28 中午部署。當天所有 GO(08:38、10:12、10:30)都使用舊版 — 紀錄中沒有「Tham so check.py」這一行,印出的區間是 09/01 → 09/27。第一次真正執行是 09/29 早上。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk2Title">2. 即將到來的月份交界(09/30 → 10/01)</span></h4><span data-i18n="rk2Body">10/02 的執行會稽核 Stat.date 10/01,並寫入 10 月日期的旗標。若 ISO 檔中「Tháng 10 …」工作表尚未手動建立,check.py 會在寫入前以「找不到工作表」停止(安全,不會寫一半),但 Step 3 會延後到工作表建立為止。這也是新版跨月分支第一次真正執行。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk3Title">3.「回報 written 但未改變」的 commit 錯誤再度發生且範圍擴大</span></h4><span data-i18n="rk3Body">最初(09/23)只發生在 script 檔;09/28 在旗標檔與 Breakpoints-Log.docx 上都發生。已有強制重新 stage/檢查大小再 commit 的步驟,但根本原因在平台端,超出可控範圍。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk4Title">4. device_bash 無法使用 — 原因不明</span></h4><span data-i18n="rk4Body">已安裝 WSL2 + Virtual Machine Platform,仍然沒有。可能是 Anthropic 尚未對此帳號/組織開放的功能。已接受的後果:Step 3 延遲 1 天回報。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk5Title">5. BSL_BIANCO水表:假斷點可能再次發生</span></h4><span data-i18n="rk5Body">假設(尚未確認):電磁流量計的 NET(正向 − 反向)累計器在機台停止/排水時出現逆流。若屬實,每次停機都會再發生,且每次都需要 Tân 核准一個 CR 代碼。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk6Title">6. 已寫錯的 ISO 儲存格不會自動修正</span></h4><span data-i18n="rk6Body">ONLY_FILL_BLANK=True:若某天在修正斷點前就被寫入,該儲存格會保留錯誤數值。B10c 只負責偵測與回報;清除/修正仍需 Tân 核准(如 09/28 事故)。--end-date 修正降低了發生機率,但無法完全排除。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk7Title">7. BIHT02水表:wrap 值仍為暫定</span></h4><span data-i18n="rk7Body">~9999951 仍為暫定值,待 E&amp;H 儀表規格確認或第 2 次相符的 rollover。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk8Title">8. isNormal ↔ Anomaly 的對應尚未驗證</span></h4><span data-i18n="rk8Body">09/25 的驗證樣本中沒有真正的 Anomaly 列,因此尚不確定 isNormal=false 是否等於畫面上的 Status = Anomaly。</span></div>
+    <div class="callout risk"><h4><span data-i18n="rk9Title">9. 未使用的 Canva connector 仍掛在任務上</span></h4><span data-i18n="rk9Body">任務有 2 個 connector:Claude_Code_Remote(有使用)與 Canva(prompt 中從未出現)。不會造成功能問題,但依最小權限原則應移除。</span></div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="pickHeading">接下來的建議</h2>
+    <ul class="reclist">
+      <li data-i18n="rec1">09/29 早上:檢查新版第一次 GO 的 Step 3 紀錄 — 必須有「Tham so check.py: … --end-date &lt;旗標中的 Stat.date&gt; [--start-date …]」且印出的區間正確;若不符,停止並考慮還原為 .bak_20260928。</li>
+      <li data-i18n="rec2">在 10/02 早上前於 [HBF2] WaterData-ReportDaily.xlsx 建立「Tháng 10 …」工作表,避免 Stat.date 10/01 的 Step 3 被延後。</li>
+      <li data-i18n="rec3">確認 BSL_BIANCO水表 的累計器設定(Net/Forward)以及 09/26 21:45–21:50 前後的原始讀數,以釐清假斷點的原因。</li>
+      <li data-i18n="rec4">下一個 CR/SR 代碼出現時,試用「觸發任務並在訊息中附代碼」的路徑(尚未真正執行過),並親自監看第一次執行。</li>
+      <li data-i18n="rec5">依 E&amp;H 儀表規格正式確認 BIHT02水表 的 wrap,或等待再一次相符的 rollover。</li>
+      <li data-i18n="rec6">第一次在表格中遇到真正的 Anomaly 列時,立刻與畫面上的 Status 欄位對照並記錄到 SPEC.md,確定 isNormal ↔ Anomaly 的對應。</li>
+      <li data-i18n="rec7">確認未使用後,從任務中移除 Canva connector。</li>
+    </ul>
+    <p class="note-sensitive" data-i18n="sensitiveNote">本頁包含 HugeBamboo 的內部設定與數據(儀表名稱、讀數、核准代碼)。IP 位址與網路/資料夾路徑已移除。</p>
+  </div>
+
+  <footer>
+    <span data-i18n="footerPrefix">對照文件:</span>
+    <a href="./v1.html" target="_blank" rel="noopener" data-i18n="footerV1">09/18 報告(基準版)</a>
+    · <a href="https://ming050823.github.io/local-automation-map/" target="_blank" rel="noopener">Local Automation Map</a>
+    · <a href="https://ming050823.github.io/cloud-automation-map/" target="_blank" rel="noopener">Cloud Automation Map</a>
+    — <span data-i18n="footerSuffix">本頁僅供參考,除複製按鈕外沒有其他互動。</span>
+  </footer>
+
+</div>
+
+<script>
+var I18N = {
+  vi: {
+ "pageTitle": "iEMS Breakpoint Check · Version 2 (28/09) · so với bản 18/09 & Local Automation Map",
+ "eyebrow": "VERSION 2 · CẬP NHẬT 28/09 · SO VỚI BẢN 18/09 & LOCAL AUTOMATION MAP",
+ "h1": "iEMS Breakpoint Check: tình trạng hiện tại (28/09) so với bản 18/09, và với Local Automation Map",
+ "subtitle": "10 ngày sau bản gốc 18/09, Scheduled Task này (nay đổi tên thành “iEMS Breakpoint Check – 8:30 AM (T2–T7, tự chạy bù)”) đã qua một đợt tái kiến trúc lớn: Bước 3 chuyển ra Windows Task Scheduler, đổi nguồn đọc dữ liệu sang dữ liệu lưới, đồng bộ NAS, lịch thứ 2 → thứ 7 kèm chạy bù, và lần đầu thực thi Clear reset trên dữ liệu thật. Mọi nội dung lấy trực tiếp từ cấu hình sống của task, SPEC.md, log Bước 3, log watcher và log đồng bộ NAS — không suy đoán.",
+ "navV1": "↗ Bản đối chiếu 18/09 (bản gốc)",
+ "b1_t": "Lịch 08:30, thứ 2 → thứ 7 — ĐỔI (28/09)",
+ "b1_b": "CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · Chủ nhật PC tắt nên bỏ; ngày bị lỡ được tự chạy bù trong cửa sổ 7 ngày",
+ "b2_t": "Prompt tăng theo logic, kiến thức tĩnh nằm ở SPEC.md",
+ "b2_b": "18.680 ký tự (19/09) → 26.999 (25/09) → tăng tiếp ngày 28/09 (chạy bù, cờ theo dải ngày, xác minh sau commit); SPEC.md 27KB → 35KB",
+ "b3_t": "Clear reset chạy thật lần đầu — ĐÃ ĐÓNG (28/09)",
+ "b3_b": "BP-CR-20260926-BSLBIANCO-B-7267: EC 7706491.5 → 7267.25 L; Report 7706.5125 → 7.2883 m³, khớp Details",
+ "b4_t": "Bước 3 chạy ngoài Cowork — MỚI (22/09)",
+ "b4_b": "Windows Task Scheduler + watcher sự kiện trên máy Tân, bàn giao qua file cờ, báo cáo trễ 1 ngày",
+ "b5_t": "Đồng bộ NAS cho 2 file — MỚI (24/09)",
+ "b5_b": "Breakpoints-Log.docx + WaterData-ReportDaily.xlsx, một chiều, idempotent theo hash, lưu lịch sử theo ngày cho xlsx",
+ "b6_t": "Nguồn đọc chính: dữ liệu lưới — MỚI (25/09)",
+ "b6_b": "vxe-table qua JS thay ảnh/OCR; ~450 dòng khớp 100%; ảnh chụp chỉ còn để đối chứng",
+ "b7_t": "⚠ check.py bản mới chưa có lần GO thật",
+ "b7_b": "Bản có --end-date/--start-date triển khai trưa 28/09; mọi lần GO trước đó đều chạy bằng bản cũ. Lần chạy thật đầu tiên: sáng 29/09",
+ "tagIntro": "Chú giải nhãn trạng thái:",
+ "tag_resolved": "ĐÃ ĐÓNG",
+ "tag_unchanged": "KHÔNG ĐỔI",
+ "tag_new": "MỚI",
+ "fulltextHeading": "Toàn văn so sánh (dạng text)",
+ "fulltextLead": "Bản rút gọn dạng text thuần, tiện copy vào ghi chú hoặc CLAUDE.md/AGENTS.md.",
+ "btnViewFulltext": "Xem & copy toàn văn",
+ "btnHideFulltext": "Ẩn toàn văn",
+ "btnCopy": "Copy",
+ "btnCopied": "Đã copy ✓",
+ "btnCopyFail": "Không copy được",
+ "timelineHeading": "Các thay đổi đã triển khai từ bản 18/09 đến nay (28/09)",
+ "timelineLead": "Tất cả đều đối chiếu trực tiếp với hệ thống sống (cấu hình task, SPEC.md, log Bước 3, log watcher, log NAS sync, Breakpoints-Log.docx). Xếp theo mốc thời gian.",
+ "t1_title": "EC tính bằng script cố định (19/09)",
+ "t1_body": "Công thức CR (Final − Initial) và SR ((wrap − Initial) + Final) chuyển từ Claude tự suy luận sang gọi ec_calc.py, cùng một cách gọi ở A6a, A7, B2. Đối chiếu độc lập với dữ liệu thật ≥4 lần, khớp 100% mỗi lần.",
+ "t2_title": "SPEC.md tách riêng khỏi prompt (19/09)",
+ "t2_body": "Toàn bộ kiến thức tĩnh chuyển sang SPEC.md trên máy Tân, đọc ở BƯỚC 0.5. Sửa kiến thức tĩnh không cần cập nhật task — lý do SPEC.md có thể lớn lên 35KB mà prompt vẫn chỉ chứa logic quy trình.",
+ "t3_title": "Gỡ guard “bất thường” trong check.py (21/09)",
+ "t3_body": "Guard so với trung bình 7 ngày gây false-positive thật (BCM-23 ngày 19–20/09 bị chặn ghi vì trung bình còn nhiễm giá trị lỗi 12–14/09). Theo yêu cầu của Tân, guard được gỡ: Bước 3 chỉ kéo và ghi số đúng ngày/format; phát hiện bất thường hoàn toàn thuộc Bước 1/2.",
+ "t4_title": "Đối chiếu Report cho đồng hồ hư đã biết (21/09)",
+ "t4_body": "Khi Nhóm 2/3 không rỗng nhưng TOÀN BỘ dòng vướng đều là đồng hồ hư đã biết trong SPEC.md (JR01/04/05 蒸汽表), A11c/B10b cho Bước 3 chạy nếu Report khớp tổng Details — không cần mã duyệt. Không khớp hoặc không đối chiếu được thì mặc định chặn.",
+ "t5_title": "Bước 3 tách khỏi Cowork, chuyển sang Task Scheduler (22/09)",
+ "t5_body": "Phiên Cowork của task không có device_bash (đã thử cài WSL2 + Virtual Machine Platform, vẫn không có — nguyên nhân chưa rõ). Bước 3 chạy độc lập trên máy Tân: Cowork ghi file cờ GO/NOGO, watcher sự kiện (FileSystemWatcher) phát hiện trong vài giây và gọi run_step3.ps1 → check.py, ghi kết quả vào step3_run_log_<ngày>.txt. Phiên sau đọc log này ở BƯỚC 0.6 — đánh đổi có chủ ý: báo cáo trễ 1 ngày, không cần thêm scheduled task.",
+ "t6_title": "3 lỗi hạ tầng phát hiện & sửa khi debug kiến trúc mới (22–23/09)",
+ "t6_body": "(1) device_commit_files đôi khi báo ghi thành công nhưng file trên máy không đổi — bắt buộc stage lại để xác nhận sau mỗi lần commit. (2) FileSystemWatcher bỏ sót sự kiện Renamed (cách bridge ghi file kiểu atomic) — thêm Renamed + kiểm định kỳ 60 giây dự phòng. (3) UnicodeEncodeError cp950: console Big5 trên máy Tân làm check.py crash khi in tiếng Việt — sửa bằng PYTHONIOENCODING=utf-8 trong run_step3.ps1, không đụng check.py.",
+ "t7_title": "Đồng bộ NAS cho cả log và dữ liệu ISO (24/09)",
+ "t7_body": "Task cũ chỉ sync docx, sai đích, và bị admin xoá vì tài khoản tạo task đã mồ côi. Task mới (Watch-NasSync.ps1, chạy dưới tài khoản riêng của máy) sync CẢ HAI file một chiều máy Tân → NAS, đích đã sửa đúng, so hash để tránh copy thừa, ghi an toàn qua .tmp + rename, giữ lịch sử theo ngày cho xlsx. Kiểm chứng đầy đủ đầu tiên: sáng 25/09.",
+ "t8_title": "Đọc dữ liệu lưới (vxe-table) làm nguồn chính (25/09)",
+ "t8_body": "Trang Meter reading correction dùng vxe-table (Vue 2): đọc tableFullData qua JS, duyệt hết mọi trang, gộp theo id, đối chiếu tổng với “Total N” của pager. Kiểm chứng 25/09: ~450 dòng (BCM*, BR14, BIHT02, JR01, JR13) khớp tuyệt đối với màn hình, gồm 46 dòng Break point = Yes với các wrap lệch số danh nghĩa (9994, 9998, 9999862.00, 9999951.00). Ảnh chụp giữ làm bằng chứng đối chứng.",
+ "t9_title": "Lịch thứ 2 → thứ 7 + tự chạy bù (28/09)",
+ "t9_body": "Chủ nhật 27/09 PC tắt → Stat.date 26/09 không được thẩm định và không phiên nào báo. Lịch đổi thành thứ 2 → thứ 7; mỗi lần chạy, BƯỚC 0.7 tự dò các Stat.date trong 7 ngày gần nhất CHƯA có Heading 1 trong Breakpoints-Log.docx và thẩm định bù (cũ → mới) — dò theo log, không đoán theo thứ trong tuần. Ngày thiếu cũ hơn 7 ngày chỉ được liệt kê để Tân quyết, vì gần giới hạn “Update details days” = 14 của iEMS.",
+ "t10_title": "Sự cố điền ISO cho ngày chưa thẩm định → check.py nhận dải ngày (28/09)",
+ "t10_body": "check.py cũ không dùng Stat.date trong cờ: GO|2026-09-27 (08:38 ngày 28/09, water_updated=54 = 2 ngày) điền luôn 26/09 chưa thẩm định → ô B-SL BIANCO NƯỚC 26/09 = 7706.5125 m³ (sai). Đã xử lý: Clear reset, xoá trống ô (Tân duyệt), chạy lại GO → 7.28825 m³, khớp Report. Vá gốc: check.py nhận --end-date/--start-date, run_step3.ps1 đọc Stat.date và trường from= trong cờ, Cowork ghi MỘT cờ cho cả đợt (GO|S_max|from=S_min), kiểm đủ sheet mọi tháng trước khi ghi; bản cũ giữ ở .bak_20260928. Lỗi commit “written nhưng không đổi” tái diễn với cả file cờ lẫn docx → thêm bước bắt buộc stage lại/kiểm size sau commit.",
+ "t11_title": "Clear reset trên dữ liệu thật lần đầu + đồng hồ nhiều break point (28/09)",
+ "t11_body": "BSL_BIANCO水表 ca B ngày 26/09 bị iEMS gắn 2 System break point giả (số tổng chỉ tụt ~81,5 L trong ~2 phút), EC 7706491.5 L (~1000 lần lịch sử). Kết luận Nhóm 2, mã BP-CR-20260926-BSLBIANCO-B-7267, Tân duyệt, thực thi theo đúng checklist Bước 2 bằng Claude in Chrome (trong phiên tương tác, Tân gửi mã trong phiên): một lần Clear reset gỡ cả hai điểm, EC → 7267.25 = Final − Initial, Report 7706.5125 → 7.2883 m³ sau Refresh stat. (~4,5 phút). ec_calc.py nhận --wrap nhiều giá trị để tái lập đúng công thức iEMS; SPEC.md thêm mục NHIỀU BREAK POINT.",
+ "diagram1Heading": "Khoảng cách với Local Automation Map — trước và sau",
+ "diagram1Lead": "Hai khoảng cách lớn nhất bản 18/09 nêu (thiếu SPEC.md riêng, thiếu script tính cố định) đã đóng và vẫn giữ. Lịch chạy chuyển sang thứ 2 → thứ 7 kèm chạy bù.",
+ "containerLabel": "Local Automation Map — quy trình 6 bước",
+ "s1_sub1": "Interview",
+ "s1_sub2": "",
+ "s2_sub_after": "✓ SPEC.md riêng",
+ "s2_sub_before": "18/09: chưa có",
+ "s3_sub_after": "✓ ec_calc.py",
+ "s3_sub_before": "18/09: LLM tự tính",
+ "s4_sub1": "Confirm",
+ "s4_sub2": "schedule",
+ "s5_sub1": "Set up",
+ "s5_sub2": "schedule",
+ "s6_sub1": "Verify &",
+ "s6_sub2": "handoff",
+ "d1_sched_t": "Scheduled Task",
+ "d1_sched_1": "cron 30 8 * * 1-6 · permission_mode: auto",
+ "d1_sched_2": "tự chạy bù Stat.date thiếu trong 7 ngày",
+ "closedNote": "Xanh = khoảng cách bản 18/09 nêu ra đã đóng ở Stage 2 và Stage 3. Cam = Stage 5 (thiết lập lịch) đã đổi ngày 28/09. Các stage còn lại không đổi.",
+ "diagram2Heading": "Cơ chế an toàn 2 đường — giữ nguyên",
+ "diagram2Lead": "Đường tự động chỉ thẩm định; ghi dữ liệu thật chỉ qua mã duyệt thủ công (hoặc đường đối chiếu Report cho đồng hồ hư đã biết). Khác biệt: quyết định cho chạy Bước 3 giờ là GHI CỜ cho Task Scheduler (một cờ cho cả đợt, có dải ngày), không tự chạy check.py trong phiên.",
+ "d2_zoneA": "Đường tự động (cron)",
+ "d2_zoneB": "Đường thực thi (cần mã duyệt)",
+ "d2_a1a": "Cron 08:30",
+ "d2_a1b": "T2–T7, tự động",
+ "d2_a2a": "BƯỚC 1 (+ chạy bù)",
+ "d2_a2b": "chỉ thẩm định · đọc dữ liệu lưới",
+ "d2_a2c": "EC: ec_calc.py",
+ "d2_a3a": "Ghi cờ + báo cáo",
+ "d2_a3b": "đề xuất mã duyệt nếu có Nhóm 2/3",
+ "d2_conn1": "GO/NOGO → Task Scheduler (Diagram 3)",
+ "d2_conn2": "hoặc Tân gửi mã duyệt → Bước 2",
+ "d2_b1a": "Kích hoạt + mã duyệt",
+ "d2_b1b": "BP-CR-… / BP-SR-…",
+ "d2_b2a": "Cổng khoá",
+ "d2_b2b": "6 điều kiện (B2)",
+ "d2_b3a": "BƯỚC 2",
+ "d2_b3b": "Clear reset / Set as reset",
+ "d2_b3c": "CR đã chạy thật lần đầu 28/09",
+ "d2_b4a": "Hậu kiểm bắt buộc",
+ "d2_b4b": "B5 + đối chiếu Report",
+ "d2_reject1": "Không đạt điều kiện",
+ "d2_reject2": "→ bỏ qua dòng đó, ghi lý do",
+ "diagram3Heading": "Kiến trúc Bước 3 bàn giao qua file cờ (từ 22/09, cập nhật 28/09)",
+ "diagram3Lead": "check.py không chạy trong phiên Cowork. Bàn giao qua file cờ + watcher sự kiện trên máy Tân, báo cáo trễ 1 ngày.",
+ "d3_1a": "Cowork (Bước 1/2)",
+ "d3_1b": "quyết định GO/NOGO",
+ "d3_2a": "Ghi file cờ",
+ "d3_2b": "step3_trigger.txt",
+ "d3_2c": "GO|S_max|from=S_min",
+ "d3_3a": "Watcher sự kiện",
+ "d3_3b": "FileSystemWatcher",
+ "d3_3c": "phát hiện trong vài giây",
+ "d3_4a": "run_step3.ps1",
+ "d3_4b": "→ check.py --end-date/--start-date",
+ "d3_4c": "ghi step3_run_log_<ngày>.txt",
+ "d3_5a": "Watch-NasSync.ps1",
+ "d3_5b": "sync docx + xlsx → NAS",
+ "d3_5l": "xlsx đổi → sync",
+ "d3_6a": "Cowork phiên sau",
+ "d3_6b": "đọc log (BƯỚC 0.6)",
+ "d3_6c": "báo cáo trễ 1 ngày",
+ "d3_6l": "log Bước 3",
+ "d3_note": "Cờ được cập nhật thành DONE|<ngày>|success hoặc error_exit_<code> để không chạy lặp (idempotent). Watcher tự kiểm cờ khi khởi động (catch-up) và kiểm định kỳ 60 giây dự phòng. Sau mỗi lần ghi cờ, Cowork phải stage lại để xác nhận nội dung (A11d).",
+ "tableHeading": "Đối chiếu các khía cạnh — trạng thái 28/09",
+ "col1": "Khía cạnh",
+ "col2": "Thực tế hiện tại (28/09, xác minh qua hệ thống)",
+ "col3": "Đánh giá",
+ "col4": "Trạng thái",
+ "r1_h": "Stage 1–2: SPEC.md, duyệt xong mới code",
+ "r1_a": "SPEC.md ~35KB, có mục “GHI CHÚ HẠ TẦNG” theo ngày (22/09, 24/09, 28/09) và mục mới “NHIỀU BREAK POINT”",
+ "r1_b": "Không chỉ đóng khoảng cách cũ mà còn thành nhật ký sự cố có ích cho lần debug sau",
+ "r2_h": "Stage 3: bước tính toán → script cố định",
+ "r2_a": "ec_calc.py vẫn chạy dù không có device_bash (thuần Python, chạy trong sandbox của phiên); 28/09 thêm --wrap nhiều giá trị, kiểm chứng với dữ liệu thật",
+ "r2_b": "Ví dụ tốt của script tách độc lập: hạ tầng đổi, công thức không bị ảnh hưởng",
+ "r3_h": "Dry-run trước real-run",
+ "r3_a": "BƯỚC 1 luôn chỉ thẩm định, kể cả khi thẩm định bù nhiều ngày; BƯỚC 2 chỉ chạy khi có mã duyệt",
+ "r3_b": "Vẫn chặt hơn khuôn mẫu LAM",
+ "r4_h": "Approval khi thực thi",
+ "r4_a": "Cơ chế mã BP-CR-/BP-SR- không đổi; có lối thoát A11c/B10b cho đồng hồ hư đã biết",
+ "r4_b": "Fail-safe: nhánh mơ hồ nào cũng mặc định chặn",
+ "r5_h": "Dedup",
+ "r5_a": "Heading 1 theo Stat.date, tìm theo nội dung chứ không theo vị trí (vì có ngày chạy bù); Bước 3 dedup qua trạng thái DONE trong file cờ",
+ "r5_b": "Mở rộng đúng chỗ khi thêm chạy bù",
+ "r6_h": "Xử lý lỗi",
+ "r6_a": "Nguyên tắc dừng, không tự retry; áp dụng cho lỗi đọc lưới, lỗi log Bước 3, đối chiếu Report thất bại, thiếu sheet tháng mới — đều mặc định NOGO/dừng",
+ "r6_b": "Các lỗ hổng được siết qua debug thực tế, không phải suy đoán trước",
+ "r7_h": "requires_local_device + folder",
+ "r7_a": "Khai 2 folder (thư mục gốc + data_iso_3) để ghi được file cờ",
+ "r7_b": "Đúng theo nhu cầu thực tế mới",
+ "r8_h": "Thông báo",
+ "r8_a": "Push; mở đầu bằng danh sách ngày chạy bù + kết quả Bước 3 của phiên trước (BƯỚC 0.6) + trạng thái cờ GO/NOGO đã xác minh",
+ "r8_b": "Thông tin trễ 1 ngày của Bước 3 được đưa lên đầu, không bị chìm",
+ "r9_h": "Lịch chạy & chạy bù",
+ "r9_a": "08:30 thứ 2 → thứ 7; BƯỚC 0.7 tự thẩm định bù mọi Stat.date thiếu trong 7 ngày gần nhất",
+ "r9_b": "Sửa đúng lỗ hổng thật (26/09 bị bỏ qua vì Chủ nhật PC tắt); cửa sổ 7 ngày giữ khoảng an toàn với giới hạn sửa 14 ngày của iEMS",
+ "r10_h": "Bước 3: chạy ở đâu",
+ "r10_a": "Windows Task Scheduler trên máy Tân, bàn giao qua file cờ + watcher sự kiện, báo cáo trễ 1 ngày",
+ "r10_b": "Thay đổi bắt buộc do giới hạn nền tảng (không có device_bash), không phải lựa chọn thiết kế",
+ "r11_h": "Đồng bộ NAS",
+ "r11_a": "2 file (docx + xlsx), một chiều, idempotent theo hash, lịch sử theo ngày cho xlsx",
+ "r11_b": "Chạy dưới tài khoản riêng (tránh lặp lại việc task bị xoá); lỗi “Access denied” khi file đang mở trên NAS tự phục hồi (RECOVERED) khi đóng file",
+ "r12_h": "Nguồn đọc dữ liệu Bước 1",
+ "r12_a": "Dữ liệu lưới (vxe-table) làm nguồn chính, ~450 dòng khớp 100%; ảnh chụp là bằng chứng đối chứng",
+ "r12_b": "Giảm rủi ro đọc sai từ ảnh — nhưng ánh xạ isNormal ↔ Anomaly vẫn chưa kiểm chứng",
+ "r13_h": "Ghi ISO theo dải ngày",
+ "r13_a": "check.py --end-date/--start-date; một cờ GO|S_max|from=S_min cho cả đợt; xử lý được qua ranh giới tháng",
+ "r13_b": "Vá gốc sự cố 28/09 (điền ngày chưa thẩm định). Chưa có lần GO thật nào chạy bằng bản mới",
+ "r14_h": "Nhánh Clear reset trên dữ liệu thật",
+ "r14_a": "28/09: BP-CR-20260926-BSLBIANCO-B-7267 thực thi theo checklist Bước 2; hậu kiểm và đối chiếu Report đều khớp",
+ "r14_b": "Rủi ro treo lâu nhất từ 18/09 đã đóng. Lưu ý: chạy trong phiên tương tác; đường kích hoạt tự động kèm mã chưa được thử",
+ "goodHeading": "Điểm thiết kế tốt hơn khuôn mẫu LAM",
+ "g1Title": "1. Nhánh tự động luôn chỉ thẩm định",
+ "g1Body": "Mọi lần cron tự động (kể cả chạy bù nhiều ngày) đều mặc định chỉ đọc — ghi dữ liệu thật không bao giờ xảy ra tự động.",
+ "g2Title": "2. Cổng duyệt riêng + lối thoát fail-safe",
+ "g2Body": "Mã BP-CR-/BP-SR- qua 6 điều kiện (B2); ca đồng hồ hư đã biết có đường đối chiếu Report riêng, mặc định chặn nếu không chắc.",
+ "g3Title": "3. Kiến trúc Bước 3 mới vẫn giữ chuẩn an toàn",
+ "g3Body": "Watcher theo sự kiện (không đoán giờ), idempotent qua DONE, catch-up khi khởi động, kiểm định kỳ 60 giây, xác minh cờ sau khi ghi.",
+ "g4Title": "4. Dữ liệu lưới thay ảnh — giảm rủi ro đọc sai",
+ "g4Body": "Đọc trực tiếp tableFullData, đối chiếu tổng với pager, kiểm chứng ~450 dòng khớp 100% trước khi tin làm nguồn chính.",
+ "g5Title": "5. Kỷ luật đồng bộ NAS",
+ "g5Body": "So hash trước khi copy, ghi qua .tmp + rename, lỗi lặp chỉ ghi log một lần tới khi RECOVERED — log không bị rác.",
+ "g6Title": "6. SPEC.md tự ghi nhật ký sự cố có ngày tháng",
+ "g6Body": "Mỗi sự cố hạ tầng được ghi kèm ngày, nguyên nhân và cách xử lý — để lại bằng chứng cho lần debug sau thay vì vá rồi quên.",
+ "g7Title": "7. Chạy bù dò theo log, không đoán theo lịch",
+ "g7Body": "BƯỚC 0.7 xác định ngày thiếu bằng Heading 1 trong log, không dựa vào thứ trong tuần — tự đúng cả khi lễ, Tết hay PC hỏng; ngày quá 7 ngày không tự chạy mà báo để Tân quyết.",
+ "g8Title": "8. Sự cố 28/09 xử lý đúng quy trình và vá tận gốc",
+ "g8Body": "Phát hiện ô ISO sai → cấp mã CR → Tân duyệt → gỡ cờ → xoá ô (có duyệt) → chạy lại → đối chiếu Report khớp; sau đó sửa check.py để lỗi không tái diễn, giữ bản backup để quay lại.",
+ "riskHeading": "Rủi ro — theo thứ tự ưu tiên",
+ "rk1Title": "1. check.py / run_step3.ps1 bản mới chưa có lần GO thật",
+ "rk1Body": "Triển khai trưa 28/09. Các lần GO trong ngày 28/09 (08:38, 10:12, 10:30) đều chạy bằng bản cũ — log không có dòng “Tham so check.py”, dải in ra là 01/09 → 27/09. Lần chạy thật đầu tiên là sáng 29/09.",
+ "rk2Title": "2. Ranh giới tháng sắp tới (30/09 → 01/10)",
+ "rk2Body": "Phiên 02/10 thẩm định Stat.date 01/10 và ghi cờ có ngày tháng 10. Nếu sheet “Tháng 10 …” trong file ISO chưa được tạo tay, check.py dừng với lỗi “Không tìm thấy sheet” trước khi ghi (an toàn, không ghi dở) nhưng Bước 3 bị hoãn tới khi có sheet. Đây cũng là lần đầu nhánh qua tháng của bản mới được chạy thật.",
+ "rk3Title": "3. Lỗi commit “written nhưng không đổi” tái diễn và lan rộng",
+ "rk3Body": "Ban đầu (23/09) chỉ gặp với file script; 28/09 gặp với CẢ file cờ lẫn Breakpoints-Log.docx. Đã có bước bắt buộc stage lại/kiểm size rồi commit lại, nhưng nguyên nhân gốc nằm ở phía nền tảng, ngoài tầm kiểm soát.",
+ "rk4Title": "4. device_bash không khả dụng — nguyên nhân chưa rõ",
+ "rk4Body": "Đã thử cài WSL2 + Virtual Machine Platform, vẫn không có. Có thể là giới hạn tính năng phía Anthropic chưa rollout cho tài khoản/tổ chức này. Hệ quả đã chấp nhận: Bước 3 báo cáo trễ 1 ngày.",
+ "rk5Title": "5. BSL_BIANCO水表: break point giả có thể lặp lại",
+ "rk5Body": "Giả thuyết (CHƯA xác nhận): bộ tổng kiểu NET (thuận − ngược) của đồng hồ điện từ, có dòng chảy ngược khi máy dừng/xả. Nếu đúng, lỗi sẽ lặp lại mỗi khi máy dừng và mỗi lần đều cần một mã CR do Tân duyệt.",
+ "rk6Title": "6. Ô ISO đã điền sai không tự sửa",
+ "rk6Body": "ONLY_FILL_BLANK=True: nếu một ngày bị điền trước khi sửa breakpoint, ô đó giữ nguyên số sai. B10c chỉ phát hiện và báo; xoá/sửa ô vẫn cần Tân duyệt (như sự cố 28/09). Bản vá --end-date làm giảm khả năng xảy ra, không loại bỏ hoàn toàn.",
+ "rk7Title": "7. BIHT02水表: wrap vẫn ở trạng thái tạm",
+ "rk7Body": "Giá trị ~9999951 vẫn TẠM, chờ xác nhận theo thông số đồng hồ E&H hoặc một lần rollover trùng khớp thứ 2.",
+ "rk8Title": "8. Ánh xạ isNormal ↔ Anomaly chưa kiểm chứng",
+ "rk8Body": "Mẫu kiểm chứng 25/09 không có dòng Anomaly thật nào, nên chưa chắc isNormal=false tương ứng đúng Status = Anomaly trên màn hình.",
+ "rk9Title": "9. Connector Canva không dùng vẫn gắn trên task",
+ "rk9Body": "Task có 2 connector: Claude_Code_Remote (có dùng) và Canva (không xuất hiện trong prompt). Không gây lỗi chức năng, nhưng nên gỡ theo nguyên tắc quyền tối thiểu.",
+ "pickHeading": "Khuyến nghị tiếp theo",
+ "rec1": "Sáng 29/09: kiểm log Bước 3 của lần GO đầu tiên chạy bằng bản mới — phải có dòng “Tham so check.py: … --end-date <Stat.date trong cờ> [--start-date …]” và dải ngày in ra đúng; lệch thì dừng và cân nhắc quay về bản .bak_20260928.",
+ "rec2": "Tạo sheet “Tháng 10 …” trong [HBF2] WaterData-ReportDaily.xlsx trước sáng 02/10 để Bước 3 của Stat.date 01/10 không bị hoãn.",
+ "rec3": "Xác nhận cấu hình totalizer (Net/Forward) của BSL_BIANCO水表 và số đọc thô quanh 21:45–21:50 ngày 26/09 để chốt nguyên nhân break point giả.",
+ "rec4": "Khi có mã CR/SR tiếp theo, thử đường kích hoạt task kèm mã trong tin nhắn (chưa từng chạy thật) và theo dõi trực tiếp lần đầu.",
+ "rec5": "Xác nhận chính thức wrap của BIHT02水表 theo thông số đồng hồ E&H, hoặc chờ thêm một lần rollover trùng khớp.",
+ "rec6": "Lần đầu gặp dòng Anomaly thật qua đọc lưới, đối chiếu ngay với cột Status trên màn hình và ghi vào SPEC.md để chốt ánh xạ isNormal ↔ Anomaly.",
+ "rec7": "Gỡ connector Canva khỏi task nếu xác nhận không dùng.",
+ "sensitiveNote": "Trang này chứa cấu hình và số liệu nội bộ của HugeBamboo (tên đồng hồ, số đo, mã duyệt). Địa chỉ IP và đường dẫn mạng/thư mục đã được lược bỏ.",
+ "footerPrefix": "Nối tiếp:",
+ "footerV1": "Bản đối chiếu 18/09 (bản gốc)",
+ "footerSuffix": "Trang chỉ để tham khảo, không có tương tác ngoài nút copy.",
+ "ft_title": "iEMS Breakpoint Check — Version 2 (tình trạng 28/09)",
+ "ft_config": "CẤU HÌNH HIỆN TẠI",
+ "ft_changes": "CÁC THAY ĐỔI TỪ BẢN 18/09 (theo mốc thời gian)",
+ "ft_aspects": "ĐỐI CHIẾU KHÍA CẠNH",
+ "ft_good": "ĐIỂM THIẾT KẾ TỐT",
+ "ft_risks": "RỦI RO (theo ưu tiên)",
+ "ft_recs": "KHUYẾN NGHỊ",
+ "fulltextContent": "iEMS Breakpoint Check — Version 2 (tình trạng 28/09)\n10 ngày sau bản gốc 18/09, Scheduled Task này (nay đổi tên thành “iEMS Breakpoint Check – 8:30 AM (T2–T7, tự chạy bù)”) đã qua một đợt tái kiến trúc lớn: Bước 3 chuyển ra Windows Task Scheduler, đổi nguồn đọc dữ liệu sang dữ liệu lưới, đồng bộ NAS, lịch thứ 2 → thứ 7 kèm chạy bù, và lần đầu thực thi Clear reset trên dữ liệu thật. Mọi nội dung lấy trực tiếp từ cấu hình sống của task, SPEC.md, log Bước 3, log watcher và log đồng bộ NAS — không suy đoán.\n\nCẤU HÌNH HIỆN TẠI\n- Lịch 08:30, thứ 2 → thứ 7 — ĐỔI (28/09): CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · Chủ nhật PC tắt nên bỏ; ngày bị lỡ được tự chạy bù trong cửa sổ 7 ngày\n- Prompt tăng theo logic, kiến thức tĩnh nằm ở SPEC.md: 18.680 ký tự (19/09) → 26.999 (25/09) → tăng tiếp ngày 28/09 (chạy bù, cờ theo dải ngày, xác minh sau commit); SPEC.md 27KB → 35KB\n- Clear reset chạy thật lần đầu — ĐÃ ĐÓNG (28/09): BP-CR-20260926-BSLBIANCO-B-7267: EC 7706491.5 → 7267.25 L; Report 7706.5125 → 7.2883 m³, khớp Details\n- Bước 3 chạy ngoài Cowork — MỚI (22/09): Windows Task Scheduler + watcher sự kiện trên máy Tân, bàn giao qua file cờ, báo cáo trễ 1 ngày\n- Đồng bộ NAS cho 2 file — MỚI (24/09): Breakpoints-Log.docx + WaterData-ReportDaily.xlsx, một chiều, idempotent theo hash, lưu lịch sử theo ngày cho xlsx\n- Nguồn đọc chính: dữ liệu lưới — MỚI (25/09): vxe-table qua JS thay ảnh/OCR; ~450 dòng khớp 100%; ảnh chụp chỉ còn để đối chứng\n- ⚠ check.py bản mới chưa có lần GO thật: Bản có --end-date/--start-date triển khai trưa 28/09; mọi lần GO trước đó đều chạy bằng bản cũ. Lần chạy thật đầu tiên: sáng 29/09\n\nCÁC THAY ĐỔI TỪ BẢN 18/09 (theo mốc thời gian)\n1. EC tính bằng script cố định (19/09)\n   Công thức CR (Final − Initial) và SR ((wrap − Initial) + Final) chuyển từ Claude tự suy luận sang gọi ec_calc.py, cùng một cách gọi ở A6a, A7, B2. Đối chiếu độc lập với dữ liệu thật ≥4 lần, khớp 100% mỗi lần.\n2. SPEC.md tách riêng khỏi prompt (19/09)\n   Toàn bộ kiến thức tĩnh chuyển sang SPEC.md trên máy Tân, đọc ở BƯỚC 0.5. Sửa kiến thức tĩnh không cần cập nhật task — lý do SPEC.md có thể lớn lên 35KB mà prompt vẫn chỉ chứa logic quy trình.\n3. Gỡ guard “bất thường” trong check.py (21/09)\n   Guard so với trung bình 7 ngày gây false-positive thật (BCM-23 ngày 19–20/09 bị chặn ghi vì trung bình còn nhiễm giá trị lỗi 12–14/09). Theo yêu cầu của Tân, guard được gỡ: Bước 3 chỉ kéo và ghi số đúng ngày/format; phát hiện bất thường hoàn toàn thuộc Bước 1/2.\n4. Đối chiếu Report cho đồng hồ hư đã biết (21/09)\n   Khi Nhóm 2/3 không rỗng nhưng TOÀN BỘ dòng vướng đều là đồng hồ hư đã biết trong SPEC.md (JR01/04/05 蒸汽表), A11c/B10b cho Bước 3 chạy nếu Report khớp tổng Details — không cần mã duyệt. Không khớp hoặc không đối chiếu được thì mặc định chặn.\n5. Bước 3 tách khỏi Cowork, chuyển sang Task Scheduler (22/09)\n   Phiên Cowork của task không có device_bash (đã thử cài WSL2 + Virtual Machine Platform, vẫn không có — nguyên nhân chưa rõ). Bước 3 chạy độc lập trên máy Tân: Cowork ghi file cờ GO/NOGO, watcher sự kiện (FileSystemWatcher) phát hiện trong vài giây và gọi run_step3.ps1 → check.py, ghi kết quả vào step3_run_log_<ngày>.txt. Phiên sau đọc log này ở BƯỚC 0.6 — đánh đổi có chủ ý: báo cáo trễ 1 ngày, không cần thêm scheduled task.\n6. 3 lỗi hạ tầng phát hiện & sửa khi debug kiến trúc mới (22–23/09)\n   (1) device_commit_files đôi khi báo ghi thành công nhưng file trên máy không đổi — bắt buộc stage lại để xác nhận sau mỗi lần commit. (2) FileSystemWatcher bỏ sót sự kiện Renamed (cách bridge ghi file kiểu atomic) — thêm Renamed + kiểm định kỳ 60 giây dự phòng. (3) UnicodeEncodeError cp950: console Big5 trên máy Tân làm check.py crash khi in tiếng Việt — sửa bằng PYTHONIOENCODING=utf-8 trong run_step3.ps1, không đụng check.py.\n7. Đồng bộ NAS cho cả log và dữ liệu ISO (24/09)\n   Task cũ chỉ sync docx, sai đích, và bị admin xoá vì tài khoản tạo task đã mồ côi. Task mới (Watch-NasSync.ps1, chạy dưới tài khoản riêng của máy) sync CẢ HAI file một chiều máy Tân → NAS, đích đã sửa đúng, so hash để tránh copy thừa, ghi an toàn qua .tmp + rename, giữ lịch sử theo ngày cho xlsx. Kiểm chứng đầy đủ đầu tiên: sáng 25/09.\n8. Đọc dữ liệu lưới (vxe-table) làm nguồn chính (25/09)\n   Trang Meter reading correction dùng vxe-table (Vue 2): đọc tableFullData qua JS, duyệt hết mọi trang, gộp theo id, đối chiếu tổng với “Total N” của pager. Kiểm chứng 25/09: ~450 dòng (BCM*, BR14, BIHT02, JR01, JR13) khớp tuyệt đối với màn hình, gồm 46 dòng Break point = Yes với các wrap lệch số danh nghĩa (9994, 9998, 9999862.00, 9999951.00). Ảnh chụp giữ làm bằng chứng đối chứng.\n9. Lịch thứ 2 → thứ 7 + tự chạy bù (28/09)\n   Chủ nhật 27/09 PC tắt → Stat.date 26/09 không được thẩm định và không phiên nào báo. Lịch đổi thành thứ 2 → thứ 7; mỗi lần chạy, BƯỚC 0.7 tự dò các Stat.date trong 7 ngày gần nhất CHƯA có Heading 1 trong Breakpoints-Log.docx và thẩm định bù (cũ → mới) — dò theo log, không đoán theo thứ trong tuần. Ngày thiếu cũ hơn 7 ngày chỉ được liệt kê để Tân quyết, vì gần giới hạn “Update details days” = 14 của iEMS.\n10. Sự cố điền ISO cho ngày chưa thẩm định → check.py nhận dải ngày (28/09)\n   check.py cũ không dùng Stat.date trong cờ: GO|2026-09-27 (08:38 ngày 28/09, water_updated=54 = 2 ngày) điền luôn 26/09 chưa thẩm định → ô B-SL BIANCO NƯỚC 26/09 = 7706.5125 m³ (sai). Đã xử lý: Clear reset, xoá trống ô (Tân duyệt), chạy lại GO → 7.28825 m³, khớp Report. Vá gốc: check.py nhận --end-date/--start-date, run_step3.ps1 đọc Stat.date và trường from= trong cờ, Cowork ghi MỘT cờ cho cả đợt (GO|S_max|from=S_min), kiểm đủ sheet mọi tháng trước khi ghi; bản cũ giữ ở .bak_20260928. Lỗi commit “written nhưng không đổi” tái diễn với cả file cờ lẫn docx → thêm bước bắt buộc stage lại/kiểm size sau commit.\n11. Clear reset trên dữ liệu thật lần đầu + đồng hồ nhiều break point (28/09)\n   BSL_BIANCO水表 ca B ngày 26/09 bị iEMS gắn 2 System break point giả (số tổng chỉ tụt ~81,5 L trong ~2 phút), EC 7706491.5 L (~1000 lần lịch sử). Kết luận Nhóm 2, mã BP-CR-20260926-BSLBIANCO-B-7267, Tân duyệt, thực thi theo đúng checklist Bước 2 bằng Claude in Chrome (trong phiên tương tác, Tân gửi mã trong phiên): một lần Clear reset gỡ cả hai điểm, EC → 7267.25 = Final − Initial, Report 7706.5125 → 7.2883 m³ sau Refresh stat. (~4,5 phút). ec_calc.py nhận --wrap nhiều giá trị để tái lập đúng công thức iEMS; SPEC.md thêm mục NHIỀU BREAK POINT.\n\nĐỐI CHIẾU KHÍA CẠNH\n- [ĐÃ ĐÓNG] Stage 1–2: SPEC.md, duyệt xong mới code: SPEC.md ~35KB, có mục “GHI CHÚ HẠ TẦNG” theo ngày (22/09, 24/09, 28/09) và mục mới “NHIỀU BREAK POINT” — Không chỉ đóng khoảng cách cũ mà còn thành nhật ký sự cố có ích cho lần debug sau\n- [ĐÃ ĐÓNG] Stage 3: bước tính toán → script cố định: ec_calc.py vẫn chạy dù không có device_bash (thuần Python, chạy trong sandbox của phiên); 28/09 thêm --wrap nhiều giá trị, kiểm chứng với dữ liệu thật — Ví dụ tốt của script tách độc lập: hạ tầng đổi, công thức không bị ảnh hưởng\n- [KHÔNG ĐỔI] Dry-run trước real-run: BƯỚC 1 luôn chỉ thẩm định, kể cả khi thẩm định bù nhiều ngày; BƯỚC 2 chỉ chạy khi có mã duyệt — Vẫn chặt hơn khuôn mẫu LAM\n- [KHÔNG ĐỔI] Approval khi thực thi: Cơ chế mã BP-CR-/BP-SR- không đổi; có lối thoát A11c/B10b cho đồng hồ hư đã biết — Fail-safe: nhánh mơ hồ nào cũng mặc định chặn\n- [KHÔNG ĐỔI] Dedup: Heading 1 theo Stat.date, tìm theo nội dung chứ không theo vị trí (vì có ngày chạy bù); Bước 3 dedup qua trạng thái DONE trong file cờ — Mở rộng đúng chỗ khi thêm chạy bù\n- [KHÔNG ĐỔI] Xử lý lỗi: Nguyên tắc dừng, không tự retry; áp dụng cho lỗi đọc lưới, lỗi log Bước 3, đối chiếu Report thất bại, thiếu sheet tháng mới — đều mặc định NOGO/dừng — Các lỗ hổng được siết qua debug thực tế, không phải suy đoán trước\n- [MỚI] requires_local_device + folder: Khai 2 folder (thư mục gốc + data_iso_3) để ghi được file cờ — Đúng theo nhu cầu thực tế mới\n- [MỚI] Thông báo: Push; mở đầu bằng danh sách ngày chạy bù + kết quả Bước 3 của phiên trước (BƯỚC 0.6) + trạng thái cờ GO/NOGO đã xác minh — Thông tin trễ 1 ngày của Bước 3 được đưa lên đầu, không bị chìm\n- [MỚI] Lịch chạy & chạy bù: 08:30 thứ 2 → thứ 7; BƯỚC 0.7 tự thẩm định bù mọi Stat.date thiếu trong 7 ngày gần nhất — Sửa đúng lỗ hổng thật (26/09 bị bỏ qua vì Chủ nhật PC tắt); cửa sổ 7 ngày giữ khoảng an toàn với giới hạn sửa 14 ngày của iEMS\n- [MỚI] Bước 3: chạy ở đâu: Windows Task Scheduler trên máy Tân, bàn giao qua file cờ + watcher sự kiện, báo cáo trễ 1 ngày — Thay đổi bắt buộc do giới hạn nền tảng (không có device_bash), không phải lựa chọn thiết kế\n- [MỚI] Đồng bộ NAS: 2 file (docx + xlsx), một chiều, idempotent theo hash, lịch sử theo ngày cho xlsx — Chạy dưới tài khoản riêng (tránh lặp lại việc task bị xoá); lỗi “Access denied” khi file đang mở trên NAS tự phục hồi (RECOVERED) khi đóng file\n- [MỚI] Nguồn đọc dữ liệu Bước 1: Dữ liệu lưới (vxe-table) làm nguồn chính, ~450 dòng khớp 100%; ảnh chụp là bằng chứng đối chứng — Giảm rủi ro đọc sai từ ảnh — nhưng ánh xạ isNormal ↔ Anomaly vẫn chưa kiểm chứng\n- [MỚI] Ghi ISO theo dải ngày: check.py --end-date/--start-date; một cờ GO|S_max|from=S_min cho cả đợt; xử lý được qua ranh giới tháng — Vá gốc sự cố 28/09 (điền ngày chưa thẩm định). Chưa có lần GO thật nào chạy bằng bản mới\n- [ĐÃ ĐÓNG] Nhánh Clear reset trên dữ liệu thật: 28/09: BP-CR-20260926-BSLBIANCO-B-7267 thực thi theo checklist Bước 2; hậu kiểm và đối chiếu Report đều khớp — Rủi ro treo lâu nhất từ 18/09 đã đóng. Lưu ý: chạy trong phiên tương tác; đường kích hoạt tự động kèm mã chưa được thử\n\nĐIỂM THIẾT KẾ TỐT\n1. Nhánh tự động luôn chỉ thẩm định: Mọi lần cron tự động (kể cả chạy bù nhiều ngày) đều mặc định chỉ đọc — ghi dữ liệu thật không bao giờ xảy ra tự động.\n2. Cổng duyệt riêng + lối thoát fail-safe: Mã BP-CR-/BP-SR- qua 6 điều kiện (B2); ca đồng hồ hư đã biết có đường đối chiếu Report riêng, mặc định chặn nếu không chắc.\n3. Kiến trúc Bước 3 mới vẫn giữ chuẩn an toàn: Watcher theo sự kiện (không đoán giờ), idempotent qua DONE, catch-up khi khởi động, kiểm định kỳ 60 giây, xác minh cờ sau khi ghi.\n4. Dữ liệu lưới thay ảnh — giảm rủi ro đọc sai: Đọc trực tiếp tableFullData, đối chiếu tổng với pager, kiểm chứng ~450 dòng khớp 100% trước khi tin làm nguồn chính.\n5. Kỷ luật đồng bộ NAS: So hash trước khi copy, ghi qua .tmp + rename, lỗi lặp chỉ ghi log một lần tới khi RECOVERED — log không bị rác.\n6. SPEC.md tự ghi nhật ký sự cố có ngày tháng: Mỗi sự cố hạ tầng được ghi kèm ngày, nguyên nhân và cách xử lý — để lại bằng chứng cho lần debug sau thay vì vá rồi quên.\n7. Chạy bù dò theo log, không đoán theo lịch: BƯỚC 0.7 xác định ngày thiếu bằng Heading 1 trong log, không dựa vào thứ trong tuần — tự đúng cả khi lễ, Tết hay PC hỏng; ngày quá 7 ngày không tự chạy mà báo để Tân quyết.\n8. Sự cố 28/09 xử lý đúng quy trình và vá tận gốc: Phát hiện ô ISO sai → cấp mã CR → Tân duyệt → gỡ cờ → xoá ô (có duyệt) → chạy lại → đối chiếu Report khớp; sau đó sửa check.py để lỗi không tái diễn, giữ bản backup để quay lại.\n\nRỦI RO (theo ưu tiên)\n1. check.py / run_step3.ps1 bản mới chưa có lần GO thật\n   Triển khai trưa 28/09. Các lần GO trong ngày 28/09 (08:38, 10:12, 10:30) đều chạy bằng bản cũ — log không có dòng “Tham so check.py”, dải in ra là 01/09 → 27/09. Lần chạy thật đầu tiên là sáng 29/09.\n2. Ranh giới tháng sắp tới (30/09 → 01/10)\n   Phiên 02/10 thẩm định Stat.date 01/10 và ghi cờ có ngày tháng 10. Nếu sheet “Tháng 10 …” trong file ISO chưa được tạo tay, check.py dừng với lỗi “Không tìm thấy sheet” trước khi ghi (an toàn, không ghi dở) nhưng Bước 3 bị hoãn tới khi có sheet. Đây cũng là lần đầu nhánh qua tháng của bản mới được chạy thật.\n3. Lỗi commit “written nhưng không đổi” tái diễn và lan rộng\n   Ban đầu (23/09) chỉ gặp với file script; 28/09 gặp với CẢ file cờ lẫn Breakpoints-Log.docx. Đã có bước bắt buộc stage lại/kiểm size rồi commit lại, nhưng nguyên nhân gốc nằm ở phía nền tảng, ngoài tầm kiểm soát.\n4. device_bash không khả dụng — nguyên nhân chưa rõ\n   Đã thử cài WSL2 + Virtual Machine Platform, vẫn không có. Có thể là giới hạn tính năng phía Anthropic chưa rollout cho tài khoản/tổ chức này. Hệ quả đã chấp nhận: Bước 3 báo cáo trễ 1 ngày.\n5. BSL_BIANCO水表: break point giả có thể lặp lại\n   Giả thuyết (CHƯA xác nhận): bộ tổng kiểu NET (thuận − ngược) của đồng hồ điện từ, có dòng chảy ngược khi máy dừng/xả. Nếu đúng, lỗi sẽ lặp lại mỗi khi máy dừng và mỗi lần đều cần một mã CR do Tân duyệt.\n6. Ô ISO đã điền sai không tự sửa\n   ONLY_FILL_BLANK=True: nếu một ngày bị điền trước khi sửa breakpoint, ô đó giữ nguyên số sai. B10c chỉ phát hiện và báo; xoá/sửa ô vẫn cần Tân duyệt (như sự cố 28/09). Bản vá --end-date làm giảm khả năng xảy ra, không loại bỏ hoàn toàn.\n7. BIHT02水表: wrap vẫn ở trạng thái tạm\n   Giá trị ~9999951 vẫn TẠM, chờ xác nhận theo thông số đồng hồ E&H hoặc một lần rollover trùng khớp thứ 2.\n8. Ánh xạ isNormal ↔ Anomaly chưa kiểm chứng\n   Mẫu kiểm chứng 25/09 không có dòng Anomaly thật nào, nên chưa chắc isNormal=false tương ứng đúng Status = Anomaly trên màn hình.\n9. Connector Canva không dùng vẫn gắn trên task\n   Task có 2 connector: Claude_Code_Remote (có dùng) và Canva (không xuất hiện trong prompt). Không gây lỗi chức năng, nhưng nên gỡ theo nguyên tắc quyền tối thiểu.\n\nKHUYẾN NGHỊ\n1. Sáng 29/09: kiểm log Bước 3 của lần GO đầu tiên chạy bằng bản mới — phải có dòng “Tham so check.py: … --end-date <Stat.date trong cờ> [--start-date …]” và dải ngày in ra đúng; lệch thì dừng và cân nhắc quay về bản .bak_20260928.\n2. Tạo sheet “Tháng 10 …” trong [HBF2] WaterData-ReportDaily.xlsx trước sáng 02/10 để Bước 3 của Stat.date 01/10 không bị hoãn.\n3. Xác nhận cấu hình totalizer (Net/Forward) của BSL_BIANCO水表 và số đọc thô quanh 21:45–21:50 ngày 26/09 để chốt nguyên nhân break point giả.\n4. Khi có mã CR/SR tiếp theo, thử đường kích hoạt task kèm mã trong tin nhắn (chưa từng chạy thật) và theo dõi trực tiếp lần đầu.\n5. Xác nhận chính thức wrap của BIHT02水表 theo thông số đồng hồ E&H, hoặc chờ thêm một lần rollover trùng khớp.\n6. Lần đầu gặp dòng Anomaly thật qua đọc lưới, đối chiếu ngay với cột Status trên màn hình và ghi vào SPEC.md để chốt ánh xạ isNormal ↔ Anomaly.\n7. Gỡ connector Canva khỏi task nếu xác nhận không dùng.\n\nTrang này chứa cấu hình và số liệu nội bộ của HugeBamboo (tên đồng hồ, số đo, mã duyệt). Địa chỉ IP và đường dẫn mạng/thư mục đã được lược bỏ."
+},
+  en: {
+ "pageTitle": "iEMS Breakpoint Check · Version 2 (Sep 28) · vs Sep 18 report & Local Automation Map",
+ "eyebrow": "VERSION 2 · UPDATED SEP 28 · VS THE SEP 18 REPORT & LOCAL AUTOMATION MAP",
+ "h1": "iEMS Breakpoint Check: current state (Sep 28) vs the Sep 18 report, and against Local Automation Map",
+ "subtitle": "Ten days after the Sep 18 baseline, this Scheduled Task (now renamed “iEMS Breakpoint Check – 8:30 AM (Mon–Sat, auto catch-up)”) has gone through a major re-architecture: Step 3 moved out to Windows Task Scheduler, the data source switched to grid data, NAS sync was added, the schedule became Monday → Saturday with catch-up, and Clear reset was executed on real data for the first time. Everything here comes directly from the task's live configuration, SPEC.md, Step 3 logs, the watcher log and the NAS sync log — no guessing.",
+ "navV1": "↗ Sep 18 report (baseline)",
+ "b1_t": "08:30, Monday → Saturday — CHANGED (Sep 28)",
+ "b1_b": "CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · Sunday dropped since the PC is off; missed days are caught up automatically within a 7-day window",
+ "b2_t": "Prompt grows with flow logic; static knowledge lives in SPEC.md",
+ "b2_b": "18,680 characters (Sep 19) → 26,999 (Sep 25) → grew again on Sep 28 (catch-up, date-range flag, post-commit verification); SPEC.md 27KB → 35KB",
+ "b3_t": "First real Clear reset — CLOSED (Sep 28)",
+ "b3_b": "BP-CR-20260926-BSLBIANCO-B-7267: EC 7706491.5 → 7267.25 L; Report 7706.5125 → 7.2883 m³, matches Details",
+ "b4_t": "Step 3 runs outside Cowork — NEW (Sep 22)",
+ "b4_b": "Windows Task Scheduler + an event watcher on Tân's machine, handed off via a flag file, reported with a 1-day delay",
+ "b5_t": "NAS sync for 2 files — NEW (Sep 24)",
+ "b5_b": "Breakpoints-Log.docx + WaterData-ReportDaily.xlsx, one-way, hash-idempotent, dated history kept for the xlsx",
+ "b6_t": "Primary source: grid data — NEW (Sep 25)",
+ "b6_b": "vxe-table via JS instead of screenshots/OCR; ~450 rows matched 100%; screenshots kept only as corroboration",
+ "b7_t": "⚠ The new check.py has no real GO run yet",
+ "b7_b": "The --end-date/--start-date version went live around noon on Sep 28; every earlier GO ran on the old version. First real run: the morning of Sep 29",
+ "tagIntro": "Status tag legend:",
+ "tag_resolved": "CLOSED",
+ "tag_unchanged": "UNCHANGED",
+ "tag_new": "NEW",
+ "fulltextHeading": "Full comparison (plain text)",
+ "fulltextLead": "A condensed plain-text version, handy to paste into notes or CLAUDE.md/AGENTS.md.",
+ "btnViewFulltext": "View & copy full text",
+ "btnHideFulltext": "Hide full text",
+ "btnCopy": "Copy",
+ "btnCopied": "Copied ✓",
+ "btnCopyFail": "Could not copy",
+ "timelineHeading": "Changes shipped since the Sep 18 baseline (as of Sep 28)",
+ "timelineLead": "All checked directly against the live system (task configuration, SPEC.md, Step 3 logs, watcher log, NAS sync log, Breakpoints-Log.docx). Ordered by date.",
+ "t1_title": "EC calculated by a fixed script (Sep 19)",
+ "t1_body": "The CR (Final − Initial) and SR ((wrap − Initial) + Final) formulas moved from free-form LLM reasoning to calling ec_calc.py, the same call at A6a, A7 and B2. Independently cross-checked against real data ≥4 times, 100% match every time.",
+ "t2_title": "SPEC.md split out of the prompt (Sep 19)",
+ "t2_body": "All static knowledge moved into SPEC.md on Tân's machine, read at STEP 0.5. Editing static knowledge no longer requires updating the task — which is why SPEC.md could grow to 35KB while the prompt holds only flow logic.",
+ "t3_title": "Removed check.py's anomaly guard (Sep 21)",
+ "t3_body": "The guard comparing against a 7-day average produced a real false positive (BCM-23 on Sep 19–20 was withheld because the average was still contaminated by the Sep 12–14 faulty values). Per Tân's request it was removed: Step 3 only pulls and writes the number for the right date/format; anomaly detection belongs entirely to Steps 1/2.",
+ "t4_title": "Report reconciliation for known-broken meters (Sep 21)",
+ "t4_body": "When Group 2/3 isn't empty but EVERY blocking row is a known-broken meter listed in SPEC.md (JR01/04/05 steam meters), A11c/B10b lets Step 3 run if the Report matches the Details total — no approval code needed. A mismatch or failed reconciliation blocks by default.",
+ "t5_title": "Step 3 decoupled from Cowork, moved to Task Scheduler (Sep 22)",
+ "t5_body": "The task's Cowork session has no device_bash (WSL2 + Virtual Machine Platform were installed, still none — cause unclear). Step 3 now runs independently on Tân's machine: Cowork writes a GO/NOGO flag file, an event watcher (FileSystemWatcher) picks it up within seconds and calls run_step3.ps1 → check.py, writing step3_run_log_<date>.txt. The next session reads that log at STEP 0.6 — a deliberate trade-off: a 1-day reporting delay, no extra scheduled task.",
+ "t6_title": "3 infrastructure bugs found & fixed while debugging (Sep 22–23)",
+ "t6_body": "(1) device_commit_files sometimes reported success while the file on the machine hadn't changed — re-staging to confirm is now mandatory after every commit. (2) FileSystemWatcher missed Renamed events (the bridge writes files atomically) — Renamed added plus a 60-second periodic safety net. (3) cp950 UnicodeEncodeError: the Big5 console on Tân's machine crashed check.py when printing Vietnamese — fixed with PYTHONIOENCODING=utf-8 in run_step3.ps1, without touching check.py.",
+ "t7_title": "NAS sync for both the log and the ISO data (Sep 24)",
+ "t7_body": "The old task synced only the docx, to the wrong destination, and was deleted by an admin because its creating account was orphaned. The new task (Watch-NasSync.ps1, running under a dedicated machine account) syncs BOTH files one-way from Tân's machine to the NAS, destination corrected, hash-compared to avoid redundant copies, written safely via .tmp + rename, with dated history for the xlsx. First full verification: the morning of Sep 25.",
+ "t8_title": "Grid data (vxe-table) becomes the primary source (Sep 25)",
+ "t8_body": "The Meter reading correction page uses vxe-table (Vue 2): tableFullData is read via JS, every page is walked, rows merged by id, and the total checked against the pager's “Total N”. Verified Sep 25: ~450 rows (BCM*, BR14, BIHT02, JR01, JR13) matched the screen exactly, including 46 Break point = Yes rows with off-nominal wraps (9994, 9998, 9999862.00, 9999951.00). Screenshots stay as corroborating evidence.",
+ "t9_title": "Monday → Saturday schedule + automatic catch-up (Sep 28)",
+ "t9_body": "Sunday Sep 27 the PC was off → Stat.date Sep 26 was never audited and no session reported it. The schedule became Monday → Saturday; on every run, STEP 0.7 finds Stat.dates in the last 7 days that have NO Heading 1 in Breakpoints-Log.docx and audits them (oldest first) — driven by the log, not by the weekday. Missing days older than 7 days are only listed for Tân to decide, since they approach iEMS's “Update details days” limit of 14.",
+ "t10_title": "Incident: ISO filled for an unaudited day → check.py takes a date range (Sep 28)",
+ "t10_body": "The old check.py ignored the Stat.date in the flag: GO|2026-09-27 (08:38 on Sep 28, water_updated=54 = 2 days) also filled the unaudited Sep 26 → cell B-SL BIANCO NƯỚC on Sep 26 = 7706.5125 m³ (wrong). Handled: Clear reset, cell cleared (Tân approved), GO rerun → 7.28825 m³, matching the Report. Root fix: check.py takes --end-date/--start-date, run_step3.ps1 reads the Stat.date and the from= field from the flag, Cowork writes ONE flag per batch (GO|S_max|from=S_min), and every month's sheet is checked before writing; the old version is kept as .bak_20260928. The “written but unchanged” commit bug recurred with both the flag file and the docx → mandatory re-stage/size check after commit.",
+ "t11_title": "First real Clear reset + multi-break-point meters (Sep 28)",
+ "t11_body": "BSL_BIANCO水表 shift B on Sep 26 got 2 false System break points from iEMS (the totalizer only dropped ~81.5 L within ~2 minutes), EC 7706491.5 L (~1000× its history). Concluded Group 2, code BP-CR-20260926-BSLBIANCO-B-7267, approved by Tân, executed per the Step 2 checklist with Claude in Chrome (in an interactive session, Tân sent the code in-session): one Clear reset removed both points, EC → 7267.25 = Final − Initial, Report 7706.5125 → 7.2883 m³ after Refresh stat. (~4.5 min). ec_calc.py now accepts multiple --wrap values to reproduce iEMS's formula exactly; SPEC.md gained a MULTIPLE BREAK POINTS section.",
+ "diagram1Heading": "Gap against Local Automation Map — before and after",
+ "diagram1Lead": "The two biggest gaps the Sep 18 report flagged (no standalone SPEC.md, no fixed calculation script) are closed and have stayed closed. The schedule moved to Monday → Saturday with catch-up.",
+ "containerLabel": "Local Automation Map — six-stage process",
+ "s1_sub1": "Interview",
+ "s1_sub2": "",
+ "s2_sub_after": "✓ Standalone SPEC.md",
+ "s2_sub_before": "Sep 18: none",
+ "s3_sub_after": "✓ ec_calc.py",
+ "s3_sub_before": "Sep 18: LLM computed",
+ "s4_sub1": "Confirm",
+ "s4_sub2": "schedule",
+ "s5_sub1": "Set up",
+ "s5_sub2": "schedule",
+ "s6_sub1": "Verify &",
+ "s6_sub2": "handoff",
+ "d1_sched_t": "Scheduled Task",
+ "d1_sched_1": "cron 30 8 * * 1-6 · permission_mode: auto",
+ "d1_sched_2": "auto catch-up of missing Stat.dates (7 days)",
+ "closedNote": "Green = gaps from the Sep 18 report now closed at Stage 2 and Stage 3. Amber = Stage 5 (schedule setup) changed on Sep 28. Other stages unchanged.",
+ "diagram2Heading": "Two-path safety mechanism — unchanged",
+ "diagram2Lead": "The automatic path only audits; real writes happen only via a manual approval code (or the Report-reconciliation path for known-broken meters). The difference: the decision to run Step 3 now WRITES A FLAG for Task Scheduler (one flag per batch, with a date range) instead of running check.py in the session.",
+ "d2_zoneA": "Automatic path (cron)",
+ "d2_zoneB": "Execution path (needs an approval code)",
+ "d2_a1a": "Cron 08:30",
+ "d2_a1b": "Mon–Sat, automatic",
+ "d2_a2a": "STEP 1 (+ catch-up)",
+ "d2_a2b": "audit only · reads grid data",
+ "d2_a2c": "EC: ec_calc.py",
+ "d2_a3a": "Write flag + report",
+ "d2_a3b": "proposes codes for Group 2/3",
+ "d2_conn1": "GO/NOGO → Task Scheduler (Diagram 3)",
+ "d2_conn2": "or Tân sends a code → Step 2",
+ "d2_b1a": "Trigger + approval code",
+ "d2_b1b": "BP-CR-… / BP-SR-…",
+ "d2_b2a": "Lock gate",
+ "d2_b2b": "6 conditions (B2)",
+ "d2_b3a": "STEP 2",
+ "d2_b3b": "Clear reset / Set as reset",
+ "d2_b3c": "CR first run for real on Sep 28",
+ "d2_b4a": "Mandatory post-check",
+ "d2_b4b": "B5 + Report cross-check",
+ "d2_reject1": "Condition not met",
+ "d2_reject2": "→ skip row, log reason",
+ "diagram3Heading": "Step 3 handoff via a flag file (since Sep 22, updated Sep 28)",
+ "diagram3Lead": "check.py doesn't run inside the Cowork session. Handoff goes through a flag file + an event watcher on Tân's machine, reported with a 1-day delay.",
+ "d3_1a": "Cowork (Step 1/2)",
+ "d3_1b": "decides GO/NOGO",
+ "d3_2a": "Writes flag file",
+ "d3_2b": "step3_trigger.txt",
+ "d3_2c": "GO|S_max|from=S_min",
+ "d3_3a": "Event watcher",
+ "d3_3b": "FileSystemWatcher",
+ "d3_3c": "detects within seconds",
+ "d3_4a": "run_step3.ps1",
+ "d3_4b": "→ check.py --end-date/--start-date",
+ "d3_4c": "writes step3_run_log_<date>.txt",
+ "d3_5a": "Watch-NasSync.ps1",
+ "d3_5b": "syncs docx + xlsx → NAS",
+ "d3_5l": "xlsx changed → sync",
+ "d3_6a": "Next Cowork session",
+ "d3_6b": "reads the log (STEP 0.6)",
+ "d3_6c": "reports with a 1-day delay",
+ "d3_6l": "Step 3 log",
+ "d3_note": "The flag is updated to DONE|<date>|success or error_exit_<code> so it never re-runs (idempotent). The watcher checks the flag at startup (catch-up) plus a 60-second periodic safety net. After writing the flag, Cowork must re-stage it to confirm the content (A11d).",
+ "tableHeading": "Aspect-by-aspect comparison — status on Sep 28",
+ "col1": "Aspect",
+ "col2": "Reality today (Sep 28, verified against the system)",
+ "col3": "Assessment",
+ "col4": "Status",
+ "r1_h": "Stage 1–2: SPEC.md, approved before coding",
+ "r1_a": "SPEC.md ~35KB, with dated “infrastructure notes” (Sep 22, 24, 28) and a new “multiple break points” section",
+ "r1_b": "Closes the old gap and doubles as an incident log for future debugging",
+ "r2_h": "Stage 3: calculation step → fixed script",
+ "r2_a": "ec_calc.py still runs without device_bash (pure Python, runs in the session sandbox); on Sep 28 it gained multi-value --wrap, verified on real data",
+ "r2_b": "A good example of a truly decoupled script: infrastructure changed, the formula didn't",
+ "r3_h": "Dry-run before real run",
+ "r3_a": "STEP 1 always only audits, even when catching up several days; STEP 2 only runs with an approval code",
+ "r3_b": "Still stricter than the LAM template",
+ "r4_h": "Approval on execution",
+ "r4_a": "The BP-CR-/BP-SR- code mechanism is unchanged; A11c/B10b gives an escape valve for known-broken meters",
+ "r4_b": "Fail-safe: every ambiguous branch blocks by default",
+ "r5_h": "Dedup",
+ "r5_a": "Heading 1 per Stat.date, matched by content rather than position (catch-up days can be out of order); Step 3 dedups via the DONE state in the flag file",
+ "r5_b": "Extended in the right place when catch-up was added",
+ "r6_h": "Error handling",
+ "r6_a": "Stop, no auto-retry; applied to grid-read errors, Step 3 log errors, failed Report reconciliation and a missing new-month sheet — all default to NOGO/stop",
+ "r6_b": "Gaps tightened through real debugging, not speculation",
+ "r7_h": "requires_local_device + folders",
+ "r7_a": "Declares 2 folders (root + data_iso_3) so the flag file can be written",
+ "r7_b": "Matches the new real need",
+ "r8_h": "Notification",
+ "r8_a": "Push; opens with the catch-up dates + the previous run's Step 3 result (STEP 0.6) + the verified GO/NOGO flag state",
+ "r8_b": "The 1-day-delayed Step 3 result is put up front, not buried",
+ "r9_h": "Schedule & catch-up",
+ "r9_a": "08:30 Monday → Saturday; STEP 0.7 audits every missing Stat.date in the last 7 days",
+ "r9_b": "Fixes a real gap (Sep 26 was skipped because the PC is off on Sunday); the 7-day window keeps a safety margin to iEMS's 14-day edit limit",
+ "r10_h": "Step 3: where it runs",
+ "r10_a": "Windows Task Scheduler on Tân's machine, handed off via a flag file + event watcher, reported with a 1-day delay",
+ "r10_b": "A change forced by a platform limitation (no device_bash), not a design choice",
+ "r11_h": "NAS sync",
+ "r11_a": "2 files (docx + xlsx), one-way, hash-idempotent, dated history for the xlsx",
+ "r11_b": "Runs under a dedicated account (so it won't be deleted again); “Access denied” while the file is open on the NAS recovers by itself (RECOVERED) once closed",
+ "r12_h": "Step 1's data source",
+ "r12_a": "Grid data (vxe-table) is the primary source, ~450 rows matched 100%; screenshots are corroborating evidence",
+ "r12_b": "Lowers misread risk — but the isNormal ↔ Anomaly mapping is still unverified",
+ "r13_h": "ISO writes by date range",
+ "r13_a": "check.py --end-date/--start-date; one GO|S_max|from=S_min flag per batch; handles month boundaries",
+ "r13_b": "Root fix for the Sep 28 incident (filling an unaudited day). No real GO has run on the new version yet",
+ "r14_h": "Clear reset branch on real data",
+ "r14_a": "Sep 28: BP-CR-20260926-BSLBIANCO-B-7267 executed per the Step 2 checklist; post-check and Report cross-check both matched",
+ "r14_b": "The longest-open risk since Sep 18 is closed. Note: ran in an interactive session; the automatic trigger-with-code path hasn't been tried yet",
+ "goodHeading": "Design points that exceed the LAM template",
+ "g1Title": "1. The automatic path only ever audits",
+ "g1Body": "Every automatic cron run (including multi-day catch-up) is read-only by default — real writes never happen automatically.",
+ "g2Title": "2. A dedicated approval gate + a fail-safe escape valve",
+ "g2Body": "BP-CR-/BP-SR- codes pass 6 gate conditions (B2); known-broken meters have their own Report-reconciliation path that blocks when unsure.",
+ "g3Title": "3. The new Step 3 architecture keeps the safety bar",
+ "g3Body": "Event-driven watcher (no guessed timing), idempotent via DONE, catch-up on startup, 60-second periodic check, flag verified after writing.",
+ "g4Title": "4. Grid data instead of screenshots — less misread risk",
+ "g4Body": "Reads tableFullData directly, checks the total against the pager, and was verified on ~450 rows at 100% before being trusted.",
+ "g5Title": "5. NAS sync discipline",
+ "g5Body": "Hash-compares before copying, writes via .tmp + rename, a repeating error is logged once until RECOVERED — the log stays clean.",
+ "g6Title": "6. SPEC.md keeps a dated incident log",
+ "g6Body": "Every infrastructure incident is recorded with its date, cause and fix — leaving evidence for next time instead of patch-and-forget.",
+ "g7Title": "7. Catch-up driven by the log, not the calendar",
+ "g7Body": "STEP 0.7 finds missing days from the log's Heading 1s, not from the weekday — it stays correct through holidays, Tết or a broken PC; days older than 7 aren't run automatically but reported for Tân to decide.",
+ "g8Title": "8. The Sep 28 incident was handled by the book and fixed at the root",
+ "g8Body": "Wrong ISO cell found → CR code issued → Tân approved → flag removed → cell cleared (approved) → rerun → Report matched; then check.py was fixed so it can't recur, with a backup kept for rollback.",
+ "riskHeading": "Risks — in priority order",
+ "rk1Title": "1. The new check.py / run_step3.ps1 has no real GO run yet",
+ "rk1Body": "Deployed around noon on Sep 28. All GO runs that day (08:38, 10:12, 10:30) used the old version — the log has no “Tham so check.py” line and the printed range is Sep 1 → Sep 27. The first real run is the morning of Sep 29.",
+ "rk2Title": "2. Upcoming month boundary (Sep 30 → Oct 1)",
+ "rk2Body": "The Oct 2 run audits Stat.date Oct 1 and writes a flag dated in October. If the “Tháng 10 …” sheet hasn't been created manually in the ISO file, check.py stops with “sheet not found” before writing (safe, no partial write), but Step 3 is postponed until the sheet exists. It is also the first real run of the new version's cross-month branch.",
+ "rk3Title": "3. The “written but unchanged” commit bug recurs and spreads",
+ "rk3Body": "At first (Sep 23) it only hit script files; on Sep 28 it hit BOTH the flag file and Breakpoints-Log.docx. A mandatory re-stage/size check + recommit is in place, but the root cause is on the platform side, outside our control.",
+ "rk4Title": "4. device_bash unavailable — cause unclear",
+ "rk4Body": "WSL2 + Virtual Machine Platform were installed, still nothing. Possibly an Anthropic-side feature not yet rolled out to this account/org. Accepted consequence: Step 3 is reported one day late.",
+ "rk5Title": "5. BSL_BIANCO水表: false break points may recur",
+ "rk5Body": "Hypothesis (NOT confirmed): the electromagnetic meter's NET (forward − reverse) totalizer sees reverse flow when the machine stops/drains. If so, it will recur whenever the machine stops, each time needing a CR code approved by Tân.",
+ "rk6Title": "6. A wrongly filled ISO cell doesn't fix itself",
+ "rk6Body": "ONLY_FILL_BLANK=True: if a day is filled before its breakpoint is fixed, the cell keeps the wrong number. B10c only detects and reports; clearing/fixing the cell still needs Tân's approval (as in the Sep 28 incident). The --end-date fix makes this less likely, not impossible.",
+ "rk7Title": "7. BIHT02水表: wrap value still tentative",
+ "rk7Body": "The ~9999951 value is still tentative, pending confirmation from the E&H meter datasheet or a second matching rollover.",
+ "rk8Title": "8. The isNormal ↔ Anomaly mapping is unverified",
+ "rk8Body": "The Sep 25 verification sample had no real Anomaly row, so it's not yet certain that isNormal=false equals Status = Anomaly on screen.",
+ "rk9Title": "9. An unused Canva connector is still attached to the task",
+ "rk9Body": "The task has 2 connectors: Claude_Code_Remote (used) and Canva (never referenced in the prompt). No functional issue, but it should be removed on least-privilege grounds.",
+ "pickHeading": "Next steps",
+ "rec1": "Morning of Sep 29: check the Step 3 log of the first GO on the new version — it must contain “Tham so check.py: … --end-date <Stat.date in the flag> [--start-date …]” and print the right range; if not, stop and consider rolling back to .bak_20260928.",
+ "rec2": "Create the “Tháng 10 …” sheet in [HBF2] WaterData-ReportDaily.xlsx before the morning of Oct 2 so Step 3 for Stat.date Oct 1 isn't postponed.",
+ "rec3": "Confirm BSL_BIANCO水表's totalizer setting (Net/Forward) and the raw readings around 21:45–21:50 on Sep 26 to pin down the cause of the false break points.",
+ "rec4": "With the next CR/SR code, try the trigger-with-code-in-message path (never run for real) and watch the first run directly.",
+ "rec5": "Formally confirm BIHT02水表's wrap from the E&H meter datasheet, or wait for one more matching rollover.",
+ "rec6": "The first time a real Anomaly row shows up in the grid, compare it with the on-screen Status column and record it in SPEC.md to settle the isNormal ↔ Anomaly mapping.",
+ "rec7": "Remove the Canva connector from the task if confirmed unused.",
+ "sensitiveNote": "This page contains HugeBamboo's internal configuration and data (meter names, readings, approval codes). IP addresses and network/folder paths have been removed.",
+ "footerPrefix": "Companion to:",
+ "footerV1": "Sep 18 report (baseline)",
+ "footerSuffix": "Reference only, no interaction besides the copy button.",
+ "ft_title": "iEMS Breakpoint Check — Version 2 (state on Sep 28)",
+ "ft_config": "CURRENT CONFIGURATION",
+ "ft_changes": "CHANGES SINCE SEP 18 (by date)",
+ "ft_aspects": "ASPECT COMPARISON",
+ "ft_good": "GOOD DESIGN POINTS",
+ "ft_risks": "RISKS (by priority)",
+ "ft_recs": "NEXT STEPS",
+ "fulltextContent": "iEMS Breakpoint Check — Version 2 (state on Sep 28)\nTen days after the Sep 18 baseline, this Scheduled Task (now renamed “iEMS Breakpoint Check – 8:30 AM (Mon–Sat, auto catch-up)”) has gone through a major re-architecture: Step 3 moved out to Windows Task Scheduler, the data source switched to grid data, NAS sync was added, the schedule became Monday → Saturday with catch-up, and Clear reset was executed on real data for the first time. Everything here comes directly from the task's live configuration, SPEC.md, Step 3 logs, the watcher log and the NAS sync log — no guessing.\n\nCURRENT CONFIGURATION\n- 08:30, Monday → Saturday — CHANGED (Sep 28): CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · Sunday dropped since the PC is off; missed days are caught up automatically within a 7-day window\n- Prompt grows with flow logic; static knowledge lives in SPEC.md: 18,680 characters (Sep 19) → 26,999 (Sep 25) → grew again on Sep 28 (catch-up, date-range flag, post-commit verification); SPEC.md 27KB → 35KB\n- First real Clear reset — CLOSED (Sep 28): BP-CR-20260926-BSLBIANCO-B-7267: EC 7706491.5 → 7267.25 L; Report 7706.5125 → 7.2883 m³, matches Details\n- Step 3 runs outside Cowork — NEW (Sep 22): Windows Task Scheduler + an event watcher on Tân's machine, handed off via a flag file, reported with a 1-day delay\n- NAS sync for 2 files — NEW (Sep 24): Breakpoints-Log.docx + WaterData-ReportDaily.xlsx, one-way, hash-idempotent, dated history kept for the xlsx\n- Primary source: grid data — NEW (Sep 25): vxe-table via JS instead of screenshots/OCR; ~450 rows matched 100%; screenshots kept only as corroboration\n- ⚠ The new check.py has no real GO run yet: The --end-date/--start-date version went live around noon on Sep 28; every earlier GO ran on the old version. First real run: the morning of Sep 29\n\nCHANGES SINCE SEP 18 (by date)\n1. EC calculated by a fixed script (Sep 19)\n   The CR (Final − Initial) and SR ((wrap − Initial) + Final) formulas moved from free-form LLM reasoning to calling ec_calc.py, the same call at A6a, A7 and B2. Independently cross-checked against real data ≥4 times, 100% match every time.\n2. SPEC.md split out of the prompt (Sep 19)\n   All static knowledge moved into SPEC.md on Tân's machine, read at STEP 0.5. Editing static knowledge no longer requires updating the task — which is why SPEC.md could grow to 35KB while the prompt holds only flow logic.\n3. Removed check.py's anomaly guard (Sep 21)\n   The guard comparing against a 7-day average produced a real false positive (BCM-23 on Sep 19–20 was withheld because the average was still contaminated by the Sep 12–14 faulty values). Per Tân's request it was removed: Step 3 only pulls and writes the number for the right date/format; anomaly detection belongs entirely to Steps 1/2.\n4. Report reconciliation for known-broken meters (Sep 21)\n   When Group 2/3 isn't empty but EVERY blocking row is a known-broken meter listed in SPEC.md (JR01/04/05 steam meters), A11c/B10b lets Step 3 run if the Report matches the Details total — no approval code needed. A mismatch or failed reconciliation blocks by default.\n5. Step 3 decoupled from Cowork, moved to Task Scheduler (Sep 22)\n   The task's Cowork session has no device_bash (WSL2 + Virtual Machine Platform were installed, still none — cause unclear). Step 3 now runs independently on Tân's machine: Cowork writes a GO/NOGO flag file, an event watcher (FileSystemWatcher) picks it up within seconds and calls run_step3.ps1 → check.py, writing step3_run_log_<date>.txt. The next session reads that log at STEP 0.6 — a deliberate trade-off: a 1-day reporting delay, no extra scheduled task.\n6. 3 infrastructure bugs found & fixed while debugging (Sep 22–23)\n   (1) device_commit_files sometimes reported success while the file on the machine hadn't changed — re-staging to confirm is now mandatory after every commit. (2) FileSystemWatcher missed Renamed events (the bridge writes files atomically) — Renamed added plus a 60-second periodic safety net. (3) cp950 UnicodeEncodeError: the Big5 console on Tân's machine crashed check.py when printing Vietnamese — fixed with PYTHONIOENCODING=utf-8 in run_step3.ps1, without touching check.py.\n7. NAS sync for both the log and the ISO data (Sep 24)\n   The old task synced only the docx, to the wrong destination, and was deleted by an admin because its creating account was orphaned. The new task (Watch-NasSync.ps1, running under a dedicated machine account) syncs BOTH files one-way from Tân's machine to the NAS, destination corrected, hash-compared to avoid redundant copies, written safely via .tmp + rename, with dated history for the xlsx. First full verification: the morning of Sep 25.\n8. Grid data (vxe-table) becomes the primary source (Sep 25)\n   The Meter reading correction page uses vxe-table (Vue 2): tableFullData is read via JS, every page is walked, rows merged by id, and the total checked against the pager's “Total N”. Verified Sep 25: ~450 rows (BCM*, BR14, BIHT02, JR01, JR13) matched the screen exactly, including 46 Break point = Yes rows with off-nominal wraps (9994, 9998, 9999862.00, 9999951.00). Screenshots stay as corroborating evidence.\n9. Monday → Saturday schedule + automatic catch-up (Sep 28)\n   Sunday Sep 27 the PC was off → Stat.date Sep 26 was never audited and no session reported it. The schedule became Monday → Saturday; on every run, STEP 0.7 finds Stat.dates in the last 7 days that have NO Heading 1 in Breakpoints-Log.docx and audits them (oldest first) — driven by the log, not by the weekday. Missing days older than 7 days are only listed for Tân to decide, since they approach iEMS's “Update details days” limit of 14.\n10. Incident: ISO filled for an unaudited day → check.py takes a date range (Sep 28)\n   The old check.py ignored the Stat.date in the flag: GO|2026-09-27 (08:38 on Sep 28, water_updated=54 = 2 days) also filled the unaudited Sep 26 → cell B-SL BIANCO NƯỚC on Sep 26 = 7706.5125 m³ (wrong). Handled: Clear reset, cell cleared (Tân approved), GO rerun → 7.28825 m³, matching the Report. Root fix: check.py takes --end-date/--start-date, run_step3.ps1 reads the Stat.date and the from= field from the flag, Cowork writes ONE flag per batch (GO|S_max|from=S_min), and every month's sheet is checked before writing; the old version is kept as .bak_20260928. The “written but unchanged” commit bug recurred with both the flag file and the docx → mandatory re-stage/size check after commit.\n11. First real Clear reset + multi-break-point meters (Sep 28)\n   BSL_BIANCO水表 shift B on Sep 26 got 2 false System break points from iEMS (the totalizer only dropped ~81.5 L within ~2 minutes), EC 7706491.5 L (~1000× its history). Concluded Group 2, code BP-CR-20260926-BSLBIANCO-B-7267, approved by Tân, executed per the Step 2 checklist with Claude in Chrome (in an interactive session, Tân sent the code in-session): one Clear reset removed both points, EC → 7267.25 = Final − Initial, Report 7706.5125 → 7.2883 m³ after Refresh stat. (~4.5 min). ec_calc.py now accepts multiple --wrap values to reproduce iEMS's formula exactly; SPEC.md gained a MULTIPLE BREAK POINTS section.\n\nASPECT COMPARISON\n- [CLOSED] Stage 1–2: SPEC.md, approved before coding: SPEC.md ~35KB, with dated “infrastructure notes” (Sep 22, 24, 28) and a new “multiple break points” section — Closes the old gap and doubles as an incident log for future debugging\n- [CLOSED] Stage 3: calculation step → fixed script: ec_calc.py still runs without device_bash (pure Python, runs in the session sandbox); on Sep 28 it gained multi-value --wrap, verified on real data — A good example of a truly decoupled script: infrastructure changed, the formula didn't\n- [UNCHANGED] Dry-run before real run: STEP 1 always only audits, even when catching up several days; STEP 2 only runs with an approval code — Still stricter than the LAM template\n- [UNCHANGED] Approval on execution: The BP-CR-/BP-SR- code mechanism is unchanged; A11c/B10b gives an escape valve for known-broken meters — Fail-safe: every ambiguous branch blocks by default\n- [UNCHANGED] Dedup: Heading 1 per Stat.date, matched by content rather than position (catch-up days can be out of order); Step 3 dedups via the DONE state in the flag file — Extended in the right place when catch-up was added\n- [UNCHANGED] Error handling: Stop, no auto-retry; applied to grid-read errors, Step 3 log errors, failed Report reconciliation and a missing new-month sheet — all default to NOGO/stop — Gaps tightened through real debugging, not speculation\n- [NEW] requires_local_device + folders: Declares 2 folders (root + data_iso_3) so the flag file can be written — Matches the new real need\n- [NEW] Notification: Push; opens with the catch-up dates + the previous run's Step 3 result (STEP 0.6) + the verified GO/NOGO flag state — The 1-day-delayed Step 3 result is put up front, not buried\n- [NEW] Schedule & catch-up: 08:30 Monday → Saturday; STEP 0.7 audits every missing Stat.date in the last 7 days — Fixes a real gap (Sep 26 was skipped because the PC is off on Sunday); the 7-day window keeps a safety margin to iEMS's 14-day edit limit\n- [NEW] Step 3: where it runs: Windows Task Scheduler on Tân's machine, handed off via a flag file + event watcher, reported with a 1-day delay — A change forced by a platform limitation (no device_bash), not a design choice\n- [NEW] NAS sync: 2 files (docx + xlsx), one-way, hash-idempotent, dated history for the xlsx — Runs under a dedicated account (so it won't be deleted again); “Access denied” while the file is open on the NAS recovers by itself (RECOVERED) once closed\n- [NEW] Step 1's data source: Grid data (vxe-table) is the primary source, ~450 rows matched 100%; screenshots are corroborating evidence — Lowers misread risk — but the isNormal ↔ Anomaly mapping is still unverified\n- [NEW] ISO writes by date range: check.py --end-date/--start-date; one GO|S_max|from=S_min flag per batch; handles month boundaries — Root fix for the Sep 28 incident (filling an unaudited day). No real GO has run on the new version yet\n- [CLOSED] Clear reset branch on real data: Sep 28: BP-CR-20260926-BSLBIANCO-B-7267 executed per the Step 2 checklist; post-check and Report cross-check both matched — The longest-open risk since Sep 18 is closed. Note: ran in an interactive session; the automatic trigger-with-code path hasn't been tried yet\n\nGOOD DESIGN POINTS\n1. The automatic path only ever audits: Every automatic cron run (including multi-day catch-up) is read-only by default — real writes never happen automatically.\n2. A dedicated approval gate + a fail-safe escape valve: BP-CR-/BP-SR- codes pass 6 gate conditions (B2); known-broken meters have their own Report-reconciliation path that blocks when unsure.\n3. The new Step 3 architecture keeps the safety bar: Event-driven watcher (no guessed timing), idempotent via DONE, catch-up on startup, 60-second periodic check, flag verified after writing.\n4. Grid data instead of screenshots — less misread risk: Reads tableFullData directly, checks the total against the pager, and was verified on ~450 rows at 100% before being trusted.\n5. NAS sync discipline: Hash-compares before copying, writes via .tmp + rename, a repeating error is logged once until RECOVERED — the log stays clean.\n6. SPEC.md keeps a dated incident log: Every infrastructure incident is recorded with its date, cause and fix — leaving evidence for next time instead of patch-and-forget.\n7. Catch-up driven by the log, not the calendar: STEP 0.7 finds missing days from the log's Heading 1s, not from the weekday — it stays correct through holidays, Tết or a broken PC; days older than 7 aren't run automatically but reported for Tân to decide.\n8. The Sep 28 incident was handled by the book and fixed at the root: Wrong ISO cell found → CR code issued → Tân approved → flag removed → cell cleared (approved) → rerun → Report matched; then check.py was fixed so it can't recur, with a backup kept for rollback.\n\nRISKS (by priority)\n1. The new check.py / run_step3.ps1 has no real GO run yet\n   Deployed around noon on Sep 28. All GO runs that day (08:38, 10:12, 10:30) used the old version — the log has no “Tham so check.py” line and the printed range is Sep 1 → Sep 27. The first real run is the morning of Sep 29.\n2. Upcoming month boundary (Sep 30 → Oct 1)\n   The Oct 2 run audits Stat.date Oct 1 and writes a flag dated in October. If the “Tháng 10 …” sheet hasn't been created manually in the ISO file, check.py stops with “sheet not found” before writing (safe, no partial write), but Step 3 is postponed until the sheet exists. It is also the first real run of the new version's cross-month branch.\n3. The “written but unchanged” commit bug recurs and spreads\n   At first (Sep 23) it only hit script files; on Sep 28 it hit BOTH the flag file and Breakpoints-Log.docx. A mandatory re-stage/size check + recommit is in place, but the root cause is on the platform side, outside our control.\n4. device_bash unavailable — cause unclear\n   WSL2 + Virtual Machine Platform were installed, still nothing. Possibly an Anthropic-side feature not yet rolled out to this account/org. Accepted consequence: Step 3 is reported one day late.\n5. BSL_BIANCO水表: false break points may recur\n   Hypothesis (NOT confirmed): the electromagnetic meter's NET (forward − reverse) totalizer sees reverse flow when the machine stops/drains. If so, it will recur whenever the machine stops, each time needing a CR code approved by Tân.\n6. A wrongly filled ISO cell doesn't fix itself\n   ONLY_FILL_BLANK=True: if a day is filled before its breakpoint is fixed, the cell keeps the wrong number. B10c only detects and reports; clearing/fixing the cell still needs Tân's approval (as in the Sep 28 incident). The --end-date fix makes this less likely, not impossible.\n7. BIHT02水表: wrap value still tentative\n   The ~9999951 value is still tentative, pending confirmation from the E&H meter datasheet or a second matching rollover.\n8. The isNormal ↔ Anomaly mapping is unverified\n   The Sep 25 verification sample had no real Anomaly row, so it's not yet certain that isNormal=false equals Status = Anomaly on screen.\n9. An unused Canva connector is still attached to the task\n   The task has 2 connectors: Claude_Code_Remote (used) and Canva (never referenced in the prompt). No functional issue, but it should be removed on least-privilege grounds.\n\nNEXT STEPS\n1. Morning of Sep 29: check the Step 3 log of the first GO on the new version — it must contain “Tham so check.py: … --end-date <Stat.date in the flag> [--start-date …]” and print the right range; if not, stop and consider rolling back to .bak_20260928.\n2. Create the “Tháng 10 …” sheet in [HBF2] WaterData-ReportDaily.xlsx before the morning of Oct 2 so Step 3 for Stat.date Oct 1 isn't postponed.\n3. Confirm BSL_BIANCO水表's totalizer setting (Net/Forward) and the raw readings around 21:45–21:50 on Sep 26 to pin down the cause of the false break points.\n4. With the next CR/SR code, try the trigger-with-code-in-message path (never run for real) and watch the first run directly.\n5. Formally confirm BIHT02水表's wrap from the E&H meter datasheet, or wait for one more matching rollover.\n6. The first time a real Anomaly row shows up in the grid, compare it with the on-screen Status column and record it in SPEC.md to settle the isNormal ↔ Anomaly mapping.\n7. Remove the Canva connector from the task if confirmed unused.\n\nThis page contains HugeBamboo's internal configuration and data (meter names, readings, approval codes). IP addresses and network/folder paths have been removed."
+},
+  zh: {
+ "pageTitle": "iEMS Breakpoint Check · Version 2(09/28)· 對照 09/18 報告與 Local Automation Map",
+ "eyebrow": "VERSION 2 · 09/28 更新 · 對照 09/18 報告與 LOCAL AUTOMATION MAP",
+ "h1": "iEMS Breakpoint Check:目前狀態(09/28)對照 09/18 報告,以及對照 Local Automation Map",
+ "subtitle": "自 09/18 基準版以來 10 天,這個 Scheduled Task(現已更名為「iEMS Breakpoint Check – 8:30 AM(週一至週六,自動補跑)」)經歷了一次重大的重新架構:Step 3 移到 Windows Task Scheduler 執行、資料來源改為表格資料、新增 NAS 同步、排程改為週一至週六並可自動補跑,並且第一次在真實資料上執行 Clear reset。本頁所有內容都直接取自任務的即時設定、SPEC.md、Step 3 紀錄、監聽器紀錄與 NAS 同步紀錄 — 不用猜測。",
+ "navV1": "↗ 09/18 報告(基準版)",
+ "b1_t": "08:30,週一至週六 — 已變更(09/28)",
+ "b1_b": "CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · 週日電腦關機故取消;漏掉的日期會在 7 天視窗內自動補跑",
+ "b2_t": "Prompt 隨流程邏輯增長,靜態知識放在 SPEC.md",
+ "b2_b": "18,680 字元(09/19)→ 26,999(09/25)→ 09/28 再增加(補跑、日期區間旗標、commit 後驗證);SPEC.md 27KB → 35KB",
+ "b3_t": "第一次真正執行 Clear reset — 已關閉(09/28)",
+ "b3_b": "BP-CR-20260926-BSLBIANCO-B-7267:EC 7706491.5 → 7267.25 L;Report 7706.5125 → 7.2883 m³,與 Details 相符",
+ "b4_t": "Step 3 在 Cowork 外執行 — 新增(09/22)",
+ "b4_b": "在 Tân 的電腦上以 Windows Task Scheduler + 事件監聽器執行,透過旗標檔交接,回報延遲 1 天",
+ "b5_t": "2 個檔案的 NAS 同步 — 新增(09/24)",
+ "b5_b": "Breakpoints-Log.docx + WaterData-ReportDaily.xlsx,單向、以雜湊值達成冪等,xlsx 保留按日期的歷史紀錄",
+ "b6_t": "主要來源:表格資料 — 新增(09/25)",
+ "b6_b": "以 JS 讀取 vxe-table 取代截圖/OCR;約 450 列 100% 相符;截圖僅作佐證",
+ "b7_t": "⚠ 新版 check.py 尚未有真正的 GO 執行",
+ "b7_b": "含 --end-date/--start-date 的版本於 09/28 中午上線;之前所有 GO 都是用舊版執行。第一次真正執行:09/29 早上",
+ "tagIntro": "狀態標籤說明:",
+ "tag_resolved": "已關閉",
+ "tag_unchanged": "未變",
+ "tag_new": "新增",
+ "fulltextHeading": "完整比較(純文字版)",
+ "fulltextLead": "精簡的純文字版本,方便貼到筆記或 CLAUDE.md/AGENTS.md。",
+ "btnViewFulltext": "查看並複製全文",
+ "btnHideFulltext": "隱藏全文",
+ "btnCopy": "複製",
+ "btnCopied": "已複製 ✓",
+ "btnCopyFail": "複製失敗",
+ "timelineHeading": "自 09/18 基準版以來已上線的變更(截至 09/28)",
+ "timelineLead": "全部直接對照真實系統確認(任務設定、SPEC.md、Step 3 紀錄、監聽器紀錄、NAS 同步紀錄、Breakpoints-Log.docx)。按時間排序。",
+ "t1_title": "EC 改用固定 script 計算(09/19)",
+ "t1_body": "CR(Final − Initial)與 SR((wrap − Initial) + Final)公式,從 LLM 自行推理改為呼叫 ec_calc.py,A6a、A7、B2 使用同一種呼叫方式。已用真實資料獨立驗證 ≥4 次,每次 100% 相符。",
+ "t2_title": "SPEC.md 從 prompt 拆出(09/19)",
+ "t2_body": "全部靜態知識移到 Tân 電腦上的 SPEC.md,於 STEP 0.5 讀取。修改靜態知識不需要更新任務 — 因此 SPEC.md 可以長到 35KB,而 prompt 仍只包含流程邏輯。",
+ "t3_title": "移除 check.py 的異常防護機制(09/21)",
+ "t3_body": "與 7 天平均值比對的防護機制造成真實誤判(BCM-23 在 09/19–20 因平均值仍受 09/12–14 錯誤值污染而被擋下)。依 Tân 的要求已移除:Step 3 只依正確日期/格式抓取並寫入數字;異常偵測完全由 Step 1/2 負責。",
+ "t4_title": "已知故障儀表的 Report 對帳(09/21)",
+ "t4_body": "當 第 2/3 組 不是空的,但所有卡住的行都是 SPEC.md 中已知故障的儀表(JR01/04/05 蒸汽表)時,只要 Report 與 Details 加總相符,A11c/B10b 就放行 Step 3 — 不需要核准代碼。不相符或無法對帳時預設擋下。",
+ "t5_title": "Step 3 脫離 Cowork,改由 Task Scheduler 執行(09/22)",
+ "t5_body": "任務的 Cowork session 沒有 device_bash(已安裝 WSL2 + Virtual Machine Platform 仍沒有 — 原因不明)。Step 3 改在 Tân 的電腦上獨立執行:Cowork 寫入 GO/NOGO 旗標檔,事件監聽器(FileSystemWatcher)幾秒內偵測到並呼叫 run_step3.ps1 → check.py,寫入 step3_run_log_<日期>.txt。下一次 session 於 STEP 0.6 讀取 — 刻意的取捨:回報延遲 1 天,換取不必再開排程任務。",
+ "t6_title": "除錯新架構時發現並修正的 3 個基礎設施錯誤(09/22–23)",
+ "t6_body": "(1)device_commit_files 有時回報成功,但電腦上的檔案沒有改變 — 每次 commit 後必須重新 stage 確認。(2)FileSystemWatcher 漏掉 Renamed 事件(橋接以原子方式寫檔)— 已加入 Renamed,並加上每 60 秒的定期檢查。(3)cp950 UnicodeEncodeError:Tân 電腦的 Big5 主控台讓 check.py 印越南文時當機 — 在 run_step3.ps1 設定 PYTHONIOENCODING=utf-8 解決,未改動 check.py。",
+ "t7_title": "紀錄檔與 ISO 資料的 NAS 同步(09/24)",
+ "t7_body": "舊任務只同步 docx、目的地錯誤,且因建立帳號無主被管理員刪除。新任務(Watch-NasSync.ps1,以該電腦的專屬帳號執行)將兩個檔案單向從 Tân 的電腦同步到 NAS,目的地已修正,先比對雜湊值避免重複複製,以 .tmp + rename 安全寫入,xlsx 保留按日期的歷史。第一次完整驗證:09/25 早上。",
+ "t8_title": "表格資料(vxe-table)成為主要來源(09/25)",
+ "t8_body": "Meter reading correction 頁面使用 vxe-table(Vue 2):以 JS 讀取 tableFullData,翻完所有分頁、依 id 合併,並與分頁器的「Total N」對照。09/25 驗證:約 450 列(BCM*、BR14、BIHT02、JR01、JR13)與畫面完全相符,包含 46 列 Break point = Yes 且 wrap 偏離標稱值(9994、9998、9999862.00、9999951.00)。截圖保留作為佐證。",
+ "t9_title": "週一至週六排程 + 自動補跑(09/28)",
+ "t9_body": "週日 09/27 電腦關機 → Stat.date 09/26 沒有被稽核,也沒有任何 session 回報。排程改為週一至週六;每次執行時,STEP 0.7 會找出最近 7 天內在 Breakpoints-Log.docx 中「沒有」Heading 1 的 Stat.date 並補做稽核(由舊到新)— 依紀錄判斷,不依星期推測。超過 7 天的缺漏只列出讓 Tân 決定,因為已接近 iEMS「Update details days」= 14 的上限。",
+ "t10_title": "事故:未稽核的日期被寫入 ISO → check.py 改為接受日期區間(09/28)",
+ "t10_body": "舊版 check.py 不使用旗標中的 Stat.date:GO|2026-09-27(09/28 08:38,water_updated=54 = 2 天)連同尚未稽核的 09/26 也寫入 → 09/26 的 B-SL BIANCO NƯỚC 儲存格 = 7706.5125 m³(錯誤)。處理:Clear reset、清空儲存格(Tân 核准)、重跑 GO → 7.28825 m³,與 Report 相符。根本修正:check.py 接受 --end-date/--start-date,run_step3.ps1 讀取旗標中的 Stat.date 與 from= 欄位,Cowork 整批只寫一個旗標(GO|S_max|from=S_min),寫入前先確認各月份工作表都存在;舊版保留為 .bak_20260928。「回報 written 但未改變」的 commit 錯誤在旗標檔與 docx 上再度發生 → commit 後強制重新 stage/檢查大小。",
+ "t11_title": "第一次真正的 Clear reset + 多斷點儀表(09/28)",
+ "t11_body": "BSL_BIANCO水表 09/26 B 班被 iEMS 標記 2 個假的 System break point(總量只在約 2 分鐘內下降約 81.5 L),EC 7706491.5 L(約為歷史值的 1000 倍)。判定為 第 2 組,代碼 BP-CR-20260926-BSLBIANCO-B-7267,經 Tân 核准,依 Step 2 檢查清單以 Claude in Chrome 執行(於互動 session 中,Tân 在 session 內傳送代碼):一次 Clear reset 同時移除兩個點,EC → 7267.25 = Final − Initial,Refresh stat. 後(約 4.5 分鐘)Report 7706.5125 → 7.2883 m³。ec_calc.py 可接受多個 --wrap 值以精確重現 iEMS 公式;SPEC.md 新增「多斷點」章節。",
+ "diagram1Heading": "與 Local Automation Map 的落差 — 前後對照",
+ "diagram1Lead": "09/18 報告指出的兩個最大落差(沒有獨立 SPEC.md、沒有固定計算 script)已關閉並維持。排程改為週一至週六並可補跑。",
+ "containerLabel": "Local Automation Map — 六階段流程",
+ "s1_sub1": "訪談",
+ "s1_sub2": "",
+ "s2_sub_after": "✓ 獨立 SPEC.md",
+ "s2_sub_before": "09/18:尚無",
+ "s3_sub_after": "✓ ec_calc.py",
+ "s3_sub_before": "09/18:LLM 自行計算",
+ "s4_sub1": "確認",
+ "s4_sub2": "排程",
+ "s5_sub1": "設定",
+ "s5_sub2": "排程",
+ "s6_sub1": "驗收與",
+ "s6_sub2": "交接",
+ "d1_sched_t": "Scheduled Task",
+ "d1_sched_1": "cron 30 8 * * 1-6 · permission_mode: auto",
+ "d1_sched_2": "自動補跑 7 天內缺漏的 Stat.date",
+ "closedNote": "綠色 = 09/18 報告指出的落差已在 Stage 2 與 Stage 3 關閉。橘色 = Stage 5(排程設定)於 09/28 變更。其餘階段未變。",
+ "diagram2Heading": "雙路徑安全機制 — 維持不變",
+ "diagram2Lead": "自動路徑只做稽核;真正的寫入只透過手動核准代碼(或已知故障儀表的 Report 對帳路徑)。差異:是否執行 Step 3 的決定,現在是「寫入旗標」交給 Task Scheduler(整批一個旗標,含日期區間),不再於 session 內直接執行 check.py。",
+ "d2_zoneA": "自動路徑(cron)",
+ "d2_zoneB": "執行路徑(需要核准代碼)",
+ "d2_a1a": "Cron 08:30",
+ "d2_a1b": "週一至週六,自動",
+ "d2_a2a": "STEP 1(+ 補跑)",
+ "d2_a2b": "只稽核 · 讀取表格資料",
+ "d2_a2c": "EC:ec_calc.py",
+ "d2_a3a": "寫入旗標 + 報告",
+ "d2_a3b": "若有 第 2/3 組 則提出核准代碼",
+ "d2_conn1": "GO/NOGO → Task Scheduler(圖 3)",
+ "d2_conn2": "或 Tân 傳送核准代碼 → Step 2",
+ "d2_b1a": "觸發 + 核准代碼",
+ "d2_b1b": "BP-CR-… / BP-SR-…",
+ "d2_b2a": "鎖定關卡",
+ "d2_b2b": "6 項條件(B2)",
+ "d2_b3a": "STEP 2",
+ "d2_b3b": "Clear reset / Set as reset",
+ "d2_b3c": "CR 已於 09/28 首次真正執行",
+ "d2_b4a": "強制事後檢查",
+ "d2_b4b": "B5 + 對照 Report",
+ "d2_reject1": "條件不符",
+ "d2_reject2": "→ 跳過該行,記錄原因",
+ "diagram3Heading": "Step 3 透過旗標檔交接(自 09/22 起,09/28 更新)",
+ "diagram3Lead": "check.py 不在 Cowork session 內執行。透過旗標檔 + Tân 電腦上的事件監聽器交接,回報延遲 1 天。",
+ "d3_1a": "Cowork(Step 1/2)",
+ "d3_1b": "決定 GO/NOGO",
+ "d3_2a": "寫入旗標檔",
+ "d3_2b": "step3_trigger.txt",
+ "d3_2c": "GO|S_max|from=S_min",
+ "d3_3a": "事件監聽器",
+ "d3_3b": "FileSystemWatcher",
+ "d3_3c": "幾秒內偵測到",
+ "d3_4a": "run_step3.ps1",
+ "d3_4b": "→ check.py --end-date/--start-date",
+ "d3_4c": "寫入 step3_run_log_<日期>.txt",
+ "d3_5a": "Watch-NasSync.ps1",
+ "d3_5b": "同步 docx + xlsx → NAS",
+ "d3_5l": "xlsx 變更 → 同步",
+ "d3_6a": "下一次 Cowork session",
+ "d3_6b": "讀取紀錄(STEP 0.6)",
+ "d3_6c": "延遲 1 天回報",
+ "d3_6l": "Step 3 紀錄",
+ "d3_note": "旗標會更新為 DONE|<日期>|success 或 error_exit_<code>,避免重複執行(冪等)。監聽器啟動時會檢查旗標(catch-up),並有每 60 秒的定期檢查作為保險。每次寫入旗標後,Cowork 必須重新 stage 確認內容(A11d)。",
+ "tableHeading": "各面向對照 — 09/28 狀態",
+ "col1": "面向",
+ "col2": "目前實況(09/28,已對照系統驗證)",
+ "col3": "評估",
+ "col4": "狀態",
+ "r1_h": "Stage 1–2:SPEC.md,核准後才寫程式",
+ "r1_a": "SPEC.md 約 35KB,有依日期記錄的「基礎設施備註」(09/22、09/24、09/28)及新章節「多斷點」",
+ "r1_b": "不只關閉舊落差,也成為日後除錯可用的事件日誌",
+ "r2_h": "Stage 3:計算步驟 → 固定 script",
+ "r2_a": "即使沒有 device_bash,ec_calc.py 仍可執行(純 Python,在 session 沙盒中執行);09/28 新增多值 --wrap,已用真實資料驗證",
+ "r2_b": "真正獨立 script 的好例子:基礎設施變了,公式不受影響",
+ "r3_h": "正式執行前先 dry-run",
+ "r3_a": "STEP 1 永遠只稽核,補跑多天時也一樣;STEP 2 只有核准代碼才會執行",
+ "r3_b": "仍比 LAM 範本更嚴謹",
+ "r4_h": "執行時的核准機制",
+ "r4_a": "BP-CR-/BP-SR- 代碼機制未變;A11c/B10b 為已知故障儀表提供逃生閥",
+ "r4_b": "故障安全:任何模糊分支都預設擋下",
+ "r5_h": "去重(Dedup)",
+ "r5_a": "每個 Stat.date 一個 Heading 1,依內容而非位置比對(補跑的日期可能不照順序);Step 3 透過旗標檔的 DONE 狀態去重",
+ "r5_b": "加入補跑時擴充得恰到好處",
+ "r6_h": "錯誤處理",
+ "r6_a": "原則為停止、不自動重試;適用於表格讀取錯誤、Step 3 紀錄錯誤、Report 對帳失敗、缺少新月份工作表 — 全部預設 NOGO/停止",
+ "r6_b": "漏洞是透過實際除錯收緊,不是事先猜測",
+ "r7_h": "requires_local_device + 資料夾",
+ "r7_a": "宣告 2 個資料夾(根目錄 + data_iso_3),以便寫入旗標檔",
+ "r7_b": "符合新的實際需求",
+ "r8_h": "通知",
+ "r8_a": "Push;開頭列出補跑日期 + 上一次 Step 3 結果(STEP 0.6)+ 已驗證的 GO/NOGO 旗標狀態",
+ "r8_b": "延遲 1 天的 Step 3 結果放在最前面,不會被淹沒",
+ "r9_h": "排程與補跑",
+ "r9_a": "週一至週六 08:30;STEP 0.7 自動補做最近 7 天內所有缺漏的 Stat.date",
+ "r9_b": "修正真實漏洞(09/26 因週日關機被跳過);7 天視窗與 iEMS 14 天修改上限保持安全距離",
+ "r10_h": "Step 3:在哪裡執行",
+ "r10_a": "在 Tân 電腦上的 Windows Task Scheduler 執行,透過旗標檔 + 事件監聽器交接,延遲 1 天回報",
+ "r10_b": "因平台限制(沒有 device_bash)被迫的改變,不是設計選擇",
+ "r11_h": "NAS 同步",
+ "r11_a": "2 個檔案(docx + xlsx),單向、以雜湊值達成冪等,xlsx 保留按日期的歷史",
+ "r11_b": "以專屬帳號執行(避免再被刪除);NAS 上檔案開啟時的「Access denied」在關閉後自動恢復(RECOVERED)",
+ "r12_h": "Step 1 的資料來源",
+ "r12_a": "表格資料(vxe-table)為主要來源,約 450 列 100% 相符;截圖作為佐證",
+ "r12_b": "降低截圖誤讀風險 — 但 isNormal ↔ Anomaly 的對應仍未驗證",
+ "r13_h": "依日期區間寫入 ISO",
+ "r13_a": "check.py --end-date/--start-date;整批一個 GO|S_max|from=S_min 旗標;可跨月份處理",
+ "r13_b": "09/28 事故(寫入未稽核日期)的根本修正。新版尚未有真正的 GO 執行",
+ "r14_h": "真實資料上的 Clear reset 分支",
+ "r14_a": "09/28:依 Step 2 檢查清單執行 BP-CR-20260926-BSLBIANCO-B-7267;事後檢查與 Report 對照皆相符",
+ "r14_b": "自 09/18 以來懸而最久的風險已關閉。注意:是在互動 session 中執行;自動觸發附代碼的路徑尚未試過",
+ "goodHeading": "比 LAM 範本更完善的設計",
+ "g1Title": "1. 自動路徑永遠只做稽核",
+ "g1Body": "每次自動 cron 執行(包括多天補跑)預設都只讀取 — 真正的寫入永遠不會自動發生。",
+ "g2Title": "2. 專屬核准關卡 + 故障安全逃生閥",
+ "g2Body": "BP-CR-/BP-SR- 代碼需通過 6 項條件(B2);已知故障儀表有專屬的 Report 對帳路徑,不確定時預設擋下。",
+ "g3Title": "3. 新的 Step 3 架構維持安全標準",
+ "g3Body": "事件驅動的監聽器(不猜時間)、透過 DONE 達成冪等、啟動時補跑、每 60 秒定期檢查、寫入後驗證旗標。",
+ "g4Title": "4. 以表格資料取代截圖 — 降低誤讀風險",
+ "g4Body": "直接讀取 tableFullData,與分頁器總數對照,並在約 450 列 100% 相符後才採用為主要來源。",
+ "g5Title": "5. NAS 同步的紀律",
+ "g5Body": "複製前比對雜湊值,以 .tmp + rename 寫入,重複錯誤只記錄一次直到 RECOVERED — 日誌保持乾淨。",
+ "g6Title": "6. SPEC.md 自帶附日期的事件紀錄",
+ "g6Body": "每個基礎設施事件都附上日期、原因與處理方式 — 為下次除錯留下證據,而不是修完就忘。",
+ "g7Title": "7. 補跑依紀錄判斷,不依行事曆推測",
+ "g7Body": "STEP 0.7 以紀錄中的 Heading 1 判斷缺漏日期,而不是看星期 — 遇到假日、過年或電腦故障也正確;超過 7 天的日期不自動執行,而是回報讓 Tân 決定。",
+ "g8Title": "8. 09/28 事故依流程處理並從根本修正",
+ "g8Body": "發現 ISO 儲存格錯誤 → 發出 CR 代碼 → Tân 核准 → 移除旗標 → 清空儲存格(經核准)→ 重跑 → Report 相符;之後修正 check.py 避免再發生,並保留備份可還原。",
+ "riskHeading": "風險 — 依優先順序排列",
+ "rk1Title": "1. 新版 check.py / run_step3.ps1 尚未有真正的 GO 執行",
+ "rk1Body": "於 09/28 中午部署。當天所有 GO(08:38、10:12、10:30)都使用舊版 — 紀錄中沒有「Tham so check.py」這一行,印出的區間是 09/01 → 09/27。第一次真正執行是 09/29 早上。",
+ "rk2Title": "2. 即將到來的月份交界(09/30 → 10/01)",
+ "rk2Body": "10/02 的執行會稽核 Stat.date 10/01,並寫入 10 月日期的旗標。若 ISO 檔中「Tháng 10 …」工作表尚未手動建立,check.py 會在寫入前以「找不到工作表」停止(安全,不會寫一半),但 Step 3 會延後到工作表建立為止。這也是新版跨月分支第一次真正執行。",
+ "rk3Title": "3.「回報 written 但未改變」的 commit 錯誤再度發生且範圍擴大",
+ "rk3Body": "最初(09/23)只發生在 script 檔;09/28 在旗標檔與 Breakpoints-Log.docx 上都發生。已有強制重新 stage/檢查大小再 commit 的步驟,但根本原因在平台端,超出可控範圍。",
+ "rk4Title": "4. device_bash 無法使用 — 原因不明",
+ "rk4Body": "已安裝 WSL2 + Virtual Machine Platform,仍然沒有。可能是 Anthropic 尚未對此帳號/組織開放的功能。已接受的後果:Step 3 延遲 1 天回報。",
+ "rk5Title": "5. BSL_BIANCO水表:假斷點可能再次發生",
+ "rk5Body": "假設(尚未確認):電磁流量計的 NET(正向 − 反向)累計器在機台停止/排水時出現逆流。若屬實,每次停機都會再發生,且每次都需要 Tân 核准一個 CR 代碼。",
+ "rk6Title": "6. 已寫錯的 ISO 儲存格不會自動修正",
+ "rk6Body": "ONLY_FILL_BLANK=True:若某天在修正斷點前就被寫入,該儲存格會保留錯誤數值。B10c 只負責偵測與回報;清除/修正仍需 Tân 核准(如 09/28 事故)。--end-date 修正降低了發生機率,但無法完全排除。",
+ "rk7Title": "7. BIHT02水表:wrap 值仍為暫定",
+ "rk7Body": "~9999951 仍為暫定值,待 E&H 儀表規格確認或第 2 次相符的 rollover。",
+ "rk8Title": "8. isNormal ↔ Anomaly 的對應尚未驗證",
+ "rk8Body": "09/25 的驗證樣本中沒有真正的 Anomaly 列,因此尚不確定 isNormal=false 是否等於畫面上的 Status = Anomaly。",
+ "rk9Title": "9. 未使用的 Canva connector 仍掛在任務上",
+ "rk9Body": "任務有 2 個 connector:Claude_Code_Remote(有使用)與 Canva(prompt 中從未出現)。不會造成功能問題,但依最小權限原則應移除。",
+ "pickHeading": "接下來的建議",
+ "rec1": "09/29 早上:檢查新版第一次 GO 的 Step 3 紀錄 — 必須有「Tham so check.py: … --end-date <旗標中的 Stat.date> [--start-date …]」且印出的區間正確;若不符,停止並考慮還原為 .bak_20260928。",
+ "rec2": "在 10/02 早上前於 [HBF2] WaterData-ReportDaily.xlsx 建立「Tháng 10 …」工作表,避免 Stat.date 10/01 的 Step 3 被延後。",
+ "rec3": "確認 BSL_BIANCO水表 的累計器設定(Net/Forward)以及 09/26 21:45–21:50 前後的原始讀數,以釐清假斷點的原因。",
+ "rec4": "下一個 CR/SR 代碼出現時,試用「觸發任務並在訊息中附代碼」的路徑(尚未真正執行過),並親自監看第一次執行。",
+ "rec5": "依 E&H 儀表規格正式確認 BIHT02水表 的 wrap,或等待再一次相符的 rollover。",
+ "rec6": "第一次在表格中遇到真正的 Anomaly 列時,立刻與畫面上的 Status 欄位對照並記錄到 SPEC.md,確定 isNormal ↔ Anomaly 的對應。",
+ "rec7": "確認未使用後,從任務中移除 Canva connector。",
+ "sensitiveNote": "本頁包含 HugeBamboo 的內部設定與數據(儀表名稱、讀數、核准代碼)。IP 位址與網路/資料夾路徑已移除。",
+ "footerPrefix": "對照文件:",
+ "footerV1": "09/18 報告(基準版)",
+ "footerSuffix": "本頁僅供參考,除複製按鈕外沒有其他互動。",
+ "ft_title": "iEMS Breakpoint Check — Version 2(09/28 狀態)",
+ "ft_config": "目前設定",
+ "ft_changes": "自 09/18 以來的變更(依時間)",
+ "ft_aspects": "各面向對照",
+ "ft_good": "良好設計",
+ "ft_risks": "風險(依優先順序)",
+ "ft_recs": "建議",
+ "fulltextContent": "iEMS Breakpoint Check — Version 2(09/28 狀態)\n自 09/18 基準版以來 10 天,這個 Scheduled Task(現已更名為「iEMS Breakpoint Check – 8:30 AM(週一至週六,自動補跑)」)經歷了一次重大的重新架構:Step 3 移到 Windows Task Scheduler 執行、資料來源改為表格資料、新增 NAS 同步、排程改為週一至週六並可自動補跑,並且第一次在真實資料上執行 Clear reset。本頁所有內容都直接取自任務的即時設定、SPEC.md、Step 3 紀錄、監聽器紀錄與 NAS 同步紀錄 — 不用猜測。\n\n目前設定\n- 08:30,週一至週六 — 已變更(09/28): CRON_TZ=Asia/Bangkok 30 8 * * 1-6 · 週日電腦關機故取消;漏掉的日期會在 7 天視窗內自動補跑\n- Prompt 隨流程邏輯增長,靜態知識放在 SPEC.md: 18,680 字元(09/19)→ 26,999(09/25)→ 09/28 再增加(補跑、日期區間旗標、commit 後驗證);SPEC.md 27KB → 35KB\n- 第一次真正執行 Clear reset — 已關閉(09/28): BP-CR-20260926-BSLBIANCO-B-7267:EC 7706491.5 → 7267.25 L;Report 7706.5125 → 7.2883 m³,與 Details 相符\n- Step 3 在 Cowork 外執行 — 新增(09/22): 在 Tân 的電腦上以 Windows Task Scheduler + 事件監聽器執行,透過旗標檔交接,回報延遲 1 天\n- 2 個檔案的 NAS 同步 — 新增(09/24): Breakpoints-Log.docx + WaterData-ReportDaily.xlsx,單向、以雜湊值達成冪等,xlsx 保留按日期的歷史紀錄\n- 主要來源:表格資料 — 新增(09/25): 以 JS 讀取 vxe-table 取代截圖/OCR;約 450 列 100% 相符;截圖僅作佐證\n- ⚠ 新版 check.py 尚未有真正的 GO 執行: 含 --end-date/--start-date 的版本於 09/28 中午上線;之前所有 GO 都是用舊版執行。第一次真正執行:09/29 早上\n\n自 09/18 以來的變更(依時間)\n1. EC 改用固定 script 計算(09/19)\n   CR(Final − Initial)與 SR((wrap − Initial) + Final)公式,從 LLM 自行推理改為呼叫 ec_calc.py,A6a、A7、B2 使用同一種呼叫方式。已用真實資料獨立驗證 ≥4 次,每次 100% 相符。\n2. SPEC.md 從 prompt 拆出(09/19)\n   全部靜態知識移到 Tân 電腦上的 SPEC.md,於 STEP 0.5 讀取。修改靜態知識不需要更新任務 — 因此 SPEC.md 可以長到 35KB,而 prompt 仍只包含流程邏輯。\n3. 移除 check.py 的異常防護機制(09/21)\n   與 7 天平均值比對的防護機制造成真實誤判(BCM-23 在 09/19–20 因平均值仍受 09/12–14 錯誤值污染而被擋下)。依 Tân 的要求已移除:Step 3 只依正確日期/格式抓取並寫入數字;異常偵測完全由 Step 1/2 負責。\n4. 已知故障儀表的 Report 對帳(09/21)\n   當 第 2/3 組 不是空的,但所有卡住的行都是 SPEC.md 中已知故障的儀表(JR01/04/05 蒸汽表)時,只要 Report 與 Details 加總相符,A11c/B10b 就放行 Step 3 — 不需要核准代碼。不相符或無法對帳時預設擋下。\n5. Step 3 脫離 Cowork,改由 Task Scheduler 執行(09/22)\n   任務的 Cowork session 沒有 device_bash(已安裝 WSL2 + Virtual Machine Platform 仍沒有 — 原因不明)。Step 3 改在 Tân 的電腦上獨立執行:Cowork 寫入 GO/NOGO 旗標檔,事件監聽器(FileSystemWatcher)幾秒內偵測到並呼叫 run_step3.ps1 → check.py,寫入 step3_run_log_<日期>.txt。下一次 session 於 STEP 0.6 讀取 — 刻意的取捨:回報延遲 1 天,換取不必再開排程任務。\n6. 除錯新架構時發現並修正的 3 個基礎設施錯誤(09/22–23)\n   (1)device_commit_files 有時回報成功,但電腦上的檔案沒有改變 — 每次 commit 後必須重新 stage 確認。(2)FileSystemWatcher 漏掉 Renamed 事件(橋接以原子方式寫檔)— 已加入 Renamed,並加上每 60 秒的定期檢查。(3)cp950 UnicodeEncodeError:Tân 電腦的 Big5 主控台讓 check.py 印越南文時當機 — 在 run_step3.ps1 設定 PYTHONIOENCODING=utf-8 解決,未改動 check.py。\n7. 紀錄檔與 ISO 資料的 NAS 同步(09/24)\n   舊任務只同步 docx、目的地錯誤,且因建立帳號無主被管理員刪除。新任務(Watch-NasSync.ps1,以該電腦的專屬帳號執行)將兩個檔案單向從 Tân 的電腦同步到 NAS,目的地已修正,先比對雜湊值避免重複複製,以 .tmp + rename 安全寫入,xlsx 保留按日期的歷史。第一次完整驗證:09/25 早上。\n8. 表格資料(vxe-table)成為主要來源(09/25)\n   Meter reading correction 頁面使用 vxe-table(Vue 2):以 JS 讀取 tableFullData,翻完所有分頁、依 id 合併,並與分頁器的「Total N」對照。09/25 驗證:約 450 列(BCM*、BR14、BIHT02、JR01、JR13)與畫面完全相符,包含 46 列 Break point = Yes 且 wrap 偏離標稱值(9994、9998、9999862.00、9999951.00)。截圖保留作為佐證。\n9. 週一至週六排程 + 自動補跑(09/28)\n   週日 09/27 電腦關機 → Stat.date 09/26 沒有被稽核,也沒有任何 session 回報。排程改為週一至週六;每次執行時,STEP 0.7 會找出最近 7 天內在 Breakpoints-Log.docx 中「沒有」Heading 1 的 Stat.date 並補做稽核(由舊到新)— 依紀錄判斷,不依星期推測。超過 7 天的缺漏只列出讓 Tân 決定,因為已接近 iEMS「Update details days」= 14 的上限。\n10. 事故:未稽核的日期被寫入 ISO → check.py 改為接受日期區間(09/28)\n   舊版 check.py 不使用旗標中的 Stat.date:GO|2026-09-27(09/28 08:38,water_updated=54 = 2 天)連同尚未稽核的 09/26 也寫入 → 09/26 的 B-SL BIANCO NƯỚC 儲存格 = 7706.5125 m³(錯誤)。處理:Clear reset、清空儲存格(Tân 核准)、重跑 GO → 7.28825 m³,與 Report 相符。根本修正:check.py 接受 --end-date/--start-date,run_step3.ps1 讀取旗標中的 Stat.date 與 from= 欄位,Cowork 整批只寫一個旗標(GO|S_max|from=S_min),寫入前先確認各月份工作表都存在;舊版保留為 .bak_20260928。「回報 written 但未改變」的 commit 錯誤在旗標檔與 docx 上再度發生 → commit 後強制重新 stage/檢查大小。\n11. 第一次真正的 Clear reset + 多斷點儀表(09/28)\n   BSL_BIANCO水表 09/26 B 班被 iEMS 標記 2 個假的 System break point(總量只在約 2 分鐘內下降約 81.5 L),EC 7706491.5 L(約為歷史值的 1000 倍)。判定為 第 2 組,代碼 BP-CR-20260926-BSLBIANCO-B-7267,經 Tân 核准,依 Step 2 檢查清單以 Claude in Chrome 執行(於互動 session 中,Tân 在 session 內傳送代碼):一次 Clear reset 同時移除兩個點,EC → 7267.25 = Final − Initial,Refresh stat. 後(約 4.5 分鐘)Report 7706.5125 → 7.2883 m³。ec_calc.py 可接受多個 --wrap 值以精確重現 iEMS 公式;SPEC.md 新增「多斷點」章節。\n\n各面向對照\n- [已關閉] Stage 1–2:SPEC.md,核准後才寫程式: SPEC.md 約 35KB,有依日期記錄的「基礎設施備註」(09/22、09/24、09/28)及新章節「多斷點」 — 不只關閉舊落差,也成為日後除錯可用的事件日誌\n- [已關閉] Stage 3:計算步驟 → 固定 script: 即使沒有 device_bash,ec_calc.py 仍可執行(純 Python,在 session 沙盒中執行);09/28 新增多值 --wrap,已用真實資料驗證 — 真正獨立 script 的好例子:基礎設施變了,公式不受影響\n- [未變] 正式執行前先 dry-run: STEP 1 永遠只稽核,補跑多天時也一樣;STEP 2 只有核准代碼才會執行 — 仍比 LAM 範本更嚴謹\n- [未變] 執行時的核准機制: BP-CR-/BP-SR- 代碼機制未變;A11c/B10b 為已知故障儀表提供逃生閥 — 故障安全:任何模糊分支都預設擋下\n- [未變] 去重(Dedup): 每個 Stat.date 一個 Heading 1,依內容而非位置比對(補跑的日期可能不照順序);Step 3 透過旗標檔的 DONE 狀態去重 — 加入補跑時擴充得恰到好處\n- [未變] 錯誤處理: 原則為停止、不自動重試;適用於表格讀取錯誤、Step 3 紀錄錯誤、Report 對帳失敗、缺少新月份工作表 — 全部預設 NOGO/停止 — 漏洞是透過實際除錯收緊,不是事先猜測\n- [新增] requires_local_device + 資料夾: 宣告 2 個資料夾(根目錄 + data_iso_3),以便寫入旗標檔 — 符合新的實際需求\n- [新增] 通知: Push;開頭列出補跑日期 + 上一次 Step 3 結果(STEP 0.6)+ 已驗證的 GO/NOGO 旗標狀態 — 延遲 1 天的 Step 3 結果放在最前面,不會被淹沒\n- [新增] 排程與補跑: 週一至週六 08:30;STEP 0.7 自動補做最近 7 天內所有缺漏的 Stat.date — 修正真實漏洞(09/26 因週日關機被跳過);7 天視窗與 iEMS 14 天修改上限保持安全距離\n- [新增] Step 3:在哪裡執行: 在 Tân 電腦上的 Windows Task Scheduler 執行,透過旗標檔 + 事件監聽器交接,延遲 1 天回報 — 因平台限制(沒有 device_bash)被迫的改變,不是設計選擇\n- [新增] NAS 同步: 2 個檔案(docx + xlsx),單向、以雜湊值達成冪等,xlsx 保留按日期的歷史 — 以專屬帳號執行(避免再被刪除);NAS 上檔案開啟時的「Access denied」在關閉後自動恢復(RECOVERED)\n- [新增] Step 1 的資料來源: 表格資料(vxe-table)為主要來源,約 450 列 100% 相符;截圖作為佐證 — 降低截圖誤讀風險 — 但 isNormal ↔ Anomaly 的對應仍未驗證\n- [新增] 依日期區間寫入 ISO: check.py --end-date/--start-date;整批一個 GO|S_max|from=S_min 旗標;可跨月份處理 — 09/28 事故(寫入未稽核日期)的根本修正。新版尚未有真正的 GO 執行\n- [已關閉] 真實資料上的 Clear reset 分支: 09/28:依 Step 2 檢查清單執行 BP-CR-20260926-BSLBIANCO-B-7267;事後檢查與 Report 對照皆相符 — 自 09/18 以來懸而最久的風險已關閉。注意:是在互動 session 中執行;自動觸發附代碼的路徑尚未試過\n\n良好設計\n1. 自動路徑永遠只做稽核: 每次自動 cron 執行(包括多天補跑)預設都只讀取 — 真正的寫入永遠不會自動發生。\n2. 專屬核准關卡 + 故障安全逃生閥: BP-CR-/BP-SR- 代碼需通過 6 項條件(B2);已知故障儀表有專屬的 Report 對帳路徑,不確定時預設擋下。\n3. 新的 Step 3 架構維持安全標準: 事件驅動的監聽器(不猜時間)、透過 DONE 達成冪等、啟動時補跑、每 60 秒定期檢查、寫入後驗證旗標。\n4. 以表格資料取代截圖 — 降低誤讀風險: 直接讀取 tableFullData,與分頁器總數對照,並在約 450 列 100% 相符後才採用為主要來源。\n5. NAS 同步的紀律: 複製前比對雜湊值,以 .tmp + rename 寫入,重複錯誤只記錄一次直到 RECOVERED — 日誌保持乾淨。\n6. SPEC.md 自帶附日期的事件紀錄: 每個基礎設施事件都附上日期、原因與處理方式 — 為下次除錯留下證據,而不是修完就忘。\n7. 補跑依紀錄判斷,不依行事曆推測: STEP 0.7 以紀錄中的 Heading 1 判斷缺漏日期,而不是看星期 — 遇到假日、過年或電腦故障也正確;超過 7 天的日期不自動執行,而是回報讓 Tân 決定。\n8. 09/28 事故依流程處理並從根本修正: 發現 ISO 儲存格錯誤 → 發出 CR 代碼 → Tân 核准 → 移除旗標 → 清空儲存格(經核准)→ 重跑 → Report 相符;之後修正 check.py 避免再發生,並保留備份可還原。\n\n風險(依優先順序)\n1. 新版 check.py / run_step3.ps1 尚未有真正的 GO 執行\n   於 09/28 中午部署。當天所有 GO(08:38、10:12、10:30)都使用舊版 — 紀錄中沒有「Tham so check.py」這一行,印出的區間是 09/01 → 09/27。第一次真正執行是 09/29 早上。\n2. 即將到來的月份交界(09/30 → 10/01)\n   10/02 的執行會稽核 Stat.date 10/01,並寫入 10 月日期的旗標。若 ISO 檔中「Tháng 10 …」工作表尚未手動建立,check.py 會在寫入前以「找不到工作表」停止(安全,不會寫一半),但 Step 3 會延後到工作表建立為止。這也是新版跨月分支第一次真正執行。\n3.「回報 written 但未改變」的 commit 錯誤再度發生且範圍擴大\n   最初(09/23)只發生在 script 檔;09/28 在旗標檔與 Breakpoints-Log.docx 上都發生。已有強制重新 stage/檢查大小再 commit 的步驟,但根本原因在平台端,超出可控範圍。\n4. device_bash 無法使用 — 原因不明\n   已安裝 WSL2 + Virtual Machine Platform,仍然沒有。可能是 Anthropic 尚未對此帳號/組織開放的功能。已接受的後果:Step 3 延遲 1 天回報。\n5. BSL_BIANCO水表:假斷點可能再次發生\n   假設(尚未確認):電磁流量計的 NET(正向 − 反向)累計器在機台停止/排水時出現逆流。若屬實,每次停機都會再發生,且每次都需要 Tân 核准一個 CR 代碼。\n6. 已寫錯的 ISO 儲存格不會自動修正\n   ONLY_FILL_BLANK=True:若某天在修正斷點前就被寫入,該儲存格會保留錯誤數值。B10c 只負責偵測與回報;清除/修正仍需 Tân 核准(如 09/28 事故)。--end-date 修正降低了發生機率,但無法完全排除。\n7. BIHT02水表:wrap 值仍為暫定\n   ~9999951 仍為暫定值,待 E&H 儀表規格確認或第 2 次相符的 rollover。\n8. isNormal ↔ Anomaly 的對應尚未驗證\n   09/25 的驗證樣本中沒有真正的 Anomaly 列,因此尚不確定 isNormal=false 是否等於畫面上的 Status = Anomaly。\n9. 未使用的 Canva connector 仍掛在任務上\n   任務有 2 個 connector:Claude_Code_Remote(有使用)與 Canva(prompt 中從未出現)。不會造成功能問題,但依最小權限原則應移除。\n\n建議\n1. 09/29 早上:檢查新版第一次 GO 的 Step 3 紀錄 — 必須有「Tham so check.py: … --end-date <旗標中的 Stat.date> [--start-date …]」且印出的區間正確;若不符,停止並考慮還原為 .bak_20260928。\n2. 在 10/02 早上前於 [HBF2] WaterData-ReportDaily.xlsx 建立「Tháng 10 …」工作表,避免 Stat.date 10/01 的 Step 3 被延後。\n3. 確認 BSL_BIANCO水表 的累計器設定(Net/Forward)以及 09/26 21:45–21:50 前後的原始讀數,以釐清假斷點的原因。\n4. 下一個 CR/SR 代碼出現時,試用「觸發任務並在訊息中附代碼」的路徑(尚未真正執行過),並親自監看第一次執行。\n5. 依 E&H 儀表規格正式確認 BIHT02水表 的 wrap,或等待再一次相符的 rollover。\n6. 第一次在表格中遇到真正的 Anomaly 列時,立刻與畫面上的 Status 欄位對照並記錄到 SPEC.md,確定 isNormal ↔ Anomaly 的對應。\n7. 確認未使用後,從任務中移除 Canva connector。\n\n本頁包含 HugeBamboo 的內部設定與數據(儀表名稱、讀數、核准代碼)。IP 位址與網路/資料夾路徑已移除。"
+}
+};
+var currentLang = 'zh';
+var fulltextOpen = false;
+
+function setLang(lang){
+  if(!I18N[lang]) return;
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key = el.getAttribute('data-i18n');
+    if(I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+  });
+  document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : lang;
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  document.getElementById('toggleBtn').textContent = fulltextOpen ? I18N[lang].btnHideFulltext : I18N[lang].btnViewFulltext;
+  document.getElementById('copyBtn').textContent = I18N[lang].btnCopy;
+}
+
+function toggleFullText(){
+  var pre = document.getElementById('fulltext');
+  pre.classList.toggle('open');
+  fulltextOpen = pre.classList.contains('open');
+  document.getElementById('toggleBtn').textContent = fulltextOpen ? I18N[currentLang].btnHideFulltext : I18N[currentLang].btnViewFulltext;
+}
+
+function copyFullText(){
+  var text = I18N[currentLang].fulltextContent;
+  var btn = document.getElementById('copyBtn');
+  function done(ok){
+    btn.textContent = ok ? I18N[currentLang].btnCopied : I18N[currentLang].btnCopyFail;
+    setTimeout(function(){ btn.textContent = I18N[currentLang].btnCopy; }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){done(true);}).catch(function(){done(false);});
+  } else {
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); done(true);
+    }catch(e){ done(false); }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){ setLang('zh'); });
+</script>
+</body>
+</html>

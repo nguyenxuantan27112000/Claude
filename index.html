@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 自動化專案索引</title>
+<style>
+  :root{
+    --bg:#f7f6f3; --card:#ffffff; --ink:#1b1b1f; --muted:#6b6b70; --border:#e4e2dc;
+    --blue:#2f5fd8; --blue-bg:#eaf0ff; --amber:#b8790a; --amber-bg:#fdf1dd;
+    --green:#1e8e5a; --green-bg:#e8f6ee; --grey:#5b6470; --grey-bg:#eef0f2; --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Microsoft JhengHei",Arial,sans-serif;line-height:1.55;}
+  .container{max-width:1080px;margin:0 auto;padding:40px 16px 80px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .langswitch{background:#fff;border:1px solid var(--border);border-radius:999px;padding:4px;display:inline-flex;gap:2px;}
+  .langswitch button{border:none;background:transparent;padding:7px 13px;border-radius:999px;font-size:0.8rem;cursor:pointer;color:var(--muted);font-weight:600;}
+  .langswitch button.active{background:var(--ink);color:#fff;}
+  .eyebrow{display:inline-block;font-size:0.7rem;letter-spacing:0.04em;font-weight:700;text-transform:uppercase;color:var(--blue);background:var(--blue-bg);padding:5px 10px;border-radius:999px;margin-bottom:14px;}
+  h1{font-size:1.7rem;margin:0 0 8px;line-height:1.28;}
+  .subtitle{color:var(--muted);max-width:780px;font-size:0.98rem;margin:0;}
+  .meta{color:var(--muted);font-size:0.8rem;margin-top:10px;}
+  .toolbar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin:26px 0;display:flex;flex-direction:column;gap:12px;}
+  .toolbar input{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.92rem;background:#fbfaf8;color:var(--ink);}
+  .toolbar input:focus{outline:2px solid var(--blue-bg);border-color:var(--blue);}
+  .filterrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .filterrow .flabel{font-size:0.75rem;color:var(--muted);font-weight:700;min-width:64px;}
+  .chip{border:1px solid var(--border);background:#fff;border-radius:999px;padding:5px 12px;font-size:0.78rem;cursor:pointer;color:var(--ink);}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .count{font-size:0.8rem;color:var(--muted);}
+  h2.section{font-size:1.1rem;margin:30px 0 14px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;}
+  .card-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;}
+  .card h3{margin:0;font-size:1.08rem;line-height:1.35;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .tag{display:inline-block;font-size:0.68rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .t-module{background:var(--blue-bg);color:var(--blue);}
+  .t-type{background:var(--grey-bg);color:var(--grey);}
+  .st-active{background:var(--green-bg);color:var(--green);}
+  .st-paused{background:var(--amber-bg);color:var(--amber);}
+  .st-archived{background:var(--grey-bg);color:var(--grey);}
+  .summary{margin:12px 0 0;font-size:0.92rem;}
+  .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin-top:14px;font-size:0.85rem;}
+  .kv dt{color:var(--muted);font-weight:600;}
+  .kv dd{margin:0;}
+  .stack{display:flex;gap:6px;flex-wrap:wrap;}
+  .stack span{font-size:0.74rem;border:1px solid var(--border);border-radius:6px;padding:1px 7px;background:#fbfaf8;}
+  details{margin-top:14px;border-top:1px solid var(--border);padding-top:10px;}
+  summary{cursor:pointer;font-size:0.85rem;font-weight:700;color:var(--ink);}
+  details ol{margin:10px 0 0;padding-left:20px;font-size:0.86rem;}
+  details li{margin-bottom:6px;}
+  .versions{margin-top:16px;border-top:1px solid var(--border);padding-top:12px;}
+  .versions h4{margin:0 0 8px;font-size:0.85rem;}
+  .vrow{display:grid;grid-template-columns:150px 96px 1fr;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px dashed var(--border);font-size:0.86rem;}
+  .vrow:last-child{border-bottom:none;}
+  .vrow a{font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap;}
+  .vrow a:hover{text-decoration:underline;}
+  .vdate{color:var(--muted);font-variant-numeric:tabular-nums;}
+  .latest{background:var(--green-bg);color:var(--green);font-size:0.66rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;}
+  .doc a{font-weight:700;color:var(--blue);text-decoration:none;}
+  .doc a:hover{text-decoration:underline;}
+  .empty,.error{background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);padding:22px;color:var(--muted);font-size:0.9rem;}
+  .error{border-color:var(--amber);background:var(--amber-bg);color:#6b4a06;}
+  .error code{background:#fff;padding:1px 5px;border-radius:4px;}
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);}
+  @media (max-width:640px){
+    .kv{grid-template-columns:1fr;}
+    .vrow{grid-template-columns:150px 1fr;}
+    .vrow .vnote{grid-column:1 / -1;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div>
+      <span class="eyebrow" data-t="eyebrow"></span>
+      <h1 data-t="title"></h1>
+      <p class="subtitle" data-t="subtitle"></p>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="langswitch" role="group" aria-label="Language">
+      <button data-lang="zh" onclick="setLang('zh')">中文</button>
+      <button data-lang="en" onclick="setLang('en')">EN</button>
+      <button data-lang="vi" onclick="setLang('vi')">VI</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="q" type="search" autocomplete="off">
+    <div class="filterrow" id="f-module"></div>
+    <div class="filterrow" id="f-type"></div>
+    <div class="filterrow" id="f-status"></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <h2 class="section" data-t="projectsHeading"></h2>
+  <div id="projects"></div>
+
+  <h2 class="section" data-t="docsHeading"></h2>
+  <div id="docs"></div>
+
+  <footer data-t="footer"></footer>
+</div>
+
+<script>
+var UI = {
+  zh: {
+    pageTitle: "Claude 自動化專案索引",
+    eyebrow: "HUGEBAMBOO · IT · CLAUDE 自動化",
+    title: "Claude 自動化專案索引",
+    subtitle: "以 Claude(Cowork)建置的自動化專案與各版本評估報告。每個專案列出用途、排程、架構與所有版本。",
+    updated: "最後更新:",
+    search: "搜尋專案名稱、說明、模組…",
+    fModule: "模組", fType: "類型", fStatus: "狀態", all: "全部",
+    count: function(n, t){ return "顯示 " + n + " / " + t + " 個專案"; },
+    projectsHeading: "專案", docsHeading: "共用文件",
+    schedule: "排程", stack: "使用工具", since: "啟用日期",
+    steps: "架構 / 主要步驟", versions: "版本", latest: "最新", open: "開啟",
+    empty: "沒有符合條件的專案。",
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
+    statuses: { active: "運行中", paused: "暫停", archived: "已封存" },
+    loadError: "無法載入 projects.json。若是直接雙擊開啟本機檔案(file://),瀏覽器會阻擋讀取 — 請在 repo 資料夾執行 <code>python -m http.server</code> 後開啟 <code>http://localhost:8000</code>,或直接看 GitHub Pages 上的版本。",
+    footer: "本站內容已移除 IP 位址、網路路徑與機器路徑。資料來源:projects.json。"
+  },
+  en: {
+    pageTitle: "Claude Automation Projects",
+    eyebrow: "HUGEBAMBOO · IT · CLAUDE AUTOMATION",
+    title: "Claude Automation Projects",
+    subtitle: "Automation projects built with Claude (Cowork), with every version of their review reports. Each project lists its purpose, schedule, architecture and all versions.",
+    updated: "Last updated: ",
+    search: "Search project name, description, module…",
+    fModule: "Module", fType: "Type", fStatus: "Status", all: "All",
+    count: function(n, t){ return "Showing " + n + " / " + t + " projects"; },
+    projectsHeading: "Projects", docsHeading: "Shared documents",
+    schedule: "Schedule", stack: "Tools", since: "Since",
+    steps: "Architecture / main steps", versions: "Versions", latest: "Latest", open: "Open",
+    empty: "No project matches the current filters.",
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
+    statuses: { active: "Active", paused: "Paused", archived: "Archived" },
+    loadError: "Could not load projects.json. When the file is opened directly from disk (file://), the browser blocks the request — run <code>python -m http.server</code> in the repo folder and open <code>http://localhost:8000</code>, or use the GitHub Pages site.",
+    footer: "IP addresses, network paths and machine paths have been removed from this site. Data source: projects.json."
+  },
+  vi: {
+    pageTitle: "Chỉ mục dự án tự động hoá Claude",
+    eyebrow: "HUGEBAMBOO · IT · CLAUDE AUTOMATION",
+    title: "Chỉ mục dự án tự động hoá Claude",
+    subtitle: "Các dự án tự động hoá xây bằng Claude (Cowork) và mọi version của trang đánh giá. Mỗi dự án có mục đích, lịch chạy, kiến trúc và danh sách version.",
+    updated: "Cập nhật lần cuối: ",
+    search: "Tìm theo tên dự án, mô tả, module…",
+    fModule: "Module", fType: "Loại", fStatus: "Trạng thái", all: "Tất cả",
+    count: function(n, t){ return "Hiển thị " + n + " / " + t + " dự án"; },
+    projectsHeading: "Dự án", docsHeading: "Tài liệu chung",
+    schedule: "Lịch chạy", stack: "Công cụ", since: "Bắt đầu",
+    steps: "Kiến trúc / các bước chính", versions: "Các version", latest: "Mới nhất", open: "Mở",
+    empty: "Không có dự án nào khớp bộ lọc.",
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
+    statuses: { active: "Đang chạy", paused: "Tạm dừng", archived: "Lưu trữ" },
+    loadError: "Không tải được projects.json. Nếu mở file trực tiếp từ ổ đĩa (file://), trình duyệt sẽ chặn — chạy <code>python -m http.server</code> trong thư mục repo rồi mở <code>http://localhost:8000</code>, hoặc xem bản trên GitHub Pages.",
+    footer: "Nội dung trang đã lược bỏ địa chỉ IP, đường dẫn mạng và đường dẫn máy. Nguồn dữ liệu: projects.json."
+  }
+};
+
+var DATA = null, LOAD_FAILED = false;
+var lang = 'zh';
+var state = { q: '', module: null, type: null, status: null };
+
+function pick(obj){
+  if (obj == null) return '';
+  if (typeof obj === 'string') return obj;
+  return obj[lang] || obj.en || obj.vi || obj.zh || '';
+}
+function h(tag, cls, text){
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function setLang(l){
+  if (!UI[l]) return;
+  lang = l;
+  var u = UI[l];
+  document.documentElement.lang = (l === 'zh') ? 'zh-Hant' : l;
+  document.title = u.pageTitle;
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    var k = el.getAttribute('data-t');
+    if (typeof u[k] === 'string') el.textContent = u[k];
+  });
+  document.getElementById('q').placeholder = u.search;
+  document.querySelectorAll('.langswitch button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === l);
+  });
+  render();
+}
+
+function uniq(arr){ return arr.filter(function(v, i){ return arr.indexOf(v) === i; }); }
+
+function buildFilter(id, label, key, values, labelFn){
+  var row = document.getElementById(id);
+  row.innerHTML = '';
+  row.appendChild(h('span', 'flabel', label));
+  var opts = [null].concat(values);
+  opts.forEach(function(v){
+    var c = h('button', 'chip' + (state[key] === v ? ' on' : ''), v === null ? UI[lang].all : labelFn(v));
+    c.type = 'button';
+    c.onclick = function(){ state[key] = v; render(); };
+    row.appendChild(c);
+  });
+}
+
+function matches(p){
+  if (state.module && (p.module || []).indexOf(state.module) < 0) return false;
+  if (state.type && p.type !== state.type) return false;
+  if (state.status && p.status !== state.status) return false;
+  if (state.q){
+    var hay = [pick(p.name), pick(p.summary), (p.module || []).join(' '), (p.stack || []).join(' '), p.id]
+      .concat((p.versions || []).map(function(v){ return pick(v.note); })).join(' ').toLowerCase();
+    var words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    for (var i = 0; i < words.length; i++) if (hay.indexOf(words[i]) < 0) return false;
+  }
+  return true;
+}
+
+function projectCard(p){
+  var u = UI[lang];
+  var card = h('article', 'card');
+  var head = h('div', 'card-head');
+  var left = h('div');
+  left.appendChild(h('h3', null, pick(p.name)));
+  var tags = h('div', 'tags');
+  (p.module || []).forEach(function(m){ tags.appendChild(h('span', 'tag t-module', m)); });
+  tags.appendChild(h('span', 'tag t-type', u.types[p.type] || p.type));
+  left.appendChild(tags);
+  head.appendChild(left);
+  head.appendChild(h('span', 'tag st-' + p.status, u.statuses[p.status] || p.status));
+  card.appendChild(head);
+
+  card.appendChild(h('p', 'summary', pick(p.summary)));
+
+  var kv = h('dl', 'kv');
+  if (p.schedule){ kv.appendChild(h('dt', null, u.schedule)); kv.appendChild(h('dd', null, pick(p.schedule))); }
+  if (p.since){ kv.appendChild(h('dt', null, u.since)); kv.appendChild(h('dd', null, p.since)); }
+  if (p.stack && p.stack.length){
+    kv.appendChild(h('dt', null, u.stack));
+    var dd = h('dd'); var st = h('div', 'stack');
+    p.stack.forEach(function(s){ st.appendChild(h('span', null, s)); });
+    dd.appendChild(st); kv.appendChild(dd);
+  }
+  card.appendChild(kv);
+
+  if (p.steps && p.steps.length){
+    var det = h('details');
+    det.appendChild(h('summary', null, u.steps));
+    var ol = h('ol');
+    p.steps.forEach(function(s){ ol.appendChild(h('li', null, pick(s))); });
+    det.appendChild(ol);
+    card.appendChild(det);
+  }
+
+  var vs = (p.versions || []).slice().sort(function(a, b){ return b.v - a.v; });
+  if (vs.length){
+    var box = h('div', 'versions');
+    box.appendChild(h('h4', null, u.versions));
+    vs.forEach(function(v, i){
+      var row = h('div', 'vrow');
+      var a = h('a', null, 'Version ' + v.v);
+      a.href = v.path;
+      var cell = h('span');
+      cell.appendChild(a);
+      if (i === 0) cell.appendChild(h('span', 'latest', u.latest));
+      row.appendChild(cell);
+      row.appendChild(h('span', 'vdate', v.date || ''));
+      row.appendChild(h('span', 'vnote', pick(v.note)));
+      box.appendChild(row);
+    });
+    card.appendChild(box);
+  }
+  return card;
+}
+
+function docCard(d){
+  var card = h('article', 'card doc');
+  var t = h('h3');
+  var a = h('a', null, pick(d.title));
+  a.href = d.path;
+  t.appendChild(a);
+  card.appendChild(t);
+  if (d.date) card.appendChild(h('div', 'meta', d.date));
+  card.appendChild(h('p', 'summary', pick(d.summary)));
+  return card;
+}
+
+function render(){
+  var u = UI[lang];
+  var pbox = document.getElementById('projects');
+  var dbox = document.getElementById('docs');
+  pbox.innerHTML = ''; dbox.innerHTML = '';
+  if (LOAD_FAILED){
+    var err = h('div', 'error'); err.innerHTML = u.loadError; pbox.appendChild(err);
+    document.getElementById('count').textContent = '';
+    return;
+  }
+  if (!DATA) return;
+  var ps = DATA.projects || [];
+  document.getElementById('meta').textContent = DATA.updated ? (u.updated + DATA.updated) : '';
+
+  var mods = uniq([].concat.apply([], ps.map(function(p){ return p.module || []; })));
+  buildFilter('f-module', u.fModule, 'module', mods, function(v){ return v; });
+  buildFilter('f-type', u.fType, 'type', uniq(ps.map(function(p){ return p.type; })), function(v){ return u.types[v] || v; });
+  buildFilter('f-status', u.fStatus, 'status', uniq(ps.map(function(p){ return p.status; })), function(v){ return u.statuses[v] || v; });
+
+  var shown = ps.filter(matches);
+  shown.sort(function(a, b){
+    var la = (a.versions || []).reduce(function(m, v){ return v.date > m ? v.date : m; }, '');
+    var lb = (b.versions || []).reduce(function(m, v){ return v.date > m ? v.date : m; }, '');
+    return lb.localeCompare(la);
+  });
+  document.getElementById('count').textContent = u.count(shown.length, ps.length);
+  if (!shown.length) pbox.appendChild(h('div', 'empty', u.empty));
+  shown.forEach(function(p){ pbox.appendChild(projectCard(p)); });
+  (DATA.docs || []).forEach(function(d){ dbox.appendChild(docCard(d)); });
+}
+
+document.getElementById('q').addEventListener('input', function(e){ state.q = e.target.value.trim(); render(); });
+
+fetch('projects.json', { cache: 'no-cache' })
+  .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(function(d){ DATA = d; render(); })
+  .catch(function(){ LOAD_FAILED = true; render(); });
+
+setLang('zh');
+</script>
+</body>
+</html>
