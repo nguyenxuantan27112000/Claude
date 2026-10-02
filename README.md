@@ -10,7 +10,7 @@ index.html          trang chỉ mục (đọc dữ liệu từ projects.json)
 projects.json       danh sách dự án, version, tài liệu chung
 docs/               tài liệu chung, không thuộc dự án nào
 <project-id>/       mỗi dự án một thư mục: v1.html, v2.html, ...
-*.html (ở gốc)      trang chuyển hướng giữ link cũ
+                    (dự án nhiều loại tài liệu: <tên>-v1.html, vd proposal-v1.html)
 .nojekyll           tắt Jekyll trên GitHub Pages
 ```
 
@@ -28,8 +28,10 @@ docs/               tài liệu chung, không thuộc dự án nào
 ## Thêm dự án mới
 
 Tạo thư mục `<project-id>/`, rồi thêm một object vào `projects` trong `projects.json`.
-Các trường: `id`, `name`, `summary`, `module`, `type` (`scheduled-task` / `script` / `report`),
-`status` (`active` / `paused` / `archived`), `since`, `schedule`, `stack`, `steps`, `versions`.
+Các trường: `id`, `name`, `summary`, `module`, `type` (`scheduled-task` / `script` / `report` / `system`),
+`status` (`active` / `proposal` / `paused` / `archived`), `since`, `schedule`, `stack`, `steps`, `versions`.
+Dự án có nhiều loại tài liệu (vd đề xuất + swimlane): dùng `documents` thay cho `versions`,
+mỗi phần tử có `id`, `title` (3 ngôn ngữ) và `versions` riêng.
 Các trường text có 3 ngôn ngữ: `{ "vi": "...", "en": "...", "zh": "..." }`.
 
 ## Trước khi push (repo đang Public)

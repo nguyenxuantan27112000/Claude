@@ -41,6 +41,10 @@
   .st-active{background:var(--green-bg);color:var(--green);}
   .st-paused{background:var(--amber-bg);color:var(--amber);}
   .st-archived{background:var(--grey-bg);color:var(--grey);}
+  .st-proposal{background:var(--blue-bg);color:var(--blue);}
+  .versions h4 + .vrow{margin-top:0;}
+  .versions .doc-title{margin:14px 0 4px;font-size:0.85rem;}
+  .versions .doc-title:first-of-type{margin-top:0;}
   .summary{margin:12px 0 0;font-size:0.92rem;}
   .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin-top:14px;font-size:0.85rem;}
   .kv dt{color:var(--muted);font-weight:600;}
@@ -120,8 +124,8 @@ var UI = {
     schedule: "排程", stack: "使用工具", since: "啟用日期",
     steps: "架構 / 主要步驟", versions: "版本", latest: "最新", open: "開啟",
     empty: "沒有符合條件的專案。",
-    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
-    statuses: { active: "運行中", paused: "暫停", archived: "已封存" },
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report", "system": "系統" },
+    statuses: { active: "運行中", proposal: "提案中", paused: "暫停", archived: "已封存" },
     loadError: "無法載入 projects.json。若是直接雙擊開啟本機檔案(file://),瀏覽器會阻擋讀取 — 請在 repo 資料夾執行 <code>python -m http.server</code> 後開啟 <code>http://localhost:8000</code>,或直接看 GitHub Pages 上的版本。",
     footer: "本站內容已移除 IP 位址、網路路徑與機器路徑。資料來源:projects.json。"
   },
@@ -138,8 +142,8 @@ var UI = {
     schedule: "Schedule", stack: "Tools", since: "Since",
     steps: "Architecture / main steps", versions: "Versions", latest: "Latest", open: "Open",
     empty: "No project matches the current filters.",
-    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
-    statuses: { active: "Active", paused: "Paused", archived: "Archived" },
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report", "system": "System" },
+    statuses: { active: "Active", proposal: "Proposal", paused: "Paused", archived: "Archived" },
     loadError: "Could not load projects.json. When the file is opened directly from disk (file://), the browser blocks the request — run <code>python -m http.server</code> in the repo folder and open <code>http://localhost:8000</code>, or use the GitHub Pages site.",
     footer: "IP addresses, network paths and machine paths have been removed from this site. Data source: projects.json."
   },
@@ -156,8 +160,8 @@ var UI = {
     schedule: "Lịch chạy", stack: "Công cụ", since: "Bắt đầu",
     steps: "Kiến trúc / các bước chính", versions: "Các version", latest: "Mới nhất", open: "Mở",
     empty: "Không có dự án nào khớp bộ lọc.",
-    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report" },
-    statuses: { active: "Đang chạy", paused: "Tạm dừng", archived: "Lưu trữ" },
+    types: { "scheduled-task": "Scheduled Task", "script": "Script", "report": "Report", "system": "Hệ thống" },
+    statuses: { active: "Đang chạy", proposal: "Đề xuất", paused: "Tạm dừng", archived: "Lưu trữ" },
     loadError: "Không tải được projects.json. Nếu mở file trực tiếp từ ổ đĩa (file://), trình duyệt sẽ chặn — chạy <code>python -m http.server</code> trong thư mục repo rồi mở <code>http://localhost:8000</code>, hoặc xem bản trên GitHub Pages.",
     footer: "Nội dung trang đã lược bỏ địa chỉ IP, đường dẫn mạng và đường dẫn máy. Nguồn dữ liệu: projects.json."
   }
@@ -211,13 +215,24 @@ function buildFilter(id, label, key, values, labelFn){
   });
 }
 
+// A project lists versions either directly (p.versions) or per document (p.documents[].versions).
+function allVersions(p){
+  var out = (p.versions || []).slice();
+  (p.documents || []).forEach(function(d){ out = out.concat(d.versions || []); });
+  return out;
+}
+function latestDate(p){
+  return allVersions(p).reduce(function(m, v){ return (v.date || '') > m ? v.date : m; }, '');
+}
+
 function matches(p){
   if (state.module && (p.module || []).indexOf(state.module) < 0) return false;
   if (state.type && p.type !== state.type) return false;
   if (state.status && p.status !== state.status) return false;
   if (state.q){
     var hay = [pick(p.name), pick(p.summary), (p.module || []).join(' '), (p.stack || []).join(' '), p.id]
-      .concat((p.versions || []).map(function(v){ return pick(v.note); })).join(' ').toLowerCase();
+      .concat(allVersions(p).map(function(v){ return pick(v.note); }))
+      .concat((p.documents || []).map(function(d){ return pick(d.title); })).join(' ').toLowerCase();
     var words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
     for (var i = 0; i < words.length; i++) if (hay.indexOf(words[i]) < 0) return false;
   }
@@ -260,21 +275,26 @@ function projectCard(p){
     card.appendChild(det);
   }
 
-  var vs = (p.versions || []).slice().sort(function(a, b){ return b.v - a.v; });
-  if (vs.length){
+  var groups = [];
+  if (p.versions && p.versions.length) groups.push({ title: null, versions: p.versions });
+  (p.documents || []).forEach(function(d){ groups.push({ title: pick(d.title), versions: d.versions || [] }); });
+  if (groups.length){
     var box = h('div', 'versions');
     box.appendChild(h('h4', null, u.versions));
-    vs.forEach(function(v, i){
-      var row = h('div', 'vrow');
-      var a = h('a', null, 'Version ' + v.v);
-      a.href = v.path;
-      var cell = h('span');
-      cell.appendChild(a);
-      if (i === 0) cell.appendChild(h('span', 'latest', u.latest));
-      row.appendChild(cell);
-      row.appendChild(h('span', 'vdate', v.date || ''));
-      row.appendChild(h('span', 'vnote', pick(v.note)));
-      box.appendChild(row);
+    groups.forEach(function(g){
+      if (g.title) box.appendChild(h('div', 'doc-title', g.title));
+      g.versions.slice().sort(function(a, b){ return b.v - a.v; }).forEach(function(v, i){
+        var row = h('div', 'vrow');
+        var a = h('a', null, 'Version ' + v.v);
+        a.href = v.path;
+        var cell = h('span');
+        cell.appendChild(a);
+        if (i === 0) cell.appendChild(h('span', 'latest', u.latest));
+        row.appendChild(cell);
+        row.appendChild(h('span', 'vdate', v.date || ''));
+        row.appendChild(h('span', 'vnote', pick(v.note)));
+        box.appendChild(row);
+      });
     });
     card.appendChild(box);
   }
@@ -314,9 +334,7 @@ function render(){
 
   var shown = ps.filter(matches);
   shown.sort(function(a, b){
-    var la = (a.versions || []).reduce(function(m, v){ return v.date > m ? v.date : m; }, '');
-    var lb = (b.versions || []).reduce(function(m, v){ return v.date > m ? v.date : m; }, '');
-    return lb.localeCompare(la);
+    return latestDate(b).localeCompare(latestDate(a));
   });
   document.getElementById('count').textContent = u.count(shown.length, ps.length);
   if (!shown.length) pbox.appendChild(h('div', 'empty', u.empty));

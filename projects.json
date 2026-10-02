@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-30",
+  "updated": "2026-10-01",
   "projects": [
     {
       "id": "iems-breakpoint-check",
@@ -13,7 +13,9 @@
         "en": "Daily audit of Break point flags in iEMS (Meter reading correction): classifies flags as valid / wrongly set / missed, issues approval codes for Tân to decide, keeps a log and updates the ISO water report.",
         "zh": "每天稽核 iEMS(Meter reading correction)的 Break point 標記:分類為有效/誤標/漏標,發出核准代碼由 Tân 決定,記錄日誌並更新 ISO 用水報表。"
       },
-      "module": ["iEMS"],
+      "module": [
+        "iEMS"
+      ],
       "type": "scheduled-task",
       "status": "active",
       "since": "2026-09-09",
@@ -22,7 +24,14 @@
         "en": "08:30 Monday → Saturday (Asia/Bangkok) · auto catch-up of missed days within 7 days",
         "zh": "週一至週六 08:30(Asia/Bangkok)· 自動補跑 7 天內缺漏的日期"
       },
-      "stack": ["Cowork Scheduled Task", "Claude in Chrome", "ec_calc.py", "check.py", "Windows Task Scheduler", "NAS sync"],
+      "stack": [
+        "Cowork Scheduled Task",
+        "Claude in Chrome",
+        "ec_calc.py",
+        "check.py",
+        "Windows Task Scheduler",
+        "NAS sync"
+      ],
       "steps": [
         {
           "vi": "Bước 1 — thẩm định & báo cáo: chỉ đọc, đọc dữ liệu lưới, phân loại Nhóm 1/2/3, cấp mã duyệt",
@@ -65,6 +74,101 @@
             "en": "Baseline: the task's real configuration compared against Local Automation Map's six-stage process",
             "zh": "基準版:以任務的真實設定對照 Local Automation Map 六階段流程"
           }
+        }
+      ]
+    },
+    {
+      "id": "menu-planning-experts",
+      "name": {
+        "vi": "[HR] Hệ thống lên thực đơn tự động cho chuyên gia – Xưởng 1",
+        "en": "[HR] Automated Menu Planning for Experts – Plant 1",
+        "zh": "[人資] 一廠專家菜單自動規劃系統"
+      },
+      "summary": {
+        "vi": "Tự động lên thực đơn trưa/tối hằng tuần cho chuyên gia theo quy tắc cứng (P1) và mềm (P1b); Nhân sự tải về, chỉnh và gửi lại bản thực tế, hệ thống dựa vào đó tạo thực đơn tuần sau.",
+        "en": "Automatically plans the weekly lunch/dinner menu for experts using hard (P1) and soft (P1b) rules; HR downloads, adjusts and uploads the actual menu, which the system uses to generate next week's.",
+        "zh": "依硬性規則(P1)與軟性規則(P1b)自動產生專家每週午、晚餐菜單;人資下載、調整並回傳實際菜單,系統據此產生下週菜單。"
+      },
+      "module": [
+        "HR"
+      ],
+      "type": "system",
+      "status": "proposal",
+      "since": "2026-09-25",
+      "schedule": {
+        "vi": "Đề xuất: tự tạo thực đơn tuần sau vào thứ Bảy · phục vụ trưa T2–T7, tối T2–T6",
+        "en": "Proposed: next week's menu generated automatically on Saturday · lunch Mon–Sat, dinner Mon–Fri",
+        "zh": "提案:每週六自動產生下週菜單 · 週一至週六午餐、週一至週五晚餐"
+      },
+      "stack": [
+        "Python",
+        "Streamlit",
+        "SQLite",
+        "openpyxl",
+        "Windows Task Scheduler"
+      ],
+      "steps": [
+        {
+          "vi": "P0 — dữ liệu nền: danh mục món, lịch phục vụ, ngày nghỉ",
+          "en": "P0 — base data: dish list, meal calendar, holidays",
+          "zh": "P0 — 基礎資料:菜色清單、供餐日曆、休假日"
+        },
+        {
+          "vi": "P1 — tạo thực đơn theo quy tắc cứng (cơ cấu món, không trùng trong tuần, ưu tiên món lâu chưa dùng)",
+          "en": "P1 — generate the menu with hard rules (dish mix, no repeats within the week, least-recently-used first)",
+          "zh": "P1 — 依硬性規則產生菜單(菜色組合、同週不重複、優先久未出現的菜)"
+        },
+        {
+          "vi": "P1b — kiểm tra quy tắc mềm (nguyên liệu, món chiên, khẩu vị) và gợi ý đổi món",
+          "en": "P1b — check soft rules (ingredients, fried dishes, flavors) and suggest swaps",
+          "zh": "P1b — 檢查軟性規則(食材、炸物、口味)並建議換菜"
+        },
+        {
+          "vi": "Nhân sự tải file, chỉnh theo phản hồi nhà bếp, tải lên bản thực tế để hệ thống kiểm tra và lưu",
+          "en": "HR downloads the file, adjusts it per kitchen feedback, uploads the actual menu for the system to check and store",
+          "zh": "人資下載檔案,依廚房回報調整後上傳實際菜單,由系統檢查並儲存"
+        }
+      ],
+      "documents": [
+        {
+          "id": "proposal",
+          "title": {
+            "vi": "Đề xuất hệ thống",
+            "en": "System proposal",
+            "zh": "系統提案"
+          },
+          "versions": [
+            {
+              "v": 1,
+              "date": "2026-10-01",
+              "path": "menu-planning-experts/proposal-v1.html",
+              "note": {
+                "vi": "Mục tiêu, hiện trạng 73 tuần, so sánh 4 phương án (đề xuất web nội bộ Streamlit + SQLite), quy tắc P1/P1b, lộ trình và các điểm cần xác nhận",
+                "en": "Goals, 73-week baseline, 4 options compared (recommends an internal Streamlit + SQLite web app), P1/P1b rules, roadmap and open questions",
+                "zh": "目標、73 週現況、4 種方案比較(建議內部 Streamlit + SQLite 網頁系統)、P1/P1b 規則、實施路線與待確認事項"
+              }
+            }
+          ]
+        },
+        {
+          "id": "swimlane",
+          "title": {
+            "vi": "Swimlane quy trình",
+            "en": "Process swimlane",
+            "zh": "流程泳道圖"
+          },
+          "versions": [
+            {
+              "v": 1,
+              "date": "2026-10-01",
+              "path": "menu-planning-experts/swimlane-v1.html",
+              "note": {
+                "vi": "Quy trình hiện tại của Nhân sự và nhà bếp so với quy trình đề xuất sau khi triển khai P0–P3",
+                "en": "HR and kitchen's current process vs the proposed process after rolling out P0–P3",
+                "zh": "人資與廚房的現行流程,對照導入 P0–P3 後的建議流程"
+              }
+            }
+          ]
         }
       ]
     }
